@@ -1,0 +1,11 @@
+package components
+
+import "sep_setting_mgr/internal/domain"
+
+
+templ TestEventRow(testEvent *domain.TestEvent) {
+  <tr>
+    <td>{testEvent.TestName}</td>
+    <td>{testEvent.TestDate.String()}</td>
+  </tr>
+}

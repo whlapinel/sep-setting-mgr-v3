@@ -1,0 +1,12 @@
+package components
+
+import "sep_setting_mgr/internal/domain"
+
+templ DayContainer(day string, testEvents domain.TestEvents) {
+	<div>
+		<h2>{ day }</h2>
+        for _, event := range testEvents {
+            @TestEventRow(event)
+        }
+	</div>
+}
