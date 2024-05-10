@@ -1,2 +1,4 @@
 node_modules
 tmp
+*_templ.go
+*_templ.txt

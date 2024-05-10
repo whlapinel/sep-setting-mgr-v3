@@ -1,0 +1,24 @@
+package components
+
+type NavItem struct {
+	Text string
+	URL  string
+}
+
+type Header struct {
+	NavItems []NavItem
+}
+
+templ HeaderComponent(h Header) {
+	<header>
+		<nav>
+			<ul class="flex gap-2">
+				for _, item := range h.NavItems {
+					<li>
+						<button hx-get={ string(templ.URL(item.URL)) } hx-target="#page">{ item.Text }</button>
+					</li>
+				}
+			</ul>
+		</nav>
+	</header>
+}

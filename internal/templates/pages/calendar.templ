@@ -7,18 +7,17 @@ import (
 )
 
 templ CalendarPage(testEvents *domain.TestEvents) {
+	@components.AddTestEventForm()
 	<table>
-		@components.AddButton()
 		<thead>
 			<tr>
-				<td>Name</td>
-				<td>Date</td>
+				<th>Name</th>
+				<th>Date</th>
+				<th>Id</th>
 			</tr>
 		</thead>
 		<tbody id="table">
-			for _, event := range *testEvents {
-				@components.TestEventRow(event)
-			}
+			@components.TestEventListComponent(testEvents)
 		</tbody>
 	</table>
 }

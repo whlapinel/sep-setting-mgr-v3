@@ -1,0 +1,26 @@
+package components
+
+type Form struct {
+	Title          string
+	SubTitle       string
+	HxAttr         templ.Attributes
+	SubmitBtnTitle string
+}
+
+templ FormComponent(f Form) {
+	<dialog class=" rounded-xl p-4">
+		<form { f.HxAttr... } hx-disabled-elt="this" id="form">
+			<div class="flex flex-col items-center">
+				<h2 class="text-base font-semibold leading-7 text-gray-900">{ f.Title }</h2>
+				<div class="max-w-[20vw]">
+					{ children... }
+				</div>
+				<div>
+					<button id="cancel">Cancel</button>
+					<button type="submit" class="bg-blue-600 rounded p-2 text-white">{ f.SubmitBtnTitle }</button>
+				</div>
+			</div>
+		</form>
+	</dialog>
+	<button id="open-dialog">{ f.SubmitBtnTitle }</button>
+}

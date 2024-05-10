@@ -1,0 +1,32 @@
+package components
+
+import "strconv"
+
+type Input struct {
+	Label       string
+	Placeholder string
+	Name        string
+	ID          string
+	Type        string
+	Required    bool
+	Min         int
+	Max         int
+	Autofocus   bool
+	OnChange    func(string)
+}
+
+templ InputComponent(it Input) {
+	<div class="p-2">
+		<label for={ it.ID } class="-top-2 left-2 inline-block bg-white px-1 text-xs font-medium text-gray-900">{ it.Label }</label>
+		<input
+			type={ it.Type }
+			name={ it.Name }
+			id={ it.ID }
+			placeholder={ it.Placeholder }
+			required?={ it.Required }
+			min={ strconv.Itoa(it.Min) }
+			max={ strconv.Itoa(it.Max) }
+			class="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+		/>
+	</div>
+}

@@ -1,0 +1,17 @@
+package pages
+
+import (
+	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/templates/components"
+)
+
+templ Dashboard(classes *domain.Classes) {
+	<div>
+		<h1>Dashboard</h1>
+		<p>Welcome to the dashboard</p>
+		@components.AddClassForm()
+		<ul id="class-list">
+			@components.ClassListComponent(classes)
+		</ul>
+	</div>
+}

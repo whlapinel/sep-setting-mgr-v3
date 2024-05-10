@@ -1,0 +1,33 @@
+package components
+
+templ AddClassForm() {
+	@FormComponent(Form{
+		Title:    "Add Class",
+		SubTitle: "Add a Class to User",
+		HxAttr: templ.Attributes{
+			"hx-post":   "/classes",
+			"hx-target": "#class-list",
+            "hx-swap": "afterbegin",
+		},
+		SubmitBtnTitle: "Add",
+	}) {
+		@InputComponent(Input{
+			Label:       "Class Name",
+			Placeholder: "Biology",
+			ID:          "name",
+			Type:        "text",
+			Name:        "name",
+			Required:    true,
+		})
+		@InputComponent(Input{
+			Label:       "Class Block",
+			Placeholder: "2",
+			ID:          "block",
+			Type:        "number",
+			Name:        "block",
+			Required:    true,
+			Min: 1,
+			Max: 4,
+		})
+	}
+}

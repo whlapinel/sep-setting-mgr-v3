@@ -1,11 +1,13 @@
 package components
 
 import "sep_setting_mgr/internal/domain"
+import "strconv"
 
 
 templ TestEventRow(testEvent *domain.TestEvent) {
   <tr>
     <td>{testEvent.TestName}</td>
-    <td>{testEvent.TestDate.String()}</td>
+    <td>{testEvent.TestDate.Format("2006-01-02")}</td>
+    <td>{strconv.Itoa(testEvent.ID)}</td>
   </tr>
 }

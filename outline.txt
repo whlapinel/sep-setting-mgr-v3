@@ -1,0 +1,35 @@
+/my-app
+├── cmd                   # Application entry points
+│   └── myapp             # Main application executable
+│       └── main.go       # Main program
+├── internal              # Private application and library code
+│   ├── api               # Controllers and routers
+│   │   ├── handler       # Request handlers
+│   │   └── middleware    # HTTP middleware components
+│   ├── domain            # Domain model definitions
+│   │   ├── class.go      # Class entity and aggregate root
+│   │   ├── student.go    # Student entity
+│   │   ├── testevent.go  # Test event entity
+│   │   └── room.go       # Room entity or value object
+│   ├── service           # Application services
+│   │   ├── classservice.go       # Manages classes and students
+│   │   ├── testservice.go        # Handles test scheduling
+│   │   └── roomservice.go        # Manages room assignments
+│   ├── repository        # Data access logic
+│   │   ├── classrepo.go  # Repository for classes
+│   │   └── roomrepo.go   # Repository for rooms
+│   ├── app               # Application layer
+│   │   ├── dto           # Data transfer objects
+│   │   └── mapper        # Mapping domain models to DTOs
+│   └── config            # Configuration handling
+│       └── config.go     # Configuration definitions and loaders
+├── pkg                   # Library code that's ok to use by external applications
+├── ui                    # User interface specific components
+│   ├── web               # Web application specific components
+│   │   ├── static        # Static files like CSS, JavaScript, and images
+│   │   └── templates     # HTML templates
+├── migrations            # Database migrations
+├── scripts               # Build, install, analysis, etc scripts
+└── tests                 # Additional external test apps and test data
+├── go.mod                # Go module definitions
+└── README.md             # Project overview and documentation
