@@ -15,7 +15,6 @@ type (
 		Teacher  User
 	}
 
-	
 	ClassRepository interface {
 		Add(name string, block int) (*Class, error)
 		All() Classes
