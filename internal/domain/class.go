@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type (
 	Class struct {
@@ -11,24 +15,21 @@ type (
 		Teacher  User
 	}
 
-	Classes []*Class
-
-	ClassService interface {
-		Service
-	}
-
+	
 	ClassRepository interface {
-		Repository
 		Add(name string, block int) (*Class, error)
 		All() Classes
+		FindByID(classID string) (*Class, error)
 	}
+
+	Classes []*Class
 )
 
 func NewClass(name string, block int) *Class {
 	return &Class{
-		ID:      uuid.New(),
-		Name:    name,
-		Block:   block,
+		ID:    uuid.New(),
+		Name:  name,
+		Block: block,
 	}
 }
 
@@ -45,4 +46,13 @@ func (c *Classes) Add(name string, block int) (*Class, error) {
 
 func (c *Classes) All() Classes {
 	return *c
+}
+
+func (c *Classes) FindByID(classID string) (*Class, error) {
+	for _, class := range *c {
+		if class.ID.String() == classID {
+			return class, nil
+		}
+	}
+	return nil, fmt.Errorf("Class not found with ID: %s", classID)
 }

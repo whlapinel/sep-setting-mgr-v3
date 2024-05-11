@@ -1,0 +1,9 @@
+package components
+
+templ TableRowComponent(cells []string) {
+	<tr>
+		for _, cell := range cells {
+			<td>{ cell }</td>
+		}
+	</tr>
+}

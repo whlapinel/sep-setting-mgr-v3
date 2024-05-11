@@ -1,8 +1,9 @@
 package components
 
 import "sep_setting_mgr/internal/domain"
+import "strconv"
 
 templ ClassRowComponent(class domain.Class ) {
-		<li>{ class.Name }</li>
+    @TableRowComponent([]string{class.Name, strconv.Itoa(class.Block), class.Teacher.Username, class.Teacher.Email})
 }
 

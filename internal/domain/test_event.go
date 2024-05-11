@@ -16,7 +16,6 @@ type TestEvent struct {
 type TestEvents []*TestEvent
 
 type TestEventService interface {
-	Service
 	RegisterNewTestEvent(testName string, class Class, testDate time.Time, block int) (*TestEvent, error)
 	ListAll() *TestEvents
 }

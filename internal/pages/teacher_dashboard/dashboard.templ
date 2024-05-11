@@ -1,0 +1,25 @@
+package teacher_dashboard
+
+import (
+	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/templates/components"
+	"strconv"
+)
+
+func prepareForTable(classes *domain.Classes) components.TableData {
+	var rows [][]string
+	headers := []string{"Name", "Block", "Username", "Email"}
+	for _, class := range *classes {
+		rows = append(rows, []string{class.Name, strconv.Itoa(class.Block), class.Teacher.Username, class.Teacher.Email})
+	}
+	return components.TableData{Title: "Classes", Headers: headers, Rows: rows}
+}
+
+templ DashboardPage(classes *domain.Classes) {
+	<div>
+		<h1>Dashboard</h1>
+		<p>Welcome to the dashboard</p>
+		@components.AddClassForm()
+		@components.TableComponent(prepareForTable(classes))
+	</div>
+}

@@ -1,6 +1,7 @@
 package classes
 
 import (
+	"log"
 	"sep_setting_mgr/internal/templates/components"
 	"strconv"
 
@@ -11,6 +12,9 @@ type (
 	Handler interface {
 		// Create : POST /classes
 		Create(c echo.Context) error
+
+		// Details : GET /classes/:classID
+		Details(c echo.Context) error
 	}
 
 	handler struct {
@@ -23,7 +27,11 @@ func NewHandler(svc Service) Handler {
 }
 
 func Mount(e *echo.Echo, h Handler) {
-	e.POST("/classes", h.Create)
+	classesGroup := e.Group("/hx-classes")
+	classesGroup.POST("", h.Create)
+
+	classIDgroup := classesGroup.Group("/:hx-classid")
+	classIDgroup.GET("", h.Details)
 }
 
 func (h handler) Create(c echo.Context) error {
@@ -47,6 +55,16 @@ func (h handler) Create(c echo.Context) error {
 		return c.Redirect(303, "/")
 	}
 	return nil
+}
+
+func (h handler) Details(e echo.Context) error {
+	classID := e.Param("classid")
+	log.Println(classID)
+	class, err := h.service.FindByID(classID)
+	if err != nil {
+		return err
+	}
+	return e.String(200, "Class name: "+class.Name)
 }
 
 func isHTMX(e echo.Context) bool {
