@@ -1,39 +1,81 @@
 package database
 
 import (
+	"database/sql"
+	"log"
 	"sep_setting_mgr/internal/domain"
 
-	"github.com/google/uuid"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-type database struct {
-}
-
 type classTable struct {
-	ID        uuid.UUID
-	Name      string
-	Block     int
-	TeacherID uuid.UUID
+	id         int
+	name       string
+	block      int
+	teacher_id int
 }
 
-func NewDatabase() domain.ClassRepository {
-	return &database{}
+type classRepo struct {
+	db *sql.DB
 }
 
-func (db *database) Add(name string, block int) (*domain.Class, error) {
-	var class *domain.Class
-
-	return class, nil
+func NewClassesRepo(db *sql.DB) domain.ClassRepository {
+	createClassesTable(db)
+	return &classRepo{db: db}
 }
 
-func (db *database) All() domain.Classes {
+func (cr *classRepo) Store(class *domain.Class) error {
+	dbClass := convertToClassTable(class)
+	log.Println("Adding class to database")
+	_, err := cr.db.Exec(`INSERT INTO classes (id, name, block) VALUES (?, ?, ?)`, dbClass.id, dbClass.name, dbClass.block)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (classRepo *classRepo) All() domain.Classes {
 	var classes domain.Classes
 
 	return classes
 }
 
-func (db *database) FindByID(classID string) (*domain.Class, error) {
-	var class *domain.Class
+func (classRepo *classRepo) FindByID(classID string) (*domain.Class, error) {
+	var dbClass classTable
 
+	class := convertToClass(dbClass)
 	return class, nil
+}
+
+func createClassesTable(db *sql.DB) error {
+	log.Println("Creating classes table")
+	result, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS 
+	classes (
+		id int AUTO_INCREMENT PRIMARY KEY, 
+		name VARCHAR(255), 
+		block INT, 
+		teacher_id int
+		)`)
+	if err != nil {
+		return err
+	}
+	log.Println(result)
+
+	return nil
+}
+
+func convertToClass(dbClass classTable) *domain.Class {
+	return &domain.Class{
+		ID:    dbClass.id,
+		Name:  dbClass.name,
+		Block: dbClass.block,
+	}
+}
+
+func convertToClassTable(class *domain.Class) classTable {
+	return classTable{
+		name:  class.Name,
+		block: class.Block,
+	}
 }

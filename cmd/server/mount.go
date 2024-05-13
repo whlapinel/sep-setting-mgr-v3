@@ -1,7 +1,8 @@
 package main
 
 import (
-	"sep_setting_mgr/internal/domain"
+	"database/sql"
+	"sep_setting_mgr/internal/database"
 	"sep_setting_mgr/internal/pages/home"
 	"sep_setting_mgr/internal/pages/teacher_dashboard"
 	classesPkg "sep_setting_mgr/internal/pages/teacher_dashboard/htmx-classes"
@@ -9,11 +10,17 @@ import (
 	"github.com/labstack/echo"
 )
 
-func MountHandlers(e *echo.Echo) error {
-	classes := domain.NewClasses()
-	classes.Add("Math", 1)
-	teacher_dashboard.Mount(e, teacher_dashboard.NewHandler(teacher_dashboard.NewService(classes)))
-	classesPkg.Mount(e, classesPkg.NewHandler(classesPkg.NewService(classes)))
+func MountHandlers(e *echo.Echo, db *sql.DB) error {
+	teacher_dashboard.Mount(
+		e, teacher_dashboard.NewHandler(
+			teacher_dashboard.NewService(
+				database.NewClassesRepo(
+					db))))
+	classesPkg.Mount(
+		e, classesPkg.NewHandler(
+			classesPkg.NewService(
+				database.NewClassesRepo(
+					db))))
 	home.Mount(e, home.NewHandler(home.NewService()))
 	return nil
 }

@@ -23,7 +23,9 @@ func NewService(classes domain.ClassRepository) Service {
 }
 
 func (s service) Add(name string, block int) (*domain.Class, error) {
-	class, err := s.classes.Add(name, block)
+	log.Println("Service: Adding class to database")
+	class := domain.NewClass(name, block)
+	err := s.classes.Store(class)
 	if err != nil {
 		return nil, err
 	}

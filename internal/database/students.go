@@ -1,12 +1,14 @@
 package database
 
-import "github.com/google/uuid"
+import (
+	"time"
+)
 
 type (
 	studentTable struct {
 		ID        int
 		FirstName string
 		LastName  string
-		Teacher   uuid.UUID
+		Teacher   time.Time
 	}
 )

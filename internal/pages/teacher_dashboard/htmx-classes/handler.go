@@ -35,6 +35,7 @@ func Mount(e *echo.Echo, h Handler) {
 }
 
 func (h handler) Create(c echo.Context) error {
+	log.Println("Handler: Creating class")
 	name := c.FormValue("name")
 	block, err := strconv.Atoi(c.FormValue("block"))
 	if err != nil {
@@ -42,7 +43,8 @@ func (h handler) Create(c echo.Context) error {
 	}
 	class, err := h.service.Add(name, block)
 	if err != nil {
-		return c.String(500, "Failed to create class. See server logs for details.")
+		log.Println("Failed to create class:", err)
+		return c.String(500, "Failed to create class. Error:"+err.Error())
 	}
 
 	switch isHTMX(c) {
