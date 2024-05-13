@@ -11,18 +11,19 @@ type (
 
 	Teacher struct {
 		User
-		Classes  Classes
-		Students Students
+		Classes  []*Class
+		Students []*Student
 	}
 
-	Users []*User
-
 	UserService interface {
-		RegisterNewUser(username string, email string, password string, admin bool) (*User, error)
+		NewUser(username string, email string, password string, admin bool) (*User, error)
 	}
 
 	UserRepository interface {
 		Store(*User) error
+		Find(username string) (*User, error)
+		GetClasses(user *User) ([]*Class, error)
+		GetStudents(user *User) ([]*Student, error)
 	}
 )
 

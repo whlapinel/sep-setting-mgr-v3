@@ -34,8 +34,8 @@ func (cr *classRepo) Store(class *domain.Class) error {
 	return nil
 }
 
-func (classRepo *classRepo) All() domain.Classes {
-	var classes domain.Classes
+func (classRepo *classRepo) All() []*domain.Class {
+	var classes []*domain.Class
 
 	return classes
 }

@@ -5,17 +5,15 @@ type (
 		ID       int
 		Name     string
 		Block    int
-		Students Students
+		Students []*Student
 		Teacher  User
 	}
 
 	ClassRepository interface {
 		Store(*Class) error
-		All() Classes
+		All() []*Class
 		FindByID(classID string) (*Class, error)
 	}
-
-	Classes []*Class
 )
 
 func NewClass(name string, block int) *Class {

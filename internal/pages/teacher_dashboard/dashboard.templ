@@ -6,16 +6,16 @@ import (
 	"strconv"
 )
 
-func prepareForTable(classes *domain.Classes) components.TableData {
+func prepareForTable(classes []*domain.Class) components.TableData {
 	var rows [][]string
 	headers := []string{"Name", "Block", "Username", "Email"}
-	for _, class := range *classes {
+	for _, class := range classes {
 		rows = append(rows, []string{class.Name, strconv.Itoa(class.Block), class.Teacher.Username, class.Teacher.Email})
 	}
 	return components.TableData{Title: "Classes", Headers: headers, Rows: rows}
 }
 
-templ DashboardPage(classes *domain.Classes) {
+templ DashboardPage(classes []*domain.Class) {
 	<div>
 		<h1>Dashboard</h1>
 		<p>Welcome to the dashboard</p>

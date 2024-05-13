@@ -7,7 +7,7 @@ import (
 type (
 	Service interface {
 		// List returns a copy of the todos list
-		List() (domain.Classes, error)
+		List() ([]*domain.Class, error)
 	}
 
 	service struct {
@@ -21,6 +21,6 @@ func NewService(classes domain.ClassRepository) Service {
 	}
 }
 
-func (s service) List() (domain.Classes, error) {
+func (s service) List() ([]*domain.Class, error) {
 	return s.classes.All(), nil
 }

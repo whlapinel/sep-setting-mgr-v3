@@ -30,5 +30,5 @@ func (h handler) DashboardHandler(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
-	return layouts.MainLayout(DashboardPage(&classes)).Render(c.Request().Context(), c.Response().Writer)
+	return layouts.MainLayout(DashboardPage(classes)).Render(c.Request().Context(), c.Response().Writer)
 }

@@ -7,13 +7,7 @@ type (
 		LastName  string
 		Teacher   User
 	}
-
-	Students []*Student
 )
-
-func NewStudents() (*Students, error) {
-	return &Students{}, nil
-}
 
 func NewStudent(firstName string, lastName string, teacher User) *Student {
 	return &Student{

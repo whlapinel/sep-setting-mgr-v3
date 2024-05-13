@@ -28,24 +28,36 @@ func NewUsersRepo(db *sql.DB) domain.UserRepository {
 func (ur *userRepo) Store(user *domain.User) error {
 	dbUser := convertToTable(user)
 	log.Println("Adding class to database")
-	_, err := ur.db.Exec(`INSERT INTO users () VALUES ()`, dbUser.username, dbUser.email, dbUser.password, dbUser.admin)
+	_, err := ur.db.Exec(`INSERT INTO users (username, email, password, admin) VALUES (?, ?, ?, ?)`, dbUser.username, dbUser.email, dbUser.password, dbUser.admin)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ur *userRepo) All() domain.Users {
-	var users domain.Users
+func (ur *userRepo) All() []*domain.User {
+	var users []*domain.User
 
 	return users
 }
 
-func (ur *userRepo) FindByID(classID string) (*domain.User, error) {
+func (ur *userRepo) Find(username string) (*domain.User, error) {
 	var dbUser userTable
 
 	user := convertFromTable(dbUser)
 	return user, nil
+}
+
+func (ur *userRepo) GetClasses(user *domain.User) ([]*domain.Class, error) {
+	var classes []*domain.Class
+
+	return classes, nil
+}
+
+func (ur *userRepo) GetStudents(user *domain.User) ([]*domain.Student, error) {
+	var classes []*domain.Student
+
+	return classes, nil
 }
 
 func createUsersTable(db *sql.DB) error {
@@ -54,8 +66,7 @@ func createUsersTable(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS 
 	users (
 		id int AUTO_INCREMENT PRIMARY KEY, 
-		first_name VARCHAR(255),
-		last_name VARCHAR(255),
+		username VARCHAR(255),
 		email VARCHAR(255),
 		password VARCHAR(255),
 		admin BOOLEAN
