@@ -3,7 +3,6 @@ package layouts
 import "sep_setting_mgr/internal/templates/components"
 
 templ MainLayout(page templ.Component) {
-	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
@@ -17,7 +16,10 @@ templ MainLayout(page templ.Component) {
 			@components.HeaderComponent(components.Header{
 				NavItems: []components.NavItem{
 					{Text: "Home", URL: "/"},
-					{Text: "Settings", URL: "/settings"},
+					{Text: "Dashboard", URL: "/dashboard"},
+					{Text: "About", URL: "/about"},
+					{Text: "Sign In", URL: "/signin"},
+					{Text: "Sign Up", URL: "/signup"},
 				},
 			})
 			<main id="page">

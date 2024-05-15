@@ -1,0 +1,30 @@
+package signup
+
+import "sep_setting_mgr/internal/templates/components"
+
+templ SignUpPage() {
+    @components.FormComponent(components.Form{
+        Title: "Sign Up",
+        SubTitle: "Enter Username and Password and Click Submit",
+        HxAttr: templ.Attributes{
+            "hx-post": "/hx-signup",
+            "hx-target": "#confirmation",
+        },
+        SubmitBtnTitle: "Submit",
+    }){
+        @components.InputComponent(components.Input{
+            Label: "Email",
+            Type: "email",
+            Name: "email",
+            ID: "email",
+            Required: true,
+        })
+        @components.InputComponent(components.Input{
+            Label: "Password",
+            Type: "password",
+            Name: "password",
+            ID: "password",
+            Required: true,
+        })
+    }
+}

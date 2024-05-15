@@ -15,10 +15,15 @@ templ FormComponent(f Form) {
 				<div class="max-w-[20vw]">
 					{ children... }
 				</div>
-				<div>
-					<button id="cancel">Cancel</button>
-					<button type="submit" class="bg-blue-600 rounded p-2 text-white">{ f.SubmitBtnTitle }</button>
+				<div class="flex gap-2">
+					@ButtonComponent(Button{Attr: templ.Attributes{"id": "cancel"}}) {
+						Cancel
+					}
+					@ButtonComponent(Button{Attr: templ.Attributes{"id": "submit"}}) {
+						{ f.SubmitBtnTitle }
+					}
 				</div>
+				<div id="confirmation"></div>
 			</div>
 		</form>
 	</dialog>

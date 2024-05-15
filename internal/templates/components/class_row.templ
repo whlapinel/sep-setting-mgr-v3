@@ -4,6 +4,6 @@ import "sep_setting_mgr/internal/domain"
 import "strconv"
 
 templ ClassRowComponent(class domain.Class ) {
-    @TableRowComponent([]string{class.Name, strconv.Itoa(class.Block), class.Teacher.Username, class.Teacher.Email})
+    @TableRowComponent([]string{class.Name, strconv.Itoa(class.Block), class.Teacher.Email})
 }
 

@@ -10,7 +10,6 @@ import (
 
 type userTable struct {
 	id       int
-	username string
 	email    string
 	password string
 	admin    bool
@@ -27,8 +26,8 @@ func NewUsersRepo(db *sql.DB) domain.UserRepository {
 
 func (ur *userRepo) Store(user *domain.User) error {
 	dbUser := convertToTable(user)
-	log.Println("Adding class to database")
-	_, err := ur.db.Exec(`INSERT INTO users (username, email, password, admin) VALUES (?, ?, ?, ?)`, dbUser.username, dbUser.email, dbUser.password, dbUser.admin)
+	log.Println("Adding user to database")
+	_, err := ur.db.Exec(`INSERT INTO users (email, password, admin) VALUES (?, ?, ?)`, dbUser.email, dbUser.password, dbUser.admin)
 	if err != nil {
 		return err
 	}
@@ -41,9 +40,10 @@ func (ur *userRepo) All() []*domain.User {
 	return users
 }
 
-func (ur *userRepo) Find(username string) (*domain.User, error) {
+func (ur *userRepo) Find(email string) (*domain.User, error) {
 	var dbUser userTable
-
+	ur.db.QueryRow(`SELECT * FROM users WHERE email = ?`, email).
+		Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
 	user := convertFromTable(dbUser)
 	return user, nil
 }
@@ -66,10 +66,9 @@ func createUsersTable(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS 
 	users (
 		id int AUTO_INCREMENT PRIMARY KEY, 
-		username VARCHAR(255),
-		email VARCHAR(255),
-		password VARCHAR(255),
-		admin BOOLEAN
+		email VARCHAR(255) UNIQUE NOT NULL,
+		password VARCHAR(255) NOT NULL,
+		admin BOOLEAN NOT NULL
 		)`)
 	if err != nil {
 		return err
@@ -82,7 +81,6 @@ func createUsersTable(db *sql.DB) error {
 func convertFromTable(dbUser userTable) *domain.User {
 	return &domain.User{
 		ID:       dbUser.id,
-		Username: dbUser.username,
 		Email:    dbUser.email,
 		Password: dbUser.password,
 		Admin:    dbUser.admin,
@@ -91,7 +89,6 @@ func convertFromTable(dbUser userTable) *domain.User {
 
 func convertToTable(user *domain.User) userTable {
 	return userTable{
-		username: user.Username,
 		email:    user.Email,
 		password: user.Password,
 		admin:    user.Admin,

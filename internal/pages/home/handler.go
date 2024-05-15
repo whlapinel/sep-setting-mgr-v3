@@ -2,8 +2,9 @@ package home
 
 import (
 	"sep_setting_mgr/internal/templates/layouts"
+	"sep_setting_mgr/internal/util"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type (
@@ -26,5 +27,8 @@ func Mount(e *echo.Echo, h Handler) {
 }
 
 func (h handler) Home(c echo.Context) error {
-	return layouts.MainLayout(HomePage()).Render(c.Request().Context(), c.Response().Writer)
+	if util.IsHTMX(c) {
+		return util.RenderTempl(HomePage(), c)
+	}
+	return util.RenderTempl(layouts.MainLayout(HomePage()), c)
 }

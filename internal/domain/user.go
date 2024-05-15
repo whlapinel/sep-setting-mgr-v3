@@ -3,7 +3,6 @@ package domain
 type (
 	User struct {
 		ID       int
-		Username string
 		Email    string
 		Admin    bool
 		Password string
@@ -27,11 +26,10 @@ type (
 	}
 )
 
-func NewUser(username string, email string, password string, admin bool) (*User, error) {
+func NewUser(email string, password string) (*User, error) {
 	return &User{
-		Username: username,
 		Email:    email,
 		Password: password,
-		Admin:    admin,
+		Admin:    false,
 	}, nil
 }

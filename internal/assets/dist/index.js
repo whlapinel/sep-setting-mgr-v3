@@ -1,9 +1,9 @@
 const submitBtn = document.querySelector("dialog button[type='submit']");
 const inputs = document.querySelectorAll("input");
-const form = document.querySelector("form");
 const body = document.querySelector("body");
 
 body.addEventListener("htmx:afterRequest", (e)=> {
+    const form = document.querySelector("#form");
     console.log("afterRequest event triggered");
     console.log(e.target)
     

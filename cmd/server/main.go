@@ -7,8 +7,8 @@ import (
 	"sep_setting_mgr/internal/database"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -23,6 +23,7 @@ func main() {
 		godotenv.Load("../../.env.production")
 	}
 	e := echo.New()
+	e.Use(middleware.Logger())
 	db, err := database.InitializeDB(false)
 	if err != nil {
 		log.Fatal(err)
@@ -32,7 +33,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	e.Use(middleware.Logger())
 	// scripts, styles and images are embedded in the binary
 	assets.RegisterStatic(e)
 	e.Logger.Fatal(e.Start(":1323"))

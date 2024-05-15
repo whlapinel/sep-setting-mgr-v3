@@ -27,7 +27,7 @@ func NewClassesRepo(db *sql.DB) domain.ClassRepository {
 func (cr *classRepo) Store(class *domain.Class) error {
 	dbClass := convertToClassTable(class)
 	log.Println("Adding class to database")
-	_, err := cr.db.Exec(`INSERT INTO classes (id, name, block) VALUES (?, ?, ?)`, dbClass.id, dbClass.name, dbClass.block)
+	_, err := cr.db.Exec(`INSERT INTO classes (name, block, teacher_id) VALUES (?, ?, ?)`, dbClass.name, dbClass.block, dbClass.teacher_id)
 	if err != nil {
 		return err
 	}
@@ -53,9 +53,9 @@ func createClassesTable(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS 
 	classes (
 		id int AUTO_INCREMENT PRIMARY KEY, 
-		name VARCHAR(255), 
-		block INT, 
-		teacher_id int
+		name VARCHAR(255) NOT NULL, 
+		block INT NOT NULL, 
+		teacher_id int NOT NULL
 		)`)
 	if err != nil {
 		return err
@@ -74,8 +74,10 @@ func convertToClass(dbClass classTable) *domain.Class {
 }
 
 func convertToClassTable(class *domain.Class) classTable {
-	return classTable{
-		name:  class.Name,
-		block: class.Block,
-	}
+	var classTable classTable
+	// if this is a new class then the ID will be 0
+	classTable.name = class.Name
+	classTable.block = class.Block
+	classTable.teacher_id = class.Teacher.ID
+	return classTable
 }

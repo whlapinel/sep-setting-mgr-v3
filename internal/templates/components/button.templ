@@ -1,0 +1,11 @@
+package components
+
+type Button struct {
+	Attr templ.Attributes
+}
+
+templ ButtonComponent(b Button) {
+	<button { b.Attr... } class="bg-blue-600 rounded p-2 text-white">
+		{ children... }
+	</button>
+}

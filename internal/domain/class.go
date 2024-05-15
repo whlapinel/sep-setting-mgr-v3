@@ -16,9 +16,15 @@ type (
 	}
 )
 
-func NewClass(name string, block int) *Class {
+func NewClass(name string, block int, teacherID int) *Class {
+
+	teacher := User{
+		ID: teacherID,
+	}
+
 	return &Class{
 		Name:  name,
 		Block: block,
+		Teacher: teacher,
 	}
 }
