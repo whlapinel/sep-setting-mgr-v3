@@ -1,6 +1,6 @@
 package layouts
 
-import "sep_setting_mgr/internal/templates/components"
+import "sep_setting_mgr/internal/components"
 
 templ MainLayout(page templ.Component) {
 	<html lang="en">
@@ -10,9 +10,10 @@ templ MainLayout(page templ.Component) {
 			<link rel="stylesheet" href="dist/styles.css"/>
 			<script src="dist/htmx.js" defer></script>
 			<script src="dist/index.js" defer></script>
-			<title>Document</title>
+			<title>Separate Setting Manager</title>
 		</head>
 		<body>
+			<div hx-post="/hx-signout" hx-trigger="signout" id="user-status" hx-target="#page"></div>
 			@components.HeaderComponent(components.Header{
 				NavItems: []components.NavItem{
 					{Text: "Home", URL: "/"},

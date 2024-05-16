@@ -1,7 +1,7 @@
 package home
 
 import (
-	"sep_setting_mgr/internal/templates/layouts"
+	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -14,12 +14,11 @@ type (
 	}
 
 	handler struct {
-		service Service
 	}
 )
 
-func NewHandler(svc Service) Handler {
-	return &handler{service: svc}
+func NewHandler() Handler {
+	return &handler{}
 }
 
 func Mount(e *echo.Echo, h Handler) {

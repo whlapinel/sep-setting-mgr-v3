@@ -1,12 +1,9 @@
 package signin
 
 import (
-	"log"
-	"net/http"
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/templates/layouts"
+	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -55,22 +52,6 @@ func (h handler) HxHandleSignin(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to issue token")
 	}
-	writeToken(c, t)
+	auth.WriteToken(c, t)
 	return c.String(200, "Authenticated")
-}
-
-func writeToken(c echo.Context, t string) {
-	writeCookie(c, t)
-	c.Response().Header().Set("Authorization", "Bearer "+t)
-}
-
-func writeCookie(c echo.Context, t string) {
-	cookie := new(http.Cookie)
-	cookie.Name = "token"
-	cookie.Value = t
-	cookie.HttpOnly = true
-	cookie.Path = "/"
-	cookie.Expires = time.Now().Add(5 * time.Minute)
-	log.Println("Setting cookie: ", cookie)
-	c.SetCookie(cookie)
 }

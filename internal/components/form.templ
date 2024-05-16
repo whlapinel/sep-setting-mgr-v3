@@ -5,14 +5,20 @@ type Form struct {
 	SubTitle       string
 	HxAttr         templ.Attributes
 	SubmitBtnTitle string
+	ShowDialog     bool
 }
 
 templ FormComponent(f Form) {
-	<dialog class=" rounded-xl p-4">
-		<form { f.HxAttr... } hx-disabled-elt="this" id="form">
+	<dialog
+		class=" rounded-xl p-4"
+		if f.ShowDialog {
+			open
+		}
+	>
+		<form { f.HxAttr... } hx-disabled-elt="this" id="form" class="min-w-56">
 			<div class="flex flex-col items-center">
 				<h2 class="text-base font-semibold leading-7 text-gray-900">{ f.Title }</h2>
-				<div class="max-w-[20vw]">
+				<div class="min-w-[20vw]">
 					{ children... }
 				</div>
 				<div class="flex gap-2">
@@ -27,5 +33,7 @@ templ FormComponent(f Form) {
 			</div>
 		</form>
 	</dialog>
-	<button id="open-dialog">{ f.SubmitBtnTitle }</button>
+	if !f.ShowDialog {
+		<button id="open-dialog">{ f.Title }</button>
+	}
 }

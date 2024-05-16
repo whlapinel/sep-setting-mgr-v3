@@ -7,6 +7,7 @@ import (
 	"sep_setting_mgr/internal/pages/dashboard"
 	"sep_setting_mgr/internal/pages/home"
 	"sep_setting_mgr/internal/pages/signin"
+	"sep_setting_mgr/internal/pages/signout"
 	"sep_setting_mgr/internal/pages/signup"
 	"sep_setting_mgr/internal/pages/unauthorized"
 
@@ -15,9 +16,10 @@ import (
 
 func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	users := database.NewUsersRepo(db)
-	home.Mount(e, home.NewHandler(home.NewService()))
+	home.Mount(e, home.NewHandler())
 	signin.Mount(e, signin.NewHandler(signin.NewService(users)))
 	signup.Mount(e, signup.NewHandler(signup.NewService(users)))
+	signout.Mount(e, signout.NewHandler())
 	unauthorized.Mount(e, unauthorized.NewHandler())
 	about.Mount(e, about.NewHandler())
 	dashboard.Mount(e, dashboard.NewHandler(dashboard.NewService(database.NewClassesRepo(db), database.NewUsersRepo(db))))

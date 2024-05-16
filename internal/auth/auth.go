@@ -2,6 +2,7 @@ package auth
 
 import (
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -40,6 +41,18 @@ func IssueToken(email string, id int) (string, error) {
 		return "", err
 	}
 	return t, nil
+}
+
+func WriteToken(c echo.Context, t string) {
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = t
+	cookie.HttpOnly = true
+	cookie.Path = "/"
+	cookie.Expires = time.Now().Add(time.Minute * 5)
+	log.Println("Setting cookie: ", cookie)
+	c.SetCookie(cookie)
+	c.Response().Header().Set("Authorization", "Bearer "+t)
 }
 
 var AddCookieToHeader = func(next echo.HandlerFunc) echo.HandlerFunc {

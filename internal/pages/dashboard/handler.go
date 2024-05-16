@@ -7,8 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/templates/components"
-	"sep_setting_mgr/internal/templates/layouts"
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 )
 

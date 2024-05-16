@@ -1,6 +1,6 @@
 package signin
 
-import "sep_setting_mgr/internal/templates/components"
+import "sep_setting_mgr/internal/components"
 
 templ SignInPage() {
     @components.FormComponent(components.Form{
@@ -9,8 +9,10 @@ templ SignInPage() {
         HxAttr: templ.Attributes{
             "hx-post": "/hx-signin",
             "hx-target": "#confirmation",
+            "hx-on:htmx:after-request":"document.dispatchEvent(new CustomEvent('signin', { bubbles: true }))",
         },
         SubmitBtnTitle: "Submit",
+        ShowDialog: true,
     }){
         @components.InputComponent(components.Input{
             Label: "Email",

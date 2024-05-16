@@ -3,7 +3,7 @@ package signup
 import (
 	"fmt"
 	"log"
-	"sep_setting_mgr/internal/templates/layouts"
+	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
