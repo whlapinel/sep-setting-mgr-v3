@@ -2,17 +2,24 @@ package domain
 
 type (
 	Student struct {
-		ID        int
-		FirstName string
-		LastName  string
-		Teacher   User
+		ID         int
+		FirstName  string
+		LastName   string
+		Teacher    User
+		Class      Class
+		TestEvents []*TestEvent
+	}
+
+	StudentRepository interface {
+		Store(*Student) (int, error)
+		All(classID int) ([]*Student, error)
 	}
 )
 
-func NewStudent(firstName string, lastName string, teacher User) *Student {
+func NewStudent(firstName string, lastName string, classID int) (*Student, error) {
 	return &Student{
 		FirstName: firstName,
 		LastName:  lastName,
-		Teacher:   teacher,
-	}
+		Class:     Class{ID: classID},
+	}, nil
 }

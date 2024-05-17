@@ -8,15 +8,15 @@ import (
 type TestEvent struct {
 	ID       int
 	TestName string
-	Class    Class
+	Class    *Class
 	TestDate time.Time
 	Block    int
-	Room     Room
+	Room     *Room
 }
 type TestEvents []*TestEvent
 
 type TestEventService interface {
-	NewTestEvent(testName string, class Class, testDate time.Time, block int) (*TestEvent, error)
+	NewTestEvent(testName string, class *Class, testDate time.Time, block int) (*TestEvent, error)
 	ListAll() *TestEvents
 }
 
@@ -50,7 +50,7 @@ func (t TestEvents) Less(i, j int) bool {
 }
 
 // NewTestEvent creates a new test event
-func NewTestEvent(testName string, class Class, testDate time.Time, block int) (*TestEvent, error) {
+func NewTestEvent(testName string, class *Class, testDate time.Time, block int) (*TestEvent, error) {
 	return &TestEvent{
 		TestName: testName,
 		Class:    class,

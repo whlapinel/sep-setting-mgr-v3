@@ -6,6 +6,7 @@ type Form struct {
 	HxAttr         templ.Attributes
 	SubmitBtnTitle string
 	ShowDialog     bool
+	Cancelable     bool
 }
 
 templ FormComponent(f Form) {
@@ -18,13 +19,15 @@ templ FormComponent(f Form) {
 		<form { f.HxAttr... } hx-disabled-elt="this" id="form" class="min-w-56">
 			<div class="flex flex-col items-center">
 				<h2 class="text-base font-semibold leading-7 text-gray-900">{ f.Title }</h2>
-				<div class="min-w-[20vw]">
+				<div class="min-w-[30vw]">
 					{ children... }
 				</div>
 				<div class="flex gap-2">
+				if f.Cancelable {
 					@ButtonComponent(Button{Attr: templ.Attributes{"id": "cancel"}}) {
 						Cancel
 					}
+				}
 					@ButtonComponent(Button{Attr: templ.Attributes{"id": "submit"}}) {
 						{ f.SubmitBtnTitle }
 					}

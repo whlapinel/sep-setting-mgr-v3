@@ -4,6 +4,6 @@ import "sep_setting_mgr/internal/domain"
 
 templ ClassListComponent(classes []*domain.Class) {
 	for _, class := range classes {
-		@ClassRowComponent(*class)
+		@ClassRowComponent(class)
 	}
 }

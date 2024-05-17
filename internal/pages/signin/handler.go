@@ -31,10 +31,11 @@ func Mount(e *echo.Echo, h Handler) {
 }
 
 func (h handler) SignInHandler(c echo.Context) error {
+	isSignedIn := auth.IsSignedIn(c)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(SignInPage(), c)
+		return util.RenderTempl(SignInPage(isSignedIn), c)
 	}
-	return util.RenderTempl(layouts.MainLayout(SignInPage()), c)
+	return util.RenderTempl(layouts.MainLayout(SignInPage(isSignedIn)), c)
 }
 
 func (h handler) HxHandleSignin(c echo.Context) error {
@@ -53,5 +54,5 @@ func (h handler) HxHandleSignin(c echo.Context) error {
 		return c.String(500, "Failed to issue token")
 	}
 	auth.WriteToken(c, t)
-	return c.String(200, "Authenticated")
+	return c.Redirect(303, "/dashboard")
 }

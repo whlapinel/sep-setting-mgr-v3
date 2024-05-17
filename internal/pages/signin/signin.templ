@@ -2,31 +2,38 @@ package signin
 
 import "sep_setting_mgr/internal/components"
 
-templ SignInPage() {
-    @components.FormComponent(components.Form{
-        Title: "Sign In",
-        SubTitle: "Enter Username and Password and Click Submit",
-        HxAttr: templ.Attributes{
-            "hx-post": "/hx-signin",
-            "hx-target": "#confirmation",
-            "hx-on:htmx:after-request":"document.dispatchEvent(new CustomEvent('signin', { bubbles: true }))",
-        },
-        SubmitBtnTitle: "Submit",
-        ShowDialog: true,
-    }){
-        @components.InputComponent(components.Input{
-            Label: "Email",
-            Type: "email",
-            Name: "email",
-            ID: "email",
-            Required: true,
-        })
-        @components.InputComponent(components.Input{
-            Label: "Password",
-            Type: "password",
-            Name: "password",
-            ID: "password",
-            Required: true,
-        })
-    }
+templ SignInPage(isSignedIn bool) {
+	if isSignedIn {
+		<div class="alert alert-success" role="alert">
+			<h1>You are signed in</h1>
+		</div>
+	} else {
+		@components.FormComponent(components.Form{
+			Title:    "Sign In",
+			SubTitle: "Enter Username and Password and Click Submit",
+			HxAttr: templ.Attributes{
+				"hx-post":                  "/hx-signin",
+				"hx-target":                "#confirmation",
+				"hx-on:htmx:after-request": "document.dispatchEvent(new CustomEvent('signin', { bubbles: true }))",
+			},
+			SubmitBtnTitle: "Submit",
+			ShowDialog:     true,
+            Cancelable:    false,
+		}) {
+			@components.InputComponent(components.Input{
+				Label:    "Email",
+				Type:     "email",
+				Name:     "email",
+				ID:       "email",
+				Required: true,
+			})
+			@components.InputComponent(components.Input{
+				Label:    "Password",
+				Type:     "password",
+				Name:     "password",
+				ID:       "password",
+				Required: true,
+			})
+		}
+	}
 }

@@ -5,7 +5,7 @@ type Button struct {
 }
 
 templ ButtonComponent(b Button) {
-	<button { b.Attr... } class="bg-blue-600 rounded p-2 text-white">
+	<button { b.Attr... } class="bg-blue-600 rounded p-2 text-white min-w-24">
 		{ children... }
 	</button>
 }

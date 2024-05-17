@@ -1,9 +1,20 @@
 package components
 
+type TableButton struct {
+	Text string
+	Attr templ.Attributes
+}
+
+type Row struct {
+	Data    []string
+	ID      int
+	Buttons []TableButton
+}
+
 type TableData struct {
-    Title   string
-    Headers []string
-    Rows    [][]string
+	Title   string
+	Headers []string
+	Rows    []Row
 }
 
 templ TableComponent(t TableData) {

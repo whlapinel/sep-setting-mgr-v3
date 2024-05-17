@@ -18,10 +18,10 @@ type (
 		DashboardHandler(c echo.Context) error
 
 		// Create : POST /classes
-		Create(c echo.Context) error
+		CreateClass(c echo.Context) error
 
-		// Details : GET /classes/:classID
-		Details(c echo.Context) error
+		// Students : GET /classes/:classID/students
+		Students(c echo.Context) error
 	}
 
 	handler struct {
@@ -40,14 +40,15 @@ func Mount(e *echo.Echo, h Handler) {
 	r.Use(auth.GetClaims)
 	r.GET("", h.DashboardHandler)
 
-	classesGroup := r.Group("/hx-classes")
-	classesGroup.POST("", h.Create)
-	classIDgroup := classesGroup.Group("/:hx-classid")
-	classIDgroup.GET("", h.Details)
+	classesGroup := r.Group("/classes")
+	classesGroup.POST("", h.CreateClass)
+	classIDgroup := classesGroup.Group("/:classid")
+	classIDgroup.GET("/students", h.Students)
 }
 
 func (h handler) DashboardHandler(c echo.Context) error {
-	classes, err := h.service.List()
+	teacherID := c.Get("id").(int)
+	classes, err := h.service.List(teacherID)
 	if err != nil {
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
@@ -57,7 +58,7 @@ func (h handler) DashboardHandler(c echo.Context) error {
 	return util.RenderTempl(layouts.MainLayout(DashboardPage(classes)), c)
 }
 
-func (h handler) Create(c echo.Context) error {
+func (h handler) CreateClass(c echo.Context) error {
 	log.Println("Handler: Creating class")
 	name := c.FormValue("name")
 	block, err := strconv.Atoi(c.FormValue("block"))
@@ -74,7 +75,7 @@ func (h handler) Create(c echo.Context) error {
 
 	switch util.IsHTMX(c) {
 	case true:
-		err := util.RenderTempl(components.ClassRowComponent(*class), c)
+		err := util.RenderTempl(components.ClassRowComponent(class), c)
 		if err != nil {
 			return c.String(500, "Failed to render class row component. See server logs for details.")
 		}
@@ -84,12 +85,15 @@ func (h handler) Create(c echo.Context) error {
 	return nil
 }
 
-func (h handler) Details(c echo.Context) error {
+func (h handler) Students(c echo.Context) error {
+	if !util.IsHTMX(c) {
+		return c.String(400, "Invalid request")
+	}
 	classID := c.Param("classid")
-	log.Println(classID)
+	log.Println("classID: ", classID)
 	class, err := h.service.FindClassByID(classID)
 	if err != nil {
 		return err
 	}
-	return c.String(200, "Class name: "+class.Name)
+	return util.RenderTempl(StudentTableComponent(class.Students), c)
 }

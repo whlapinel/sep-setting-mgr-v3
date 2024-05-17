@@ -6,11 +6,37 @@ import (
 	"strconv"
 )
 
-func prepareForTable(classes []*domain.Class) components.TableData {
-	var rows [][]string
-	headers := []string{"Name", "Block", "Username", "Email"}
+func prepareClassesForTable(classes []*domain.Class) components.TableData {
+
+	var rows []components.Row
+	headers := []string{"Name", "Block"}
 	for _, class := range classes {
-		rows = append(rows, []string{class.Name, strconv.Itoa(class.Block), class.Teacher.Email})
+		rows = append(rows, components.Row{
+			Data: []string{class.Name, strconv.Itoa(class.Block)},
+			ID:   class.ID,
+			Buttons: []components.TableButton{
+				{
+					Text: "Edit",
+				},
+				{
+					Text: "Delete",
+					Attr: templ.Attributes{
+						"hx-delete": "/dashboard/classes/" + strconv.Itoa(class.ID),
+						"hx-confirm": "Are you sure you want to delete this class?",
+					},
+				},
+				{
+					Text: "Students",
+					Attr: templ.Attributes{
+						"hx-get":    "/dashboard/classes/" + strconv.Itoa(class.ID) + "/students",
+						"hx-target": "#students-table",
+					},
+				},
+				{
+					Text: "Tests",
+				},
+			},
+		})
 	}
 	return components.TableData{Title: "Classes", Headers: headers, Rows: rows}
 }
@@ -18,6 +44,7 @@ func prepareForTable(classes []*domain.Class) components.TableData {
 templ DashboardPage(classes []*domain.Class) {
 	<h1>Dashboard</h1>
 	<p>Welcome to the dashboard</p>
-	@components.AddClassForm()
-	@components.TableComponent(prepareForTable(classes))
+	@AddClassForm()
+	@components.TableComponent(prepareClassesForTable(classes))
+	<div id="students-table"></div>
 }

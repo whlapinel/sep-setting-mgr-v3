@@ -1,0 +1,22 @@
+package dashboard
+
+import (
+	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/components"
+)
+
+func prepareStudentsForTable(students []*domain.Student) components.TableData {
+	var rows []components.Row
+	headers := []string{"Name", "Block"}
+	for _, student := range students {
+		rows = append(rows, components.Row{
+			Data: []string{student.FirstName, student.LastName},
+			ID:   student.ID,
+		})
+	}
+	return components.TableData{Title: "Students", Headers: headers, Rows: rows}
+}
+
+templ StudentTableComponent(students []*domain.Student) {
+	@components.TableComponent(prepareStudentsForTable(students))
+}

@@ -1,9 +1,16 @@
 package components
 
-import "sep_setting_mgr/internal/domain"
 import "strconv"
 
-templ ClassRowComponent(class domain.Class ) {
-    @TableRowComponent([]string{class.Name, strconv.Itoa(class.Block), class.Teacher.Email})
+import (
+	"sep_setting_mgr/internal/domain"
+)
+
+func classToRow(class *domain.Class) Row {
+	return Row{Data: []string{class.Name, strconv.Itoa(class.Block)}, ID: class.ID}
+
 }
 
+templ ClassRowComponent(class *domain.Class) {
+	@TableRowComponent(classToRow(class))
+}

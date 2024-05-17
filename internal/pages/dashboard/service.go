@@ -8,37 +8,66 @@ import (
 type (
 	Service interface {
 		// List returns a copy of the todos list
-		List() ([]*domain.Class, error)
+		List(teacherID int) ([]*domain.Class, error)
 		AddClass(name string, block int, teacherID int) (*domain.Class, error)
+		AddStudent(firstName string, lastName string, classID int) (*domain.Student, error)
 		FindClassByID(classID string) (*domain.Class, error)
 	}
 
 	service struct {
-		classes domain.ClassRepository
-		users   domain.UserRepository
+		classes  domain.ClassRepository
+		users    domain.UserRepository
+		students domain.StudentRepository
 	}
 )
 
-func NewService(classes domain.ClassRepository, users domain.UserRepository) Service {
+func NewService(classes domain.ClassRepository, users domain.UserRepository, students domain.StudentRepository) Service {
 	return &service{
-		classes: classes,
-		users:   users,
+		classes:  classes,
+		users:    users,
+		students: students,
 	}
 }
 
-func (s service) List() ([]*domain.Class, error) {
-	return s.classes.All(), nil
+func (s service) List(teacherID int) ([]*domain.Class, error) {
+	classes, err := s.classes.All(teacherID)
+	if err != nil {
+		return nil, err
+	}
+	for _, class := range classes {
+		students, err := s.students.All(class.ID)
+		if err != nil {
+			return nil, err
+		}
+		class.Students = students
+	}
+	return classes, nil
+}
+
+func (s service) AddStudent(firstName string, lastName string, classID int) (*domain.Student, error) {
+	log.Println("Service: Adding student to database")
+	// find teacher id
+	student, err := domain.NewStudent(firstName, lastName, classID)
+	if err != nil {
+		return nil, err
+	}
+	id, err := s.students.Store(student)
+	if err != nil {
+		return nil, err
+	}
+	student.ID = id
+	return student, nil
 }
 
 func (s service) AddClass(name string, block int, teacherID int) (*domain.Class, error) {
 	log.Println("Service: Adding class to database")
 	// find teacher id
 	class := domain.NewClass(name, block, teacherID)
-	err := s.classes.Store(class)
+	id, err := s.classes.Store(class)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Teacher email:", class.Teacher.Email)
+	class.ID = id
 	return class, nil
 }
 

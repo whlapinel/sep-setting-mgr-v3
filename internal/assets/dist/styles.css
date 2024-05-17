@@ -582,12 +582,16 @@ video {
   width: 100%;
 }
 
+.min-w-24 {
+  min-width: 6rem;
+}
+
 .min-w-56 {
   min-width: 14rem;
 }
 
-.min-w-\[20vw\] {
-  min-width: 20vw;
+.min-w-\[30vw\] {
+  min-width: 30vw;
 }
 
 .flex-col {

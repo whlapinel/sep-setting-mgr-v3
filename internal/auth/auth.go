@@ -79,3 +79,11 @@ var GetClaims = func(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 var JWTMiddleware = echojwt.WithConfig(config)
+
+func IsSignedIn(c echo.Context) bool {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		return false
+	}
+	return cookie.Value != ""
+}
