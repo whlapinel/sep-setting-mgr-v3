@@ -35,7 +35,7 @@ func main() {
 			} else {
 				statusColor = green
 			}
-			methodWidth := 5
+			methodWidth := 6
 			uriWidth := 25
 			statusWidth := 6
 			customWidth := 12

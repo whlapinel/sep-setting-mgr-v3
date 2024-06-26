@@ -10,7 +10,7 @@ type Header struct {
 }
 
 templ HeaderComponent(h Header) {
-	<header>
+	<header class="flex justify-between">
 		<nav>
 			<ul class="flex gap-2">
 				for _, item := range h.NavItems {
@@ -21,6 +21,7 @@ templ HeaderComponent(h Header) {
 			</ul>
 		</nav>
 		<div id="user-avatar">
+			<button hx-post="/hx-signout" hx-target="#page">Sign Out</button>
 		</div>
 	</header>
 }

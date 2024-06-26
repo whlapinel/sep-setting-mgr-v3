@@ -2,23 +2,22 @@ package dashboard
 
 import "sep_setting_mgr/internal/components"
 
-
-
 templ AddClassForm() {
 	@components.FormComponent(components.Form{
 		Title:    "Add Class",
 		SubTitle: "Add a Class to User",
 		HxAttr: templ.Attributes{
-			"hx-post":   "/dashboard/classes",
-			"hx-target": "#table",
-            "hx-swap": "afterbegin",
+			"hx-post":      "/dashboard/classes",
+			"hx-target":    "#table",
+			"hx-swap":      "afterbegin",
+			"hx-indicator": "#indicator",
 		},
 		SubmitBtnTitle: "Add",
-		Cancelable: true,
+		Cancelable:     true,
 	}) {
 		@components.InputComponent(components.Input{
 			Label:       "Class Name",
-			Placeholder: "Biology",
+			Placeholder: "e.g. Biology",
 			ID:          "name",
 			Type:        "text",
 			Name:        "name",
@@ -26,13 +25,13 @@ templ AddClassForm() {
 		})
 		@components.InputComponent(components.Input{
 			Label:       "Class Block",
-			Placeholder: "2",
+			Placeholder: "e.g. 2",
 			ID:          "block",
 			Type:        "number",
 			Name:        "block",
 			Required:    true,
-			Min: 1,
-			Max: 4,
+			Min:         1,
+			Max:         4,
 		})
 	}
 }

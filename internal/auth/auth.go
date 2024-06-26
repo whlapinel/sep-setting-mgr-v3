@@ -23,7 +23,7 @@ var config = echojwt.Config{
 	SigningKey: []byte("secret"),
 	ErrorHandler: func(c echo.Context, err error) error {
 		// Redirect to login page on error
-		return c.Redirect(302, "/unauthorized")
+		return c.Redirect(303, "/unauthorized")
 	},
 }
 
@@ -61,7 +61,7 @@ var AddCookieToHeader = func(next echo.HandlerFunc) echo.HandlerFunc {
 		log.Println("running AddCookieToHeader middleware")
 		cookie, err := c.Cookie("token")
 		if err != nil {
-			return c.Redirect(302, "/unauthorized")
+			return c.Redirect(303, "/unauthorized")
 		}
 		c.Request().Header.Set("Authorization", "Bearer "+cookie.Value)
 		return next(c)

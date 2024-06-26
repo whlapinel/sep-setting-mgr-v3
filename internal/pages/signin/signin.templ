@@ -13,7 +13,7 @@ templ SignInPage(isSignedIn bool) {
 			SubTitle: "Enter Username and Password and Click Submit",
 			HxAttr: templ.Attributes{
 				"hx-post":                  "/hx-signin",
-				"hx-target":                "#confirmation",
+				"hx-target":                "#page",
 				"hx-on:htmx:after-request": "document.dispatchEvent(new CustomEvent('signin', { bubbles: true }))",
 			},
 			SubmitBtnTitle: "Submit",

@@ -2,7 +2,7 @@
 
 ## PENDING
 
-- add students functionality
+- add students functionality: currently when you click add student, the form that is returned is the "add class" form. This needs to be changed to the add student form
 
 ## COMPLETE
 

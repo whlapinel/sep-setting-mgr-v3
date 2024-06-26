@@ -13,7 +13,7 @@ async function signout() {
     clearTimeout(timeOutWarning);
     clearTimeout(activityTimeout);
     document.removeEventListener("mousemove", onActive)
-    document.removeEventListener("click", onActive)    
+    document.removeEventListener("click", onActive)
     document.removeEventListener("scroll", onActive)
     document.removeEventListener("keydown", onActive)
     setIsSignedIn(false)
@@ -45,7 +45,7 @@ function ResetActivityTimeout() {
 document.addEventListener("signin", (e) => {
     console.log("signin event triggered")
     document.addEventListener("mousemove", onActive)
-    document.addEventListener("click", onActive)    
+    document.addEventListener("click", onActive)
     document.addEventListener("scroll", onActive)
     document.addEventListener("keydown", onActive)
     ResetActivityTimeout();

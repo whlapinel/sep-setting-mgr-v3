@@ -24,6 +24,14 @@ func NewClassesRepo(db *sql.DB) domain.ClassRepository {
 	return &classRepo{db: db}
 }
 
+func (cr *classRepo) Delete(classID int) error {
+	_, err := cr.db.Exec(`DELETE FROM classes WHERE id = ?`, classID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (cr *classRepo) Store(class *domain.Class) (int, error) {
 	dbClass := convertToClassTable(class)
 	log.Println("Adding class to database")

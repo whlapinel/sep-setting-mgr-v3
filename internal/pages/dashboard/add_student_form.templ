@@ -1,0 +1,38 @@
+package dashboard
+
+import (
+	"sep_setting_mgr/internal/components"
+	"log"
+	)
+
+templ AddStudentForm() {
+	@components.FormComponent(components.Form{
+		Title:    "Add Student",
+		SubTitle: "Add a Student to Class",
+		HxAttr: templ.Attributes{
+			"hx-post":      "/dashboard/students",
+			"hx-target":    "#student-table",
+			"hx-swap":      "afterbegin",
+			"hx-indicator": "#indicator",
+		},
+		SubmitBtnTitle: "Add",
+		Cancelable:     true,
+	}) {
+		@components.InputComponent(components.Input{
+			Label:       "First Name",
+			Placeholder: "e.g. James",
+			ID:          "first-name",
+			Type:        "text",
+			Name:        "first-name",
+			Required:    true,
+		})
+		@components.InputComponent(components.Input{
+			Label:       "Last Name",
+			Placeholder: "e.g. Wilson",
+			ID:          "last-name",
+			Type:        "text",
+			Name:        "last-name",
+			Required:    true,
+		})
+	}
+}

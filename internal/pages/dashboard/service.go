@@ -10,6 +10,7 @@ type (
 		// List returns a copy of the todos list
 		List(teacherID int) ([]*domain.Class, error)
 		AddClass(name string, block int, teacherID int) (*domain.Class, error)
+		DeleteClass(classID int) error
 		AddStudent(firstName string, lastName string, classID int) (*domain.Student, error)
 		FindClassByID(classID string) (*domain.Class, error)
 	}
@@ -57,6 +58,15 @@ func (s service) AddStudent(firstName string, lastName string, classID int) (*do
 	}
 	student.ID = id
 	return student, nil
+}
+
+func (s service) DeleteClass(classID int) error {
+	log.Println("Service: Deleting class from database")
+	err := s.classes.Delete(classID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s service) AddClass(name string, block int, teacherID int) (*domain.Class, error) {

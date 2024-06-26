@@ -7,20 +7,22 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/components"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 )
 
 type (
 	Handler interface {
-		// Dashboard : GET /
+		// Dashboard : GET /dashboard
 		DashboardHandler(c echo.Context) error
 
-		// Create : POST /classes
+		// Create : POST /dashboard/classes
 		CreateClass(c echo.Context) error
 
-		// Students : GET /classes/:classID/students
+		// Delete : DELETE /dashboard/classes/:classID
+		DeleteClass(c echo.Context) error
+
+		// Students : GET /dashboard/classes/:classID/students
 		Students(c echo.Context) error
 	}
 
@@ -43,6 +45,7 @@ func Mount(e *echo.Echo, h Handler) {
 	classesGroup := r.Group("/classes")
 	classesGroup.POST("", h.CreateClass)
 	classIDgroup := classesGroup.Group("/:classid")
+	classIDgroup.DELETE("", h.DeleteClass)
 	classIDgroup.GET("/students", h.Students)
 }
 
@@ -56,6 +59,21 @@ func (h handler) DashboardHandler(c echo.Context) error {
 		return util.RenderTempl(DashboardPage(classes), c)
 	}
 	return util.RenderTempl(layouts.MainLayout(DashboardPage(classes)), c)
+}
+
+func (h handler) DeleteClass(c echo.Context) error {
+	if !util.IsHTMX(c) {
+		return c.String(400, "Invalid request")
+	}
+	classID, err := strconv.Atoi(c.Param("classid"))
+	if err != nil {
+		return c.String(400, "Invalid class ID")
+	}
+	err = h.service.DeleteClass(classID)
+	if err != nil {
+		return c.String(500, "Failed to delete class. See server logs for details.")
+	}
+	return c.NoContent(200)
 }
 
 func (h handler) CreateClass(c echo.Context) error {
@@ -75,7 +93,7 @@ func (h handler) CreateClass(c echo.Context) error {
 
 	switch util.IsHTMX(c) {
 	case true:
-		err := util.RenderTempl(components.ClassRowComponent(class), c)
+		err := util.RenderTempl(ClassRowComponent(class), c)
 		if err != nil {
 			return c.String(500, "Failed to render class row component. See server logs for details.")
 		}

@@ -3,7 +3,9 @@ package components
 import "strconv"
 
 templ TableRowComponent(row Row) {
-	<tr data-id={ strconv.Itoa(row.ID) }>
+	<tr
+		data-id={ strconv.Itoa(row.ID) }
+	>
 		for _, cell := range row.Data {
 			<td>{ cell }</td>
 		}
