@@ -3,7 +3,6 @@ package dashboard
 import (
 	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/components"
-	"log"
 )
 
 func prepareStudentsForTable(students []*domain.Student) components.TableData {
@@ -16,7 +15,6 @@ func prepareStudentsForTable(students []*domain.Student) components.TableData {
 }
 
 templ StudentTableComponent(students []*domain.Student) {
-	log.Println("Rendering StudentTableComponent")	
 	@AddStudentForm()
 	@components.TableComponent(prepareStudentsForTable(students))
 }
