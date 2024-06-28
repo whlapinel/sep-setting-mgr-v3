@@ -1,21 +1,21 @@
 package dashboard
 
-import (
-	"sep_setting_mgr/internal/components"
-)
+import "sep_setting_mgr/internal/components"
 
-templ AddStudentForm() {
+templ AddStudentForm(showForm bool, classID int, submitPath string) {
 	@components.FormComponent(components.Form{
 		Title:    "Add Student",
 		SubTitle: "Add a Student to Class",
 		HxAttr: templ.Attributes{
-			"hx-post":      "/dashboard/students",
+			"hx-post":      submitPath,
 			"hx-target":    "#student-table",
 			"hx-swap":      "afterbegin",
 			"hx-indicator": "#indicator",
 		},
+		ShowDialog:     showForm,
 		SubmitBtnTitle: "Add",
 		Cancelable:     true,
+		ShowFormPath:   "",
 	}) {
 		@components.InputComponent(components.Input{
 			Label:       "First Name",

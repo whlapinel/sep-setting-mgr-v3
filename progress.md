@@ -1,0 +1,3 @@
+# 6/28
+
+After completing summer 1st term I resumed working on this project in earnest. I'm having an issue with the templ-vscode extension that's really bugging me. I went to the Gopher slack and posted a question about it in the #templ channel, and got a nice response from the developer "a-h" himself, who indicated that this issue has been identified and is being addressed.  Things are continuing to work alright, aside from the annoying message that keeps popping up "Request textDocument/codeAction failed." I am not sure if there is any impact to the development process, and the code runs correctly. 

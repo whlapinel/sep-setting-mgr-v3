@@ -1,9 +1,10 @@
 package dashboard
 
 import (
-	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain"
 )
+
 
 func prepareStudentsForTable(students []*domain.Student) components.TableData {
 	var rows []components.Row
@@ -14,7 +15,6 @@ func prepareStudentsForTable(students []*domain.Student) components.TableData {
 	return components.TableData{Title: "Students", Headers: headers, Rows: rows}
 }
 
-templ StudentTableComponent(students []*domain.Student) {
-	@AddStudentForm()
+templ StudentTableComponent(students []*domain.Student, classID int) {
 	@components.TableComponent(prepareStudentsForTable(students))
 }

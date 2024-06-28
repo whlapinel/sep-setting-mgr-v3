@@ -6,11 +6,16 @@ type Form struct {
 	SubTitle       string
 	HxAttr         templ.Attributes
 	SubmitBtnTitle string
+	ShowFormPath   string
 	ShowDialog     bool
 	Cancelable     bool
 }
 
 templ FormComponent(f Form) {
+	if !f.ShowDialog {
+		<button id={ "open-dialog" }>{ f.Title }</button>
+		<button id={ "open-dialog2" } hx-get={ f.ShowFormPath } hx-target="next dialog" hx-swap="outerHTML">{ f.Title }</button>
+	}
 	<dialog
 		class=" rounded-xl p-4"
 		if f.ShowDialog {
@@ -38,7 +43,4 @@ templ FormComponent(f Form) {
 			</div>
 		</form>
 	</dialog>
-	if !f.ShowDialog {
-		<button id={ "open-dialog" }>{ f.Title }</button>
-	}
 }

@@ -13,6 +13,7 @@ import (
 
 type (
 	Handler interface {
+		
 		// Dashboard : GET /dashboard
 		DashboardHandler(c echo.Context) error
 
@@ -24,6 +25,9 @@ type (
 
 		// Students : GET /dashboard/classes/:classID/students
 		Students(c echo.Context) error
+
+		// AddStudent : GET /dashboard/classes/:classID/students/add-student
+		AddStudent(c echo.Context) error
 	}
 
 	handler struct {
@@ -47,6 +51,7 @@ func Mount(e *echo.Echo, h Handler) {
 	classIDgroup := classesGroup.Group("/:classid")
 	classIDgroup.DELETE("", h.DeleteClass)
 	classIDgroup.GET("/students", h.Students)
+	classIDgroup.GET("/dashboard/classes/:classID/students/add-student", h.AddStudent)
 }
 
 func (h handler) DashboardHandler(c echo.Context) error {
@@ -114,4 +119,11 @@ func (h handler) Students(c echo.Context) error {
 		return err
 	}
 	return util.RenderTempl(StudentTableComponent(class.Students), c)
+}
+
+func (h handler) AddStudent(c echo.Context) error {
+	if !util.IsHTMX(c) {
+		return c.String(400, "Invalid request")
+	}
+	return util.RenderTempl(AddStudentForm(true), c)
 }
