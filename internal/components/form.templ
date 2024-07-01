@@ -10,13 +10,52 @@ type Form struct {
 	Cancelable     bool
 }
 
+func getDialogID(id string) string {
+	return id + "-dialog"
+}
+
+func getFormID(id string) string {
+	return id
+}
+
+func getOpenDialogID(id string) string {
+	return "open-" + id + "-dialog"
+}
+
+func getCancelButtonID(id string) string {
+	return "cancel-" + id
+}
+
+func getSubmitButtonID(id string) string {
+	return "submit-" + id
+}
+
+func getConfirmationID(id string) string {
+	return id + "-confirmation"
+}
+
 templ FormComponent(f Form) {
 	<dialog
 		class=" rounded-xl p-4"
 		if f.ShowDialog {
 			open
 		}
+		id={ f.ID + "-dialog" }
 	>
+		<script type="text/javascript">
+	console.log("hello from before the IIFE");
+	(() => {
+		let script = document.currentScript;
+		console.log("script element: " + script);
+		console.log("hello from within the IIFE");
+		const dialog = script.closest("dialog");
+		const id = dialog.getAttribute("id");
+		console.log("dialog id: " + id);
+		console.log(dialog);
+		console.log("hello from after the IIFE");
+	})()
+
+	</script>
 		<form { f.HxAttr... } hx-disabled-elt="this" id={ f.ID } class="min-w-56">
 			<div class="flex flex-col items-center">
 				<h2 class="text-base font-semibold leading-7 text-gray-900">{ f.Title }</h2>
@@ -25,20 +64,73 @@ templ FormComponent(f Form) {
 				</div>
 				<div class="flex gap-2">
 					if f.Cancelable {
-						@ButtonComponent(Button{Attr: templ.Attributes{"id": "cancel"}}) {
+						@ButtonComponent(Button{Attr: templ.Attributes{"id": getCancelButtonID(f.ID)}}) {
 							Cancel
+							<script>
+							(() => {
+								const cancelScript = document.currentScript;
+								const cancelButton = cancelScript.closest("button");
+								cancelButton.addEventListener("click", (e) => {
+									e.preventDefault();
+									const dialog = cancelButton.closest("dialog");
+									dialog.close();
+								});
+							})();
+							</script>
 						}
 					}
-					@ButtonComponent(Button{Attr: templ.Attributes{"id": "submit"}}) {
+					@ButtonComponent(Button{Attr: templ.Attributes{"id": getSubmitButtonID(f.ID), "type": "submit"}}) {
 						{ f.SubmitBtnTitle }
 					}
 				</div>
-				<div id="confirmation"></div>
+				<div id={ getConfirmationID(f.ID) }></div>
 				@Indicator("loading")
 			</div>
 		</form>
 	</dialog>
 	if !f.ShowDialog {
-		<button id={ "open-dialog" }>{ f.Title }</button>
+		<button id={ getOpenDialogID(f.ID) }>
+			{ f.Title }
+			<script>
+			(() => {
+				const showDialogScript = document.currentScript;
+				const showDialogButton = showDialogScript.closest("button");
+				console.log("hello from the button script element")
+				showDialogButton.addEventListener("click", () => {
+					console.log("hello from the button click event listener");
+					const dialog = showDialogButton.previousElementSibling;
+					dialog.showModal();
+				});
+				}
+			)();
+			</script>
+		</button>
 	}
+	<script type="text/javascript">
+	// (()=>{
+	// 	const script = document.currentScript;
+	// 	const form = document.closest("form");
+	// 	const form = document.querySelector({f.ID});
+	// 	const dialog = document.querySelector(getDialogID(f.ID));
+	// 	const openDialog = document.querySelector(getOpenDialogID(f.ID));
+	// 	const submitButton = document.querySelector(getSubmitButtonID(f.ID));
+	// 	const cancelButton = document.querySelector(getCancelButtonID(f.ID));
+
+	// 	openDialog.addEventListener("click", () => {
+	// 		dialog.showModal();
+	// 	});
+
+	// 	cancelButton.addEventListener("click", (e) => {
+	// 		e.preventDefault();
+	// 		dialog.close();
+	// 	});
+
+	// 	submitButton.addEventListener("click", (e) => {
+	// 		e.preventDefault();
+	// 		if (form.reportValidity()) {
+	// 			form.submit();
+	// 		}
+	// 	});
+	// })();
+</script>
 }
