@@ -69,7 +69,7 @@ func (classRepo *classRepo) All(teacherID int) ([]*domain.Class, error) {
 	return classes, nil
 }
 
-func (classRepo *classRepo) FindByID(classID string) (*domain.Class, error) {
+func (classRepo *classRepo) FindByID(classID int) (*domain.Class, error) {
 	var dbClass classTableRow
 
 	class := convertToClass(dbClass)

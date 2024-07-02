@@ -14,7 +14,7 @@ type (
 		Store(*Class) (int, error)
 		Delete(classID int) error
 		All(teacherID int) ([]*Class, error)
-		FindByID(classID string) (*Class, error)
+		FindByID(classID int) (*Class, error)
 	}
 )
 

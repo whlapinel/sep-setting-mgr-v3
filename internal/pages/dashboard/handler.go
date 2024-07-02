@@ -1,9 +1,6 @@
 package dashboard
 
 import (
-	"log"
-	"strconv"
-
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
@@ -24,6 +21,12 @@ type (
 
 		// Students : GET /dashboard/classes/:classID/students
 		Students(c echo.Context) error
+
+		// AddStudent : POST /dashboard/classes/:classID/students
+		AddStudent(c echo.Context) error
+
+		// DeleteStudent : DELETE /dashboard/students/:studentID
+		DeleteStudent(c echo.Context) error
 	}
 
 	handler struct {
@@ -41,12 +44,13 @@ func Mount(e *echo.Echo, h Handler) {
 	r.Use(auth.JWTMiddleware)
 	r.Use(auth.GetClaims)
 	r.GET("", h.DashboardHandler)
-
+	r.DELETE("/students/:studentid", h.DeleteStudent)
 	classesGroup := r.Group("/classes")
 	classesGroup.POST("", h.CreateClass)
 	classIDgroup := classesGroup.Group("/:classid")
 	classIDgroup.DELETE("", h.DeleteClass)
 	classIDgroup.GET("/students", h.Students)
+	classIDgroup.POST("/students", h.AddStudent)
 }
 
 func (h handler) DashboardHandler(c echo.Context) error {
@@ -56,62 +60,7 @@ func (h handler) DashboardHandler(c echo.Context) error {
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(DashboardPage(classes), c)
+		return util.RenderTempl(DashboardPage(classes), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(DashboardPage(classes)), c)
-}
-
-func (h handler) DeleteClass(c echo.Context) error {
-	if !util.IsHTMX(c) {
-		return c.String(400, "Invalid request")
-	}
-	classID, err := strconv.Atoi(c.Param("classid"))
-	if err != nil {
-		return c.String(400, "Invalid class ID")
-	}
-	err = h.service.DeleteClass(classID)
-	if err != nil {
-		return c.String(500, "Failed to delete class. See server logs for details.")
-	}
-	return c.NoContent(200)
-}
-
-func (h handler) CreateClass(c echo.Context) error {
-	log.Println("Handler: Creating class")
-	name := c.FormValue("name")
-	block, err := strconv.Atoi(c.FormValue("block"))
-	if err != nil {
-		return c.String(400, "Invalid block")
-	}
-	teacherID := c.Get("id").(int)
-	log.Println(teacherID)
-	class, err := h.service.AddClass(name, block, teacherID)
-	if err != nil {
-		log.Println("Failed to create class:", err)
-		return c.String(500, "Failed to create class. Error:"+err.Error())
-	}
-
-	switch util.IsHTMX(c) {
-	case true:
-		err := util.RenderTempl(ClassRowComponent(class), c)
-		if err != nil {
-			return c.String(500, "Failed to render class row component. See server logs for details.")
-		}
-	default:
-		return c.Redirect(303, "/")
-	}
-	return nil
-}
-
-func (h handler) Students(c echo.Context) error {
-	if !util.IsHTMX(c) {
-		return c.String(400, "Invalid request")
-	}
-	classID := c.Param("classid")
-	log.Println("classID: ", classID)
-	class, err := h.service.FindClassByID(classID)
-	if err != nil {
-		return err
-	}
-	return util.RenderTempl(StudentTableComponent(class.Students), c)
+	return util.RenderTempl(layouts.MainLayout(DashboardPage(classes)), c, 200)
 }

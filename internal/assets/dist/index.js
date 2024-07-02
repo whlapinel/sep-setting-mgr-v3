@@ -72,18 +72,3 @@ document.querySelector("body").addEventListener("htmx:afterRequest", (e) => {
         }
     }
 })
-
-
-document.querySelector("body").addEventListener("click", (e) => {
-    if (e.target.id === "open-dialog") {
-        document.querySelector("dialog").showModal();
-    }
-})
-
-document.querySelector("body").addEventListener("click", (e) => {
-    const closeButton = document.querySelector("dialog button#cancel");
-    if (e.target === closeButton) {
-        e.preventDefault();
-        document.querySelector("dialog").close();
-    }
-})

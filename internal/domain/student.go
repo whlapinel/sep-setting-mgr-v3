@@ -13,6 +13,7 @@ type (
 	StudentRepository interface {
 		Store(*Student) (int, error)
 		All(classID int) ([]*Student, error)
+		Delete(studentID int) error
 	}
 )
 

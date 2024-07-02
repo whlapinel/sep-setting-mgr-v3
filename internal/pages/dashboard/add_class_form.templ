@@ -4,12 +4,12 @@ import "sep_setting_mgr/internal/components"
 
 templ AddClassForm() {
 	@components.FormComponent(components.Form{
-		ID: 	 "add-class-form",
+		ID:       "add-class-form",
 		Title:    "Add Class",
 		SubTitle: "Add a Class to User",
 		HxAttr: templ.Attributes{
 			"hx-post":      "/dashboard/classes",
-			"hx-target":    "#table",
+			"hx-target":    "#classes-table",
 			"hx-swap":      "afterbegin",
 			"hx-indicator": "#indicator",
 		},

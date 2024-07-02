@@ -1,16 +1,11 @@
 package dashboard
 
-import (
-	"sep_setting_mgr/internal/domain"
-)
+import "sep_setting_mgr/internal/domain"
 
 templ DashboardPage(classes []*domain.Class) {
 	<h1>Dashboard</h1>
 	<p>Welcome to the dashboard</p>
 	@AddClassForm()
 	@ClassesTable(classes)
-	<div id="students-table"></div>
-	<script>
-	const hello = "hello";
-	</script>
+	<div id="students"></div>
 }

@@ -1,6 +1,7 @@
 package unauthorized
 
 import (
+	"net/http"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
@@ -26,7 +27,7 @@ func Mount(e *echo.Echo, h Handler) {
 
 func (h handler) UnauthorizedHandler(c echo.Context) error {
 	if util.IsHTMX(c) {
-		return util.RenderTempl(UnauthorizedPage(), c)
+		return util.RenderTempl(UnauthorizedPage(), c, http.StatusForbidden)
 	}
-	return util.RenderTempl(layouts.MainLayout(UnauthorizedPage()), c)
+	return util.RenderTempl(layouts.MainLayout(UnauthorizedPage()), c, http.StatusForbidden)
 }

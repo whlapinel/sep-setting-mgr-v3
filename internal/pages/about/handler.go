@@ -1,6 +1,7 @@
 package about
 
 import (
+	"net/http"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -24,5 +25,5 @@ func Mount(e *echo.Echo, h Handler) {
 }
 
 func (h handler) AboutHandler(c echo.Context) error {
-	return util.RenderTempl(AboutPage(), c)
+	return util.RenderTempl(AboutPage(), c, http.StatusOK)
 }

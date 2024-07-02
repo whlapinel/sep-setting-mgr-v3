@@ -10,6 +10,7 @@ func IsHTMX(e echo.Context) bool {
 	return e.Request().Header.Get("Hx-Request") != ""
 }
 
-func RenderTempl(component templ.Component, c echo.Context) error {
+func RenderTempl(component templ.Component, c echo.Context, statusCode int) error {
+	c.Response().WriteHeader(statusCode)
 	return component.Render(c.Request().Context(), c.Response().Writer)
 }

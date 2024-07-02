@@ -1,8 +1,8 @@
 package dashboard
 
 import (
-	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain"
 )
 
 func prepareStudentsForTable(students []*domain.Student) components.TableData {
@@ -11,10 +11,10 @@ func prepareStudentsForTable(students []*domain.Student) components.TableData {
 	for _, student := range students {
 		rows = append(rows, studentToRow(student))
 	}
-	return components.TableData{Title: "Students", Headers: headers, Rows: rows}
+	return components.TableData{ID: "students-table", Title: "Students", Headers: headers, Rows: rows}
 }
 
-templ StudentTableComponent(students []*domain.Student) {
-	@AddStudentForm()
+templ StudentTableComponent(students []*domain.Student, classID int) {
+	@AddStudentForm(classID)
 	@components.TableComponent(prepareStudentsForTable(students))
 }

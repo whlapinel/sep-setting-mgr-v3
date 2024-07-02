@@ -43,19 +43,18 @@ templ FormComponent(f Form) {
 		id={ f.ID + "-dialog" }
 	>
 		<script type="text/javascript">
-	console.log("hello from before the IIFE");
-	(() => {
-		let script = document.currentScript;
-		console.log("script element: " + script);
-		console.log("hello from within the IIFE");
-		const dialog = script.closest("dialog");
-		const id = dialog.getAttribute("id");
-		console.log("dialog id: " + id);
-		console.log(dialog);
-		console.log("hello from after the IIFE");
-	})()
+			(() => {
+				let script = document.currentScript;
+				console.log("script element: " + script);
+				console.log("hello from within the IIFE");
+				const dialog = script.closest("dialog");
+				const id = dialog.getAttribute("id");
+				console.log("dialog id: " + id);
+				console.log(dialog);
+				console.log("hello from after the IIFE");
+			})()
 
-	</script>
+		</script>
 		<form { f.HxAttr... } hx-disabled-elt="this" id={ f.ID } class="min-w-56">
 			<div class="flex flex-col items-center">
 				<h2 class="text-base font-semibold leading-7 text-gray-900">{ f.Title }</h2>
@@ -67,15 +66,15 @@ templ FormComponent(f Form) {
 						@ButtonComponent(Button{Attr: templ.Attributes{"id": getCancelButtonID(f.ID)}}) {
 							Cancel
 							<script>
-							(() => {
-								const cancelScript = document.currentScript;
-								const cancelButton = cancelScript.closest("button");
-								cancelButton.addEventListener("click", (e) => {
-									e.preventDefault();
-									const dialog = cancelButton.closest("dialog");
-									dialog.close();
-								});
-							})();
+								(() => {
+									const cancelScript = document.currentScript;
+									const cancelButton = cancelScript.closest("button");
+									cancelButton.addEventListener("click", (e) => {
+										e.preventDefault();
+										const dialog = cancelButton.closest("dialog");
+										dialog.close();
+									});
+								})();
 							</script>
 						}
 					}
@@ -86,6 +85,24 @@ templ FormComponent(f Form) {
 				<div id={ getConfirmationID(f.ID) }></div>
 				@Indicator("loading")
 			</div>
+			<script type="text/javascript">
+				(() => {
+					const script = document.currentScript;
+					document.querySelector("body").addEventListener("htmx:afterRequest", (e) => {
+						const form = script.closest("form");
+						const formID = form.getAttribute("id");
+						console.log("form id: " + formID);
+						console.log("afterRequest event triggered");
+						console.log("event target: " + e.target)
+						var xhr = e.detail.xhr;
+						console.log(xhr.status);
+						if (xhr.status === 201) {
+							const dialog = form.closest("dialog");
+							dialog.close();
+						}
+				})
+				})();
+			</script>
 		</form>
 	</dialog>
 	if !f.ShowDialog {
@@ -106,31 +123,4 @@ templ FormComponent(f Form) {
 			</script>
 		</button>
 	}
-	<script type="text/javascript">
-	// (()=>{
-	// 	const script = document.currentScript;
-	// 	const form = document.closest("form");
-	// 	const form = document.querySelector({f.ID});
-	// 	const dialog = document.querySelector(getDialogID(f.ID));
-	// 	const openDialog = document.querySelector(getOpenDialogID(f.ID));
-	// 	const submitButton = document.querySelector(getSubmitButtonID(f.ID));
-	// 	const cancelButton = document.querySelector(getCancelButtonID(f.ID));
-
-	// 	openDialog.addEventListener("click", () => {
-	// 		dialog.showModal();
-	// 	});
-
-	// 	cancelButton.addEventListener("click", (e) => {
-	// 		e.preventDefault();
-	// 		dialog.close();
-	// 	});
-
-	// 	submitButton.addEventListener("click", (e) => {
-	// 		e.preventDefault();
-	// 		if (form.reportValidity()) {
-	// 			form.submit();
-	// 		}
-	// 	});
-	// })();
-</script>
 }

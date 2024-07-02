@@ -1,8 +1,8 @@
 package dashboard
 
 import (
-	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain"
 	"strconv"
 )
 
@@ -26,6 +26,6 @@ func studentToRow(student *domain.Student) components.Row {
 	}
 }
 
-templ StudentRow(student *domain.Student) {
+templ StudentRowComponent(student *domain.Student) {
 	@components.TableRowComponent(studentToRow(student))
 }
