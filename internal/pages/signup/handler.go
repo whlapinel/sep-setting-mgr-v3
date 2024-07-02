@@ -49,7 +49,7 @@ func (h handler) HxHandleSignUp(c echo.Context) error {
 
 func (h handler) SignUpHandler(c echo.Context) error {
 	if util.IsHTMX(c) {
-		return util.RenderTempl(SignUpPage(), c)
+		return util.RenderTempl(SignUpPage(), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(SignUpPage()), c)
+	return util.RenderTempl(layouts.MainLayout(SignUpPage()), c, 200)
 }

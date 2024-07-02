@@ -33,9 +33,9 @@ func Mount(e *echo.Echo, h Handler) {
 func (h handler) SignInHandler(c echo.Context) error {
 	isSignedIn := auth.IsSignedIn(c)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(SignInPage(isSignedIn), c)
+		return util.RenderTempl(SignInPage(isSignedIn), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(SignInPage(isSignedIn)), c)
+	return util.RenderTempl(layouts.MainLayout(SignInPage(isSignedIn)), c, 200)
 }
 
 func (h handler) HxHandleSignin(c echo.Context) error {

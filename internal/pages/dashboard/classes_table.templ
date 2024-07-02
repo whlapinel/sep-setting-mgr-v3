@@ -1,8 +1,8 @@
 package dashboard
 
 import (
-	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain"
 )
 
 func prepareClassesForTable(classes []*domain.Class) components.TableData {
@@ -11,7 +11,7 @@ func prepareClassesForTable(classes []*domain.Class) components.TableData {
 	for _, class := range classes {
 		rows = append(rows, classToRow(class))
 	}
-	return components.TableData{Title: "Classes", Headers: headers, Rows: rows}
+	return components.TableData{ID: "classes-table", Title: "Classes", Headers: headers, Rows: rows}
 }
 
 templ ClassesTable(classes []*domain.Class) {

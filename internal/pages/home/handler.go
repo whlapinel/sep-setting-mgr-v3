@@ -27,7 +27,7 @@ func Mount(e *echo.Echo, h Handler) {
 
 func (h handler) Home(c echo.Context) error {
 	if util.IsHTMX(c) {
-		return util.RenderTempl(HomePage(), c)
+		return util.RenderTempl(HomePage(), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(HomePage()), c)
+	return util.RenderTempl(layouts.MainLayout(HomePage()), c, 200)
 }

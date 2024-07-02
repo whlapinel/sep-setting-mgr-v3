@@ -12,6 +12,7 @@ type Row struct {
 }
 
 type TableData struct {
+	ID      string
 	Title   string
 	Headers []string
 	Rows    []Row
@@ -29,7 +30,7 @@ templ TableComponent(t TableData) {
 				}
 			</tr>
 		</thead>
-		<tbody id="table">
+		<tbody id={ t.ID }>
 			for _, row := range t.Rows {
 				@TableRowComponent(row)
 			}

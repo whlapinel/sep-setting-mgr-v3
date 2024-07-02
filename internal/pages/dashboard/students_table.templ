@@ -5,16 +5,16 @@ import (
 	"sep_setting_mgr/internal/domain"
 )
 
-
 func prepareStudentsForTable(students []*domain.Student) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, student := range students {
 		rows = append(rows, studentToRow(student))
 	}
-	return components.TableData{Title: "Students", Headers: headers, Rows: rows}
+	return components.TableData{ID: "students-table", Title: "Students", Headers: headers, Rows: rows}
 }
 
 templ StudentTableComponent(students []*domain.Student, classID int) {
+	@AddStudentForm(classID)
 	@components.TableComponent(prepareStudentsForTable(students))
 }

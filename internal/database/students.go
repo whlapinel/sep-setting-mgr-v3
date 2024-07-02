@@ -97,3 +97,13 @@ func createStudentsTable(db *sql.DB) error {
 	}
 	return nil
 }
+
+func (sr *studentRepo) Delete(studentID int) error {
+	_, err := sr.db.Exec(`
+	DELETE FROM students 
+	WHERE id = ?`, studentID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
