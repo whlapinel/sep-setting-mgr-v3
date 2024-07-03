@@ -2,26 +2,21 @@ package unauthorized
 
 import (
 	"net/http"
+	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
 
-type (
-	Handler interface {
-		// redirect after middleware credential check fails
-		UnauthorizedHandler(c echo.Context) error
-	}
-	handler struct {
-	}
-)
+type handler struct {
+}
 
-func NewHandler() Handler {
+func NewHandler() domain.UnauthorizedHandler {
 	return &handler{}
 }
 
-func Mount(e *echo.Echo, h Handler) {
+func Mount(e *echo.Echo, h domain.UnauthorizedHandler) {
 	e.GET("/unauthorized", h.UnauthorizedHandler)
 }
 

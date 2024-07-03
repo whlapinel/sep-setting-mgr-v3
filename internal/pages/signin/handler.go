@@ -2,30 +2,22 @@ package signin
 
 import (
 	"sep_setting_mgr/internal/auth"
+	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
 
-type (
-	Handler interface {
-		// signin : GET /
-		SignInHandler(e echo.Context) error
-		// signin : POST /
-		HxHandleSignin(e echo.Context) error
-	}
+type handler struct {
+	service domain.SigninService
+}
 
-	handler struct {
-		service Service
-	}
-)
-
-func NewHandler(svc Service) Handler {
+func NewHandler(svc domain.SigninService) domain.SigninHandler {
 	return &handler{service: svc}
 }
 
-func Mount(e *echo.Echo, h Handler) {
+func Mount(e *echo.Echo, h domain.SigninHandler) {
 	e.GET("/signin", h.SignInHandler)
 	e.POST("/hx-signin", h.HxHandleSignin)
 }

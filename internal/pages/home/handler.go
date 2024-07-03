@@ -1,6 +1,7 @@
 package home
 
 import (
+	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
@@ -8,20 +9,15 @@ import (
 )
 
 type (
-	Handler interface {
-		// Dashboard : GET /
-		Home(e echo.Context) error
-	}
-
 	handler struct {
 	}
 )
 
-func NewHandler() Handler {
+func NewHandler() domain.HomeHandler {
 	return &handler{}
 }
 
-func Mount(e *echo.Echo, h Handler) {
+func Mount(e *echo.Echo, h domain.HomeHandler) {
 	e.GET("/", h.Home)
 }
 

@@ -3,30 +3,22 @@ package signup
 import (
 	"fmt"
 	"log"
+	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
 
-type (
-	Handler interface {
-		// signin : GET /
-		SignUpHandler(c echo.Context) error
-		// signin : POST /
-		HxHandleSignUp(c echo.Context) error
-	}
+type handler struct {
+	service domain.SignupService
+}
 
-	handler struct {
-		service Service
-	}
-)
-
-func NewHandler(svc Service) Handler {
+func NewHandler(svc domain.SignupService) domain.SignupHandler {
 	return &handler{service: svc}
 }
 
-func Mount(e *echo.Echo, h Handler) {
+func Mount(e *echo.Echo, h domain.SignupHandler) {
 	e.GET("/signup", h.SignUpHandler)
 	e.POST("/hx-signup", h.HxHandleSignUp)
 }

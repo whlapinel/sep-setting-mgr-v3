@@ -2,26 +2,20 @@ package signout
 
 import (
 	"sep_setting_mgr/internal/auth"
+	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
 
-type (
-	Handler interface {
-		// signout : POST /
-		HxHandleSignOut(c echo.Context) error
-	}
+type handler struct {
+}
 
-	handler struct {
-	}
-)
-
-func NewHandler() Handler {
+func NewHandler() domain.SignoutHandler {
 	return &handler{}
 }
 
-func Mount(e *echo.Echo, h Handler) {
+func Mount(e *echo.Echo, h domain.SignoutHandler) {
 	e.POST("/hx-signout", h.HxHandleSignOut)
 }
 
