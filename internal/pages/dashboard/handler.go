@@ -4,42 +4,22 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
+	"sep_setting_mgr/internal/domain"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 )
 
 type (
-	Handler interface {
-
-		// Dashboard : GET /dashboard
-		DashboardHandler(c echo.Context) error
-
-		// Create : POST /dashboard/classes
-		CreateClass(c echo.Context) error
-
-		// Delete : DELETE /dashboard/classes/:classID
-		DeleteClass(c echo.Context) error
-
-		// Students : GET /dashboard/classes/:classID/students
-		Students(c echo.Context) error
-
-		// AddStudent : POST /dashboard/classes/:classID/students
-		AddStudent(c echo.Context) error
-
-		// DeleteStudent : DELETE /dashboard/students/:studentID
-		DeleteStudent(c echo.Context) error
-	}
-
 	handler struct {
-		service Service
+		service domain.DashboardService
 	}
 )
 
-func NewHandler(svc Service) Handler {
+func NewHandler(svc domain.DashboardService) domain.DashboardHandler {
 	return &handler{service: svc}
 }
 
-func Mount(e *echo.Echo, h Handler) {
+func Mount(e *echo.Echo, h domain.DashboardHandler) {
 	r := e.Group("/dashboard")
 	r.Use(auth.AddCookieToHeader)
 	r.Use(auth.JWTMiddleware)

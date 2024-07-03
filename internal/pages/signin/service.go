@@ -4,18 +4,11 @@ import (
 	"sep_setting_mgr/internal/domain"
 )
 
-type (
-	Service interface {
-		VerifyCredentials(email string, password string) (bool, error)
-		GetUserID(email string) int
-	}
+type service struct {
+	users domain.UserRepository
+}
 
-	service struct {
-		users domain.UserRepository
-	}
-)
-
-func NewService(users domain.UserRepository) Service {
+func NewService(users domain.UserRepository) domain.SigninService {
 	return &service{users: users}
 }
 

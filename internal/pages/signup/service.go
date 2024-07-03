@@ -2,17 +2,11 @@ package signup
 
 import "sep_setting_mgr/internal/domain"
 
-type (
-	Service interface {
-		CreateUser(username string, password string) (bool, error)
-	}
+type service struct {
+	users domain.UserRepository
+}
 
-	service struct {
-		users domain.UserRepository
-	}
-)
-
-func NewService(users domain.UserRepository) Service {
+func NewService(users domain.UserRepository) domain.SignupService {
 	return &service{users: users}
 }
 
