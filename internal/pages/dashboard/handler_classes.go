@@ -13,7 +13,7 @@ func (h handler) DeleteClass(c echo.Context) error {
 	if !util.IsHTMX(c) {
 		return c.String(400, "Invalid request")
 	}
-	classID, err := strconv.Atoi(c.Param("classid"))
+	classID, err := strconv.Atoi(c.Param("class-id"))
 	if err != nil {
 		return c.String(400, "Invalid class ID")
 	}

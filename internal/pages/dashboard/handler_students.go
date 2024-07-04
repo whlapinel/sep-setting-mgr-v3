@@ -13,7 +13,7 @@ func (h handler) Students(c echo.Context) error {
 	if !util.IsHTMX(c) {
 		return c.String(400, "Invalid request")
 	}
-	idParam := c.Param("classid")
+	idParam := c.Param("class-id")
 	classID, err := strconv.Atoi(idParam)
 	if err != nil {
 		return c.String(400, "Invalid class ID")
@@ -37,7 +37,7 @@ func (h handler) AddStudent(c echo.Context) error {
 	lastName := c.FormValue("last-name")
 	log.Println("First name:", firstName)
 	log.Println("Last name:", lastName)
-	classID, err := strconv.Atoi(c.Param("classid"))
+	classID, err := strconv.Atoi(c.Param("class-id"))
 	if err != nil {
 		return c.String(400, "Invalid class ID")
 	}
@@ -52,7 +52,7 @@ func (h handler) DeleteStudent(c echo.Context) error {
 	if !util.IsHTMX(c) {
 		return c.String(400, "Invalid request")
 	}
-	studentID, err := strconv.Atoi(c.Param("studentid"))
+	studentID, err := strconv.Atoi(c.Param("student-id"))
 	if err != nil {
 		return c.String(400, "Invalid student ID")
 	}

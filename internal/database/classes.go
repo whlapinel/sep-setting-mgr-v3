@@ -70,8 +70,11 @@ func (classRepo *classRepo) All(teacherID int) ([]*domain.Class, error) {
 }
 
 func (classRepo *classRepo) FindByID(classID int) (*domain.Class, error) {
+	log.SetPrefix("Repository: ")
+	log.Println("Finding class by ID")
+	log.Println("Class ID: ", classID)
 	var dbClass classTableRow
-
+	dbClass.id = classID
 	class := convertToClass(dbClass)
 	return class, nil
 }

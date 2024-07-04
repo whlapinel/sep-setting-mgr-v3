@@ -25,12 +25,15 @@ func Mount(e *echo.Echo, h domain.DashboardHandler) {
 	r.Use(auth.JWTMiddleware)
 	r.Use(auth.GetClaims)
 	r.GET("", h.DashboardHandler)
-	r.DELETE("/students/:studentid", h.DeleteStudent)
+	r.DELETE("/students/:student-id", h.DeleteStudent)
+	r.DELETE("/test-events/:test-event-id", h.DeleteTestEvent)
 	classesGroup := r.Group("/classes")
 	classesGroup.POST("", h.CreateClass)
-	classIDgroup := classesGroup.Group("/:classid")
+	classIDgroup := classesGroup.Group("/:class-id")
 	classIDgroup.DELETE("", h.DeleteClass)
 	classIDgroup.GET("/students", h.Students)
+	classIDgroup.GET("/test-events", h.TestEvents)
+	classIDgroup.POST("/test-events", h.CreateTestEvent)
 	classIDgroup.POST("/students", h.AddStudent)
 }
 

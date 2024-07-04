@@ -1,0 +1,38 @@
+package dashboard
+
+import (
+	"sep_setting_mgr/internal/components"
+	"strconv"
+)
+
+templ AddTestEventForm(classID int) {
+	@components.FormComponent(components.Form{
+		Title:    "Add Test Event",
+		SubTitle: "Add a Test Event to Class",
+		HxAttr: templ.Attributes{
+			"hx-post":      "/dashboard/classes/" + strconv.Itoa(classID) + "/test-events",
+			"hx-target":    "#test-events-table",
+			"hx-swap":      "afterbegin",
+			"hx-indicator": "#test-events-indicator",
+		},
+		SubmitBtnTitle: "Add",
+		Cancelable:     true,
+		ID:             "add-test-event-form",
+	}) {
+		@components.InputComponent(components.Input{
+			Label:       "Test Name",
+			Placeholder: "e.g. Unit 1 Test",
+			ID:          "test-name",
+			Type:        "text",
+			Name:        "test-name",
+			Required:    true,
+		})
+		@components.InputComponent(components.Input{
+			Label:    "Test Date",
+			ID:       "test-date",
+			Type:     "date",
+			Name:     "test-date",
+			Required: true,
+		})
+	}
+}
