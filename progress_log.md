@@ -2,7 +2,7 @@
 
 ## 7/4
 
-- Added test events functionality from nearly scratch with lightning speed. Basically just my other objects as examples and tailored accordingly. Amazed at how much faster this was. Didn't really get stuck anywhere.  Things are beginning to make a lot more sense, and I feel confident that this stack could work very well for production development. 
+- Added test events functionality from nearly scratch with lightning speed. Basically just my other objects as examples and tailored accordingly. Amazed at how much faster this was. Didn't really get stuck anywhere.  Things are beginning to make a lot more sense, and I feel confident that this stack could work very well for production development.
 
 ## 7/3
 

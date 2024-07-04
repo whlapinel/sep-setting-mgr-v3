@@ -2,6 +2,10 @@
 
 ## PENDING
 
+- dashboard: URL params should be changed to query params e.g. dashboard/classes/:class-id?students=true&test-events=true so that display state can be reflected accurately in the URL.
+- test rooms functionality
+- admin functionality
+
 ## COMPLETE
 
 - change hx-post url in add-student-form component and url of handler
