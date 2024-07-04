@@ -1,5 +1,13 @@
 # PROGRESS LOG
 
+## 7/4
+
+- Added test events functionality from nearly scratch with lightning speed. Basically just my other objects as examples and tailored accordingly. Amazed at how much faster this was. Didn't really get stuck anywhere.  Things are beginning to make a lot more sense, and I feel confident that this stack could work very well for production development. 
+
+## 7/3
+
+- today I moved all my page interfaces (handlers, services) to the domain package and now everything makes a lot more sense. Don't really understand why my interfaces were in the same place as their implementation.
+
 ## 7/2
 
 - modified util.RenderTempl to allow adding a status code.

@@ -32,6 +32,11 @@ func classToRow(class *domain.Class) components.Row {
 			},
 			{
 				Text: "Tests",
+				Attr: templ.Attributes{
+					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/test-events",
+					"hx-target":   "#test-events-table",
+					"hx-push-url": "true",
+				},
 			},
 		},
 	}

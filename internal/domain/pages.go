@@ -1,6 +1,8 @@
 package domain
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+)
 
 type DashboardService interface {
 	// List returns a copy of the todos list
@@ -11,26 +13,38 @@ type DashboardService interface {
 	DeleteStudent(studentID int) error
 	ListStudents(classID int) ([]*Student, error)
 	FindClassByID(classID int) (*Class, error)
+	ListAllTestEvents(classID int) (*TestEvents, error)
+	CreateTestEvent(classID int, testName string, testDate string) (*TestEvent, error)
+	DeleteTestEvent(testEventID int) error
 }
 
 type DashboardHandler interface {
-	// Dashboard : GET /dashboard
+	// GET /dashboard
 	DashboardHandler(c echo.Context) error
 
-	// Create : POST /dashboard/classes
+	// POST /dashboard/classes
 	CreateClass(c echo.Context) error
 
-	// Delete : DELETE /dashboard/classes/:classID
+	// DELETE /dashboard/classes/:class-id
 	DeleteClass(c echo.Context) error
 
-	// Students : GET /dashboard/classes/:classID/students
+	// GET /dashboard/classes/:class-id/students
 	Students(c echo.Context) error
 
-	// AddStudent : POST /dashboard/classes/:classID/students
+	// POST /dashboard/classes/:class-id/students
 	AddStudent(c echo.Context) error
 
-	// DeleteStudent : DELETE /dashboard/students/:studentID
+	// DELETE /students/:student-id
 	DeleteStudent(c echo.Context) error
+
+	// GET /dashboard/classes/:class-id/test-events
+	TestEvents(c echo.Context) error
+
+	// POST /dashboard/classes/:class-id/test-events
+	CreateTestEvent(c echo.Context) error
+
+	// DELETE /test-events/test-event-id
+	DeleteTestEvent(c echo.Context) error
 }
 
 type HomeHandler interface {

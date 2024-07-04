@@ -1,0 +1,20 @@
+package dashboard
+
+import (
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain"
+)
+
+func prepareTestEventsForTable(testEvents *domain.TestEvents) components.TableData {
+	var rows []components.Row
+	headers := []string{"Name", "Date"}
+	for _, testEvent := range *testEvents {
+		rows = append(rows, testEventToRow(testEvent))
+	}
+	return components.TableData{ID: "test-events-table", Title: "Test Events", Headers: headers, Rows: rows}
+}
+
+templ TestEventsTableComponent(testEvents *domain.TestEvents, classID int) {
+	@AddTestEventForm(classID)
+	@components.TableComponent(prepareTestEventsForTable(testEvents))
+}
