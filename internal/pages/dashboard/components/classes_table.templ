@@ -2,10 +2,11 @@ package components
 
 import (
 	"sep_setting_mgr/internal/components"
-	domain "sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
 )
 
-func prepareClassesForTable(classes []*domain.Class) components.TableData {
+func prepareClassesForTable(classes []*models.Class) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, class := range classes {
@@ -14,6 +15,46 @@ func prepareClassesForTable(classes []*domain.Class) components.TableData {
 	return components.TableData{ID: "classes-table", Title: "Classes", Headers: headers, Rows: rows}
 }
 
-templ ClassesTable(classes []*domain.Class) {
+templ ClassesTable(classes []*models.Class) {
 	@components.TableComponent(prepareClassesForTable(classes))
+}
+
+func classToRow(class *models.Class) components.Row {
+	return components.Row{
+		Data: []string{class.Name, strconv.Itoa(class.Block)},
+		ID:   class.ID,
+		Buttons: []components.TableButton{
+			{
+				Text: "Edit",
+			},
+			{
+				Text: "Delete",
+				Attr: templ.Attributes{
+					"hx-delete":  "/dashboard/classes/" + strconv.Itoa(class.ID),
+					"hx-target":  "closest tr",
+					"hx-confirm": "Are you sure you want to delete this class?",
+				},
+			},
+			{
+				Text: "Students",
+				Attr: templ.Attributes{
+					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/students",
+					"hx-target":   "#details",
+					"hx-push-url": "true",
+				},
+			},
+			{
+				Text: "Tests",
+				Attr: templ.Attributes{
+					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/test-events",
+					"hx-target":   "#details",
+					"hx-push-url": "true",
+				},
+			},
+		},
+	}
+}
+
+templ ClassRowComponent(class *models.Class) {
+	@components.TableRowComponent(classToRow(class))
 }

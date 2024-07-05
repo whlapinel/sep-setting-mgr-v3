@@ -1,0 +1,40 @@
+package components
+
+import "time"
+
+const format string = "2006-01-02"
+
+func getToday() time.Time {
+	return time.Now()
+}
+
+func getThisMonday() time.Time {
+	today := getToday()
+	return today.AddDate(0, 0, -int(today.Weekday())+1)
+}
+
+templ CalendarComponent() {
+	<h1>Calendar</h1>
+	@WeekComponent(getThisMonday())
+	@WeekComponent(getThisMonday().AddDate(0, 0, 7))
+}
+
+templ DayComponent(date time.Time) {
+	<h3>{ date.Format(format) }</h3>
+}
+
+func getFriday(date time.Time) time.Time {
+	return date.AddDate(0, 0, 4)
+}
+
+templ WeekComponent(date time.Time) {
+	if date.Weekday() != time.Monday {
+		return
+	}
+	<h2>Week of { date.Format(format) } to { getFriday(date).Format(format) } </h2>
+	<div class="flex gap-2">
+		for i := 0; i < 5; i++ {
+			@DayComponent(date.AddDate(0, 0, i))
+		}
+	</div>
+}

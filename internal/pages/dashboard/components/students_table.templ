@@ -2,10 +2,11 @@ package components
 
 import (
 	"sep_setting_mgr/internal/components"
-	domain "sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
 )
 
-func prepareStudentsForTable(students []*domain.Student) components.TableData {
+func prepareStudentsForTable(students []*models.Student) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, student := range students {
@@ -14,7 +15,31 @@ func prepareStudentsForTable(students []*domain.Student) components.TableData {
 	return components.TableData{ID: "students-table", Title: "Students", Headers: headers, Rows: rows}
 }
 
-templ StudentTableComponent(students []*domain.Student, classID int) {
+templ StudentTableComponent(students []*models.Student, classID int) {
 	@AddStudentForm(classID)
 	@components.TableComponent(prepareStudentsForTable(students))
+}
+
+func studentToRow(student *models.Student) components.Row {
+	return components.Row{
+		Data: []string{student.FirstName, student.LastName},
+		ID:   student.ID,
+		Buttons: []components.TableButton{
+			{
+				Text: "Edit",
+			},
+			{
+				Text: "Delete",
+				Attr: templ.Attributes{
+					"hx-delete":  "/dashboard/students/" + strconv.Itoa(student.ID),
+					"hx-target":  "closest tr",
+					"hx-confirm": "Are you sure you want to delete this student?",
+				},
+			},
+		},
+	}
+}
+
+templ StudentRowComponent(student *models.Student) {
+	@components.TableRowComponent(studentToRow(student))
 }

@@ -26,6 +26,7 @@ func Mount(e *echo.Echo, h pages.DashboardHandler) {
 	r.Use(auth.JWTMiddleware)
 	r.Use(auth.GetClaims)
 	r.GET("", h.DashboardHandler)
+	r.GET("/calendar", h.ShowCalendar)
 	r.DELETE("/students/:student-id", h.DeleteStudent)
 	r.DELETE("/test-events/:test-event-id", h.DeleteTestEvent)
 	classesGroup := r.Group("/classes")
@@ -48,4 +49,11 @@ func (h handler) DashboardHandler(c echo.Context) error {
 		return util.RenderTempl(components.DashboardPage(classes), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes)), c, 200)
+}
+
+func (h handler) ShowCalendar(c echo.Context) error {
+	if util.IsHTMX(c) {
+		return util.RenderTempl(components.CalendarComponent(), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(components.CalendarComponent()), c, 200)
 }

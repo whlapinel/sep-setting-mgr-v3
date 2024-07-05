@@ -24,6 +24,9 @@ type DashboardHandler interface {
 	// GET /dashboard
 	DashboardHandler(c echo.Context) error
 
+	// GET /dashboard/calendar
+	ShowCalendar(c echo.Context) error
+
 	// POST /dashboard/classes
 	CreateClass(c echo.Context) error
 
