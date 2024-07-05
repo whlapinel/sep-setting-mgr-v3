@@ -1,16 +1,11 @@
 package database
 
 import (
-	"database/sql"
 	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/testutils"
 	"testing"
 )
-
-type mockDB struct {
-	db *sql.DB
-}
 
 func TestNewStudentsRepo(t *testing.T) {
 	testutils.LoadEnvironment()
