@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"log"
+	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
 	"strconv"
 
@@ -20,7 +21,7 @@ func (h handler) TestEvents(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to list test events. See server logs for details.")
 	}
-	return util.RenderTempl(TestEventsTableComponent(testEvents, classID), c, 200)
+	return util.RenderTempl(components.TestEventsTableComponent(testEvents, classID), c, 200)
 }
 
 func (h handler) CreateTestEvent(c echo.Context) error {
@@ -38,7 +39,7 @@ func (h handler) CreateTestEvent(c echo.Context) error {
 		log.Println("Failed to create test event:", err)
 		return c.String(500, "Failed to create test event. See server logs for details.")
 	}
-	return util.RenderTempl(TestEventRowComponent(testEvent), c, 201)
+	return util.RenderTempl(components.TestEventRowComponent(testEvent), c, 201)
 }
 
 func (h handler) DeleteTestEvent(c echo.Context) error {

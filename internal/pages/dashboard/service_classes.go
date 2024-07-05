@@ -2,7 +2,7 @@ package dashboard
 
 import (
 	"log"
-	"sep_setting_mgr/internal/domain"
+	domain "sep_setting_mgr/internal/domain/models"
 )
 
 func (s service) DeleteClass(classID int) error {

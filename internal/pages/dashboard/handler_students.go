@@ -3,6 +3,7 @@ package dashboard
 import (
 	"log"
 	"net/http"
+	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
 	"strconv"
 
@@ -28,7 +29,7 @@ func (h handler) Students(c echo.Context) error {
 		return c.String(500, "Failed to list students. See server logs for details.")
 	}
 	class.Students = students
-	return util.RenderTempl(StudentTableComponent(class.Students, classID), c, 200)
+	return util.RenderTempl(components.StudentTableComponent(class.Students, classID), c, 200)
 }
 
 func (h handler) AddStudent(c echo.Context) error {
@@ -45,7 +46,7 @@ func (h handler) AddStudent(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to add student. See server logs for details.")
 	}
-	return util.RenderTempl(StudentRowComponent(student), c, 201)
+	return util.RenderTempl(components.StudentRowComponent(student), c, 201)
 }
 
 func (h handler) DeleteStudent(c echo.Context) error {

@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
-	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/domain/models"
 	"time"
 )
 
@@ -20,7 +20,7 @@ type (
 	}
 )
 
-func NewTestEventsRepo(db *sql.DB) domain.TestEventRepository {
+func NewTestEventsRepo(db *sql.DB) models.TestEventRepository {
 	err := createTestEventTable(db)
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func NewTestEventsRepo(db *sql.DB) domain.TestEventRepository {
 	return &testEventsRepo{db: db}
 }
 
-func (tr *testEventsRepo) Store(testEvent *domain.TestEvent) (int, error) {
+func (tr *testEventsRepo) Store(testEvent *models.TestEvent) (int, error) {
 	log.SetPrefix("Repository: ")
 	log.Println("Storing test event in database")
 	log.Println("Class ID: ", testEvent.Class.ID)
@@ -43,8 +43,8 @@ func (tr *testEventsRepo) Store(testEvent *domain.TestEvent) (int, error) {
 	return testEvent.ID, nil
 }
 
-func (tr *testEventsRepo) FindByClass(classID int) (*domain.TestEvents, error) {
-	var testEvents domain.TestEvents
+func (tr *testEventsRepo) FindByClass(classID int) (*models.TestEvents, error) {
+	var testEvents models.TestEvents
 	var tableRows []testEventTableRow
 	rows, err := tr.db.Query(`
 	SELECT * FROM test_events 
@@ -68,7 +68,7 @@ func (tr *testEventsRepo) FindByClass(classID int) (*domain.TestEvents, error) {
 	return &testEvents, nil
 }
 
-func convertTestEventToTable(testEvent *domain.TestEvent) testEventTableRow {
+func convertTestEventToTable(testEvent *models.TestEvent) testEventTableRow {
 	return testEventTableRow{
 		id:        testEvent.ID,
 		test_name: testEvent.TestName,
@@ -77,12 +77,12 @@ func convertTestEventToTable(testEvent *domain.TestEvent) testEventTableRow {
 	}
 }
 
-func convertToTestEvent(tableRow testEventTableRow) *domain.TestEvent {
-	return &domain.TestEvent{
+func convertToTestEvent(tableRow testEventTableRow) *models.TestEvent {
+	return &models.TestEvent{
 		ID:       tableRow.id,
 		TestName: tableRow.test_name,
 		TestDate: &tableRow.test_date,
-		Class: &domain.Class{
+		Class: &models.Class{
 			ID: tableRow.class_id,
 		},
 	}

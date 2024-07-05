@@ -1,7 +1,7 @@
 package home
 
 import (
-	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
@@ -13,11 +13,11 @@ type (
 	}
 )
 
-func NewHandler() domain.HomeHandler {
+func NewHandler() pages.HomeHandler {
 	return &handler{}
 }
 
-func Mount(e *echo.Echo, h domain.HomeHandler) {
+func Mount(e *echo.Echo, h pages.HomeHandler) {
 	e.GET("/", h.Home)
 }
 

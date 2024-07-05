@@ -1,4 +1,4 @@
-package domain
+package models
 
 type (
 	User struct {
@@ -23,6 +23,7 @@ type (
 		Find(username string) (*User, error)
 		GetClasses(user *User) ([]*Class, error)
 		GetStudents(user *User) ([]*Student, error)
+		All() ([]*User, error)
 	}
 )
 

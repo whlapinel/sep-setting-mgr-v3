@@ -3,7 +3,7 @@ package signup
 import (
 	"fmt"
 	"log"
-	"sep_setting_mgr/internal/domain"
+	domain "sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 

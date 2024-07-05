@@ -3,6 +3,7 @@ package dashboard
 import (
 	"log"
 	"net/http"
+	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
 	"strconv"
 
@@ -42,7 +43,7 @@ func (h handler) CreateClass(c echo.Context) error {
 	switch util.IsHTMX(c) {
 	case true:
 
-		err := util.RenderTempl(ClassRowComponent(class), c, 201)
+		err := util.RenderTempl(components.ClassRowComponent(class), c, 201)
 		if err != nil {
 			return c.String(500, "Failed to render class row component. See server logs for details.")
 		}

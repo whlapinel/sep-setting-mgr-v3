@@ -2,7 +2,7 @@ package signin
 
 import (
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/domain"
+	domain "sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 

@@ -2,7 +2,7 @@ package signout
 
 import (
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/domain"
+	domain "sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"

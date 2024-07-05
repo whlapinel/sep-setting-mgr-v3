@@ -4,22 +4,23 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
 )
 
 type (
 	handler struct {
-		service domain.DashboardService
+		service pages.DashboardService
 	}
 )
 
-func NewHandler(svc domain.DashboardService) domain.DashboardHandler {
+func NewHandler(svc pages.DashboardService) pages.DashboardHandler {
 	return &handler{service: svc}
 }
 
-func Mount(e *echo.Echo, h domain.DashboardHandler) {
+func Mount(e *echo.Echo, h pages.DashboardHandler) {
 	r := e.Group("/dashboard")
 	r.Use(auth.AddCookieToHeader)
 	r.Use(auth.JWTMiddleware)
@@ -44,7 +45,7 @@ func (h handler) DashboardHandler(c echo.Context) error {
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(DashboardPage(classes), c, 200)
+		return util.RenderTempl(components.DashboardPage(classes), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(DashboardPage(classes)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes)), c, 200)
 }

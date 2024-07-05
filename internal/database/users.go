@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
-	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/domain/models"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -19,12 +19,12 @@ type userRepo struct {
 	db *sql.DB
 }
 
-func NewUsersRepo(db *sql.DB) domain.UserRepository {
+func NewUsersRepo(db *sql.DB) models.UserRepository {
 	createUsersTable(db)
 	return &userRepo{db: db}
 }
 
-func (ur *userRepo) Store(user *domain.User) error {
+func (ur *userRepo) Store(user *models.User) error {
 	dbUser := convertToTable(user)
 	log.Println("Adding user to database")
 	_, err := ur.db.Exec(`INSERT INTO users (email, password, admin) VALUES (?, ?, ?)`, dbUser.email, dbUser.password, dbUser.admin)
@@ -34,13 +34,13 @@ func (ur *userRepo) Store(user *domain.User) error {
 	return nil
 }
 
-func (ur *userRepo) All() []*domain.User {
-	var users []*domain.User
+func (ur *userRepo) All() ([]*models.User, error) {
+	var users []*models.User
 
-	return users
+	return users, nil
 }
 
-func (ur *userRepo) Find(email string) (*domain.User, error) {
+func (ur *userRepo) Find(email string) (*models.User, error) {
 	var dbUser userTable
 	ur.db.QueryRow(`SELECT * FROM users WHERE email = ?`, email).
 		Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
@@ -48,14 +48,14 @@ func (ur *userRepo) Find(email string) (*domain.User, error) {
 	return user, nil
 }
 
-func (ur *userRepo) GetClasses(user *domain.User) ([]*domain.Class, error) {
-	var classes []*domain.Class
+func (ur *userRepo) GetClasses(user *models.User) ([]*models.Class, error) {
+	var classes []*models.Class
 
 	return classes, nil
 }
 
-func (ur *userRepo) GetStudents(user *domain.User) ([]*domain.Student, error) {
-	var classes []*domain.Student
+func (ur *userRepo) GetStudents(user *models.User) ([]*models.Student, error) {
+	var classes []*models.Student
 
 	return classes, nil
 }
@@ -78,8 +78,8 @@ func createUsersTable(db *sql.DB) error {
 	return nil
 }
 
-func convertFromTable(dbUser userTable) *domain.User {
-	return &domain.User{
+func convertFromTable(dbUser userTable) *models.User {
+	return &models.User{
 		ID:       dbUser.id,
 		Email:    dbUser.email,
 		Password: dbUser.password,
@@ -87,7 +87,7 @@ func convertFromTable(dbUser userTable) *domain.User {
 	}
 }
 
-func convertToTable(user *domain.User) userTable {
+func convertToTable(user *models.User) userTable {
 	return userTable{
 		email:    user.Email,
 		password: user.Password,

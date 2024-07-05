@@ -1,20 +1,22 @@
-package domain
+package pages
 
 import (
+	"sep_setting_mgr/internal/domain/models"
+
 	"github.com/labstack/echo/v4"
 )
 
 type DashboardService interface {
 	// List returns a copy of the todos list
-	List(teacherID int) ([]*Class, error)
-	AddClass(name string, block int, teacherID int) (*Class, error)
+	List(teacherID int) ([]*models.Class, error)
+	AddClass(name string, block int, teacherID int) (*models.Class, error)
 	DeleteClass(classID int) error
-	AddStudent(firstName string, lastName string, classID int) (*Student, error)
+	AddStudent(firstName string, lastName string, classID int) (*models.Student, error)
 	DeleteStudent(studentID int) error
-	ListStudents(classID int) ([]*Student, error)
-	FindClassByID(classID int) (*Class, error)
-	ListAllTestEvents(classID int) (*TestEvents, error)
-	CreateTestEvent(classID int, testName string, testDate string) (*TestEvent, error)
+	ListStudents(classID int) ([]*models.Student, error)
+	FindClassByID(classID int) (*models.Class, error)
+	ListAllTestEvents(classID int) (*models.TestEvents, error)
+	CreateTestEvent(classID int, testName string, testDate string) (*models.TestEvent, error)
 	DeleteTestEvent(testEventID int) error
 }
 
@@ -45,6 +47,16 @@ type DashboardHandler interface {
 
 	// DELETE /test-events/test-event-id
 	DeleteTestEvent(c echo.Context) error
+}
+
+type AdminHandler interface {
+	// GET /admin
+	AdminHandler(c echo.Context) error
+}
+
+type AdminService interface {
+	// GET /admin/users
+	ListUsers() ([]*models.User, error)
 }
 
 type HomeHandler interface {

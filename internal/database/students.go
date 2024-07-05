@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/domain/models"
 )
 
 type (
@@ -18,7 +18,7 @@ type (
 	}
 )
 
-func NewStudentsRepo(db *sql.DB) domain.StudentRepository {
+func NewStudentsRepo(db *sql.DB) models.StudentRepository {
 	err := createStudentsTable(db)
 	if err != nil {
 		panic(err)
@@ -26,7 +26,7 @@ func NewStudentsRepo(db *sql.DB) domain.StudentRepository {
 	return &studentRepo{db: db}
 }
 
-func (sr *studentRepo) Store(student *domain.Student) (int, error) {
+func (sr *studentRepo) Store(student *models.Student) (int, error) {
 	dbStudent := convertToStudentTable(student)
 	_, err := sr.db.Exec(`
 	INSERT INTO students (first_name, last_name, class_id) 
@@ -38,8 +38,8 @@ func (sr *studentRepo) Store(student *domain.Student) (int, error) {
 	return student.ID, nil
 }
 
-func (sr *studentRepo) All(classID int) ([]*domain.Student, error) {
-	var students []*domain.Student
+func (sr *studentRepo) All(classID int) ([]*models.Student, error) {
+	var students []*models.Student
 	var tableRows []studentTableRow
 	rows, err := sr.db.Query(`
 	SELECT * FROM students 
@@ -63,7 +63,7 @@ func (sr *studentRepo) All(classID int) ([]*domain.Student, error) {
 	return students, nil
 }
 
-func convertToStudentTable(student *domain.Student) studentTableRow {
+func convertToStudentTable(student *models.Student) studentTableRow {
 	return studentTableRow{
 		id:         student.ID,
 		first_name: student.FirstName,
@@ -72,12 +72,12 @@ func convertToStudentTable(student *domain.Student) studentTableRow {
 	}
 }
 
-func convertToStudent(tableRow studentTableRow) *domain.Student {
-	return &domain.Student{
+func convertToStudent(tableRow studentTableRow) *models.Student {
+	return &models.Student{
 		ID:        tableRow.id,
 		FirstName: tableRow.first_name,
 		LastName:  tableRow.last_name,
-		Class: domain.Class{
+		Class: models.Class{
 			ID: tableRow.class_id,
 		},
 	}

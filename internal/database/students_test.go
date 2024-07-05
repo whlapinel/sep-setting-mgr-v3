@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
-	"sep_setting_mgr/internal/domain"
+	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/testutils"
 	"testing"
 )
@@ -48,7 +48,7 @@ func TestStudentsRepo_Store(t *testing.T) {
 		t.Errorf("InitializeDB() error = %v; want nil", err)
 	}
 	sr := NewStudentsRepo(db)
-	student, err := domain.NewStudent("John", "Doe", 1)
+	student, err := models.NewStudent("John", "Doe", 1)
 	if err != nil {
 		t.Errorf("NewStudent() error = %v; want nil", err)
 	}
@@ -84,7 +84,7 @@ func TestStudentsRepo_All(t *testing.T) {
 		t.Errorf("InitializeDB() error = %v; want nil", err)
 	}
 	sr := NewStudentsRepo(db)
-	student, err := domain.NewStudent("John", "Doe", 1)
+	student, err := models.NewStudent("John", "Doe", 1)
 	if err != nil {
 		t.Errorf("NewStudent() error = %v; want nil", err)
 	}

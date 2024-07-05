@@ -3,6 +3,7 @@
 ## 7/4
 
 - Added test events functionality from nearly scratch with lightning speed. Basically just my other objects as examples and tailored accordingly. Amazed at how much faster this was. Didn't really get stuck anywhere.  Things are beginning to make a lot more sense, and I feel confident that this stack could work very well for production development.
+- not in my project, but as a side note, the Templ repo issue with missing completions and recurring "Request textDocument/codeAction failed" error is resolved!!  This will be a huge help.
 
 ## 7/3
 
