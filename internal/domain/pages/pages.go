@@ -11,7 +11,7 @@ type DashboardService interface {
 	List(teacherID int) ([]*models.Class, error)
 	AddClass(name string, block int, teacherID int) (*models.Class, error)
 	DeleteClass(classID int) error
-	AddStudent(firstName string, lastName string, classID int) (*models.Student, error)
+	AddStudent(firstName string, lastName string, classID int, oneOneOne bool) (*models.Student, error)
 	DeleteStudent(studentID int) error
 	ListStudents(classID int) ([]*models.Student, error)
 	FindClassByID(classID int) (*models.Class, error)

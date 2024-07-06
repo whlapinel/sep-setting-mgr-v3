@@ -2,6 +2,7 @@ package about
 
 import (
 	"net/http"
+	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -25,5 +26,8 @@ func Mount(e *echo.Echo, h Handler) {
 }
 
 func (h handler) AboutHandler(c echo.Context) error {
+	if !util.IsHTMX(c) {
+		return util.RenderTempl(layouts.MainLayout(AboutPage()), c, http.StatusOK)
+	}
 	return util.RenderTempl(AboutPage(), c, http.StatusOK)
 }

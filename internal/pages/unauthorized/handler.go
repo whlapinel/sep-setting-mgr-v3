@@ -22,7 +22,7 @@ func Mount(e *echo.Echo, h domain.UnauthorizedHandler) {
 
 func (h handler) UnauthorizedHandler(c echo.Context) error {
 	if util.IsHTMX(c) {
-		return util.RenderTempl(UnauthorizedPage(), c, http.StatusForbidden)
+		return util.RenderTempl(UnauthorizedPage(), c, http.StatusOK)
 	}
-	return util.RenderTempl(layouts.MainLayout(UnauthorizedPage()), c, http.StatusForbidden)
+	return util.RenderTempl(layouts.MainLayout(UnauthorizedPage()), c, http.StatusOK)
 }

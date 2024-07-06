@@ -11,6 +11,7 @@ type (
 		first_name string
 		last_name  string
 		class_id   int
+		one_on_one bool
 	}
 
 	studentRepo struct {
@@ -29,8 +30,8 @@ func NewStudentsRepo(db *sql.DB) models.StudentRepository {
 func (sr *studentRepo) Store(student *models.Student) (int, error) {
 	dbStudent := convertToStudentTable(student)
 	_, err := sr.db.Exec(`
-	INSERT INTO students (first_name, last_name, class_id) 
-	VALUES (?, ?, ?)`, dbStudent.first_name, dbStudent.last_name, dbStudent.class_id)
+	INSERT INTO students (first_name, last_name, class_id, one_on_one) 
+	VALUES (?, ?, ?, ?)`, dbStudent.first_name, dbStudent.last_name, dbStudent.class_id, dbStudent.one_on_one)
 	if err != nil {
 		return 0, err
 	}
@@ -50,7 +51,7 @@ func (sr *studentRepo) All(classID int) ([]*models.Student, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var studentTable studentTableRow
-		err := rows.Scan(&studentTable.id, &studentTable.first_name, &studentTable.last_name, &studentTable.class_id)
+		err := rows.Scan(&studentTable.id, &studentTable.first_name, &studentTable.last_name, &studentTable.class_id, &studentTable.one_on_one)
 		if err != nil {
 			return nil, err
 		}
@@ -69,6 +70,7 @@ func convertToStudentTable(student *models.Student) studentTableRow {
 		first_name: student.FirstName,
 		last_name:  student.LastName,
 		class_id:   student.Class.ID,
+		one_on_one: student.OneOnOne,
 	}
 }
 
@@ -80,6 +82,7 @@ func convertToStudent(tableRow studentTableRow) *models.Student {
 		Class: models.Class{
 			ID: tableRow.class_id,
 		},
+		OneOnOne: tableRow.one_on_one,
 	}
 }
 
@@ -90,6 +93,7 @@ func createStudentsTable(db *sql.DB) error {
 		first_name VARCHAR(100),
 		last_name VARCHAR(100),
 		class_id INT,
+		one_on_one BOOLEAN,
 		FOREIGN KEY (class_id) REFERENCES classes(id)
 	)`)
 	if err != nil {

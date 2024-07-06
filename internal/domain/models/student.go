@@ -8,6 +8,7 @@ type (
 		Teacher    User
 		Class      Class
 		TestEvents []*TestEvent
+		OneOnOne   bool
 	}
 
 	StudentRepository interface {
@@ -17,10 +18,11 @@ type (
 	}
 )
 
-func NewStudent(firstName string, lastName string, classID int) (*Student, error) {
+func NewStudent(firstName string, lastName string, classID int, oneOnOne bool) (*Student, error) {
 	return &Student{
 		FirstName: firstName,
 		LastName:  lastName,
 		Class:     Class{ID: classID},
+		OneOnOne:  oneOnOne,
 	}, nil
 }

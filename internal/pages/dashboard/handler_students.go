@@ -36,13 +36,14 @@ func (h handler) AddStudent(c echo.Context) error {
 	log.Println("Handler: Adding student")
 	firstName := c.FormValue("first-name")
 	lastName := c.FormValue("last-name")
+	oneOnOne := c.FormValue("one-on-one") == "on"
 	log.Println("First name:", firstName)
 	log.Println("Last name:", lastName)
 	classID, err := strconv.Atoi(c.Param("class-id"))
 	if err != nil {
 		return c.String(400, "Invalid class ID")
 	}
-	student, err := h.service.AddStudent(firstName, lastName, classID)
+	student, err := h.service.AddStudent(firstName, lastName, classID, oneOnOne)
 	if err != nil {
 		return c.String(500, "Failed to add student. See server logs for details.")
 	}

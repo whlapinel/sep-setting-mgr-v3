@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"log"
+
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
@@ -40,9 +42,11 @@ func Mount(e *echo.Echo, h pages.DashboardHandler) {
 }
 
 func (h handler) DashboardHandler(c echo.Context) error {
+	log.SetPrefix("DashboardHandler: ")
 	teacherID := c.Get("id").(int)
 	classes, err := h.service.List(teacherID)
 	if err != nil {
+		log.Println("Failed to list classes: ", err)
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
 	if util.IsHTMX(c) {

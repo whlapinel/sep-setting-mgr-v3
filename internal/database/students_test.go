@@ -43,7 +43,7 @@ func TestStudentsRepo_Store(t *testing.T) {
 		t.Errorf("InitializeDB() error = %v; want nil", err)
 	}
 	sr := NewStudentsRepo(db)
-	student, err := models.NewStudent("John", "Doe", 1)
+	student, err := models.NewStudent("John", "Doe", 1, false)
 	if err != nil {
 		t.Errorf("NewStudent() error = %v; want nil", err)
 	}
@@ -79,7 +79,7 @@ func TestStudentsRepo_All(t *testing.T) {
 		t.Errorf("InitializeDB() error = %v; want nil", err)
 	}
 	sr := NewStudentsRepo(db)
-	student, err := models.NewStudent("John", "Doe", 1)
+	student, err := models.NewStudent("John", "Doe", 1, false)
 	if err != nil {
 		t.Errorf("NewStudent() error = %v; want nil", err)
 	}

@@ -1,0 +1,50 @@
+package components
+
+type RadioGroup struct {
+	Name     string
+	Options  []*RadioOption
+	Required bool
+}
+
+type RadioOption struct {
+	ID      string
+	Value   string
+	Label   string
+	Checked bool
+	Attr    templ.Attributes
+}
+
+func boolToString(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}
+
+templ RadioComponent(r RadioGroup) {
+	<fieldset>
+		<legend class="block text-sm font-medium text-gray-700">{ r.Name }</legend>
+		<div class="flex gap-2">
+			for _, option := range r.Options {
+				<input
+					type="radio"
+					if r.Required {
+						required
+					}
+					id={ option.ID }
+					name={ r.Name }
+					value={ option.Value }
+					if option.Checked {
+						checked
+					}
+					{ option.Attr... }
+				/>
+				<label
+					for={ option.ID }
+				>
+					{ option.Label }
+				</label>
+			}
+		</div>
+	</fieldset>
+}

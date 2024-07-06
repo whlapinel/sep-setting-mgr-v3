@@ -9,10 +9,11 @@ templ MainLayout(page templ.Component) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link rel="stylesheet" href="dist/styles.css"/>
 			<script src="dist/htmx.js" defer></script>
+			<script src="dist/htmx-response-targets.js" defer></script>
 			<script src="dist/index.js" defer></script>
 			<title>Separate Setting Manager</title>
 		</head>
-		<body>
+		<body hx-ext="response-targets">
 			<div hx-post="/hx-signout" hx-trigger="signout" id="user-status" hx-target="#page"></div>
 			@components.HeaderComponent(components.Header{
 				NavItems: []components.NavItem{

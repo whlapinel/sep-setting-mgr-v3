@@ -1,5 +1,7 @@
 package components
 
+import "strconv"
+
 type TableButton struct {
 	Text string
 	Attr templ.Attributes
@@ -36,4 +38,23 @@ templ TableComponent(t TableData) {
 			}
 		</tbody>
 	</table>
+}
+
+templ TableRowComponent(row Row) {
+	<tr
+		data-id={ strconv.Itoa(row.ID) }
+	>
+		for _, cell := range row.Data {
+			<td>{ cell }</td>
+		}
+		for _, button := range row.Buttons {
+			<td>
+				@ButtonComponent(Button{
+					Attr: button.Attr,
+				}) {
+					{ button.Text }
+				}
+			</td>
+		}
+	</tr>
 }

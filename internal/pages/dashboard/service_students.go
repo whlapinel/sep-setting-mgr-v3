@@ -5,10 +5,10 @@ import (
 	domain "sep_setting_mgr/internal/domain/models"
 )
 
-func (s service) AddStudent(firstName string, lastName string, classID int) (*domain.Student, error) {
+func (s service) AddStudent(firstName string, lastName string, classID int, oneOnOne bool) (*domain.Student, error) {
 	log.Println("Service: Adding student to database")
 	// find teacher id
-	student, err := domain.NewStudent(firstName, lastName, classID)
+	student, err := domain.NewStudent(firstName, lastName, classID, oneOnOne)
 	if err != nil {
 		return nil, err
 	}

@@ -3,13 +3,20 @@ let activityTimeout;
 let timeOutWarning;
 let isSignedIn;
 
+const warningTimer = 60000; // 1 minute
+const signoutTimer = 120000; // 2 minutes
+
 function setIsSignedIn(signedIn) {
     isSignedIn = signedIn;
 }
 
 async function signout() {
     console.log("signOut")
-    // dispatch custom event to trigger signout
+    // dispatches custom event to trigger signout
+    // the event listener for this event is in the user-status component
+    // this component will send request to server to signout
+    document.querySelector("div#user-status")
+        .dispatchEvent(new CustomEvent("signout", { bubbles: true, cancelable: true }));
     clearTimeout(timeOutWarning);
     clearTimeout(activityTimeout);
     document.removeEventListener("mousemove", onActive)
@@ -35,11 +42,10 @@ function ResetActivityTimeout() {
     clearTimeout(timeOutWarning);
     timeOutWarning = setTimeout(() => {
         console.log("timeOutWarning")
-    }, 240000); // 4 minutes
+    }, warningTimer);
     activityTimeout = setTimeout(() => {
-        document.querySelector("div#user-status").dispatchEvent(new CustomEvent("signout", { bubbles: true, cancelable: true }));
         signout();
-    }, 300000); // 5 minutes
+    }, signoutTimer);
 }
 
 document.addEventListener("signin", (e) => {
@@ -53,22 +59,5 @@ document.addEventListener("signin", (e) => {
 
 document.addEventListener("signout", (e) => {
     console.log("signout event triggered")
-    clearTimeout(activityTimeout);
 })
 
-document.querySelector("body").addEventListener("htmx:afterRequest", (e) => {
-    const form = document.querySelector("#form");
-    console.log("afterRequest event triggered");
-    console.log(e.target)
-
-    if (e.target.matches("#form")) {
-        var xhr = e.detail.xhr;
-        console.log(xhr.status);
-
-        if (form.reportValidity()) {
-            console.log("clearing forms, removing required, and closing dialog")
-            document.querySelector("form").reset()
-            document.querySelector("dialog").close();
-        }
-    }
-})

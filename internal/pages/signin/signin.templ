@@ -34,6 +34,16 @@ templ SignInPage(isSignedIn bool) {
 				ID:       "password",
 				Required: true,
 			})
+			<script>
+			(() => {
+				let script = document.currentScript;
+				parent = script.closest("form");
+				button = parent.querySelector("button[type=submit]");
+				button.addEventListener("click", () => {
+					document.dispatchEvent(new CustomEvent('signin', { bubbles: true }));
+				});
+			})();
+			</script>
 		}
 	}
 }
