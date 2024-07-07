@@ -20,7 +20,7 @@ type TestEvents []*TestEvent
 type TestEventRepository interface {
 	Store(testEvent *TestEvent) (id int, err error)
 	Delete(id int) error
-	FindByClass(classID int) (*TestEvents, error)
+	FindByClass(classID int) (TestEvents, error)
 }
 
 func (t *TestEvent) Update(testName string, testDate *time.Time) {
@@ -48,6 +48,11 @@ func NewTestEvent(testName string, class *Class, testDate *time.Time, block int)
 	log.SetPrefix("Domain: ")
 	log.Println("Creating new test event")
 	log.Println("Class ID: ", class.ID)
+
+	// check for students in class
+
+	// assign room(s)
+
 	return &TestEvent{
 		TestName: testName,
 		Class:    class,

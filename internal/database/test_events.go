@@ -43,7 +43,7 @@ func (tr *testEventsRepo) Store(testEvent *models.TestEvent) (int, error) {
 	return testEvent.ID, nil
 }
 
-func (tr *testEventsRepo) FindByClass(classID int) (*models.TestEvents, error) {
+func (tr *testEventsRepo) FindByClass(classID int) (models.TestEvents, error) {
 	var testEvents models.TestEvents
 	var tableRows []testEventTableRow
 	rows, err := tr.db.Query(`
@@ -55,7 +55,12 @@ func (tr *testEventsRepo) FindByClass(classID int) (*models.TestEvents, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var testEventTableRow testEventTableRow
-		err := rows.Scan(&testEventTableRow.id, &testEventTableRow.test_name, &testEventTableRow.test_date, &testEventTableRow.class_id)
+		var tempDate []uint8
+		err := rows.Scan(&testEventTableRow.id, &testEventTableRow.test_name, &tempDate, &testEventTableRow.class_id)
+		if err != nil {
+			return nil, err
+		}
+		testEventTableRow.test_date, err = time.Parse("2006-01-02", string(tempDate))
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +70,7 @@ func (tr *testEventsRepo) FindByClass(classID int) (*models.TestEvents, error) {
 		testEvent := convertToTestEvent(tableRow)
 		testEvents = append(testEvents, testEvent)
 	}
-	return &testEvents, nil
+	return testEvents, nil
 }
 
 func convertTestEventToTable(testEvent *models.TestEvent) testEventTableRow {
@@ -89,6 +94,7 @@ func convertToTestEvent(tableRow testEventTableRow) *models.TestEvent {
 }
 
 func createTestEventTable(db *sql.DB) error {
+	log.Println("Creating test events table")
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS test_events (
 		id INT AUTO_INCREMENT PRIMARY KEY,

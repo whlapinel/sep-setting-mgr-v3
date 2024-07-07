@@ -2,6 +2,7 @@ package pages
 
 import (
 	"sep_setting_mgr/internal/domain/models"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,9 +16,10 @@ type DashboardService interface {
 	DeleteStudent(studentID int) error
 	ListStudents(classID int) ([]*models.Student, error)
 	FindClassByID(classID int) (*models.Class, error)
-	ListAllTestEvents(classID int) (*models.TestEvents, error)
+	ListAllTestEvents(classID int) (models.TestEvents, error)
 	CreateTestEvent(classID int, testName string, testDate string) (*models.TestEvent, error)
 	DeleteTestEvent(testEventID int) error
+	GetAssignments(eventID int, start, end time.Time) (models.Assignments, error)
 }
 
 type DashboardHandler interface {

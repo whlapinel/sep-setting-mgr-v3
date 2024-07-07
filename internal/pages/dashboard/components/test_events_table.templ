@@ -6,23 +6,23 @@ import (
 	"strconv"
 )
 
-func prepareTestEventsForTable(testEvents *models.TestEvents) components.TableData {
+func prepareTestEventsForTable(testEvents models.TestEvents) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Date"}
-	for _, testEvent := range *testEvents {
+	for _, testEvent := range testEvents {
 		rows = append(rows, testEventToRow(testEvent))
 	}
 	return components.TableData{ID: "test-events-table", Title: "Test Events", Headers: headers, Rows: rows}
 }
 
-templ TestEventsTableComponent(testEvents *models.TestEvents, classID int) {
+templ TestEventsTableComponent(testEvents models.TestEvents, classID int) {
 	@AddTestEventForm(classID)
 	@components.TableComponent(prepareTestEventsForTable(testEvents))
 }
 
 func testEventToRow(testEvent *models.TestEvent) components.Row {
 	return components.Row{
-		Data: []string{testEvent.TestName, strconv.Itoa(testEvent.Block)},
+		Data: []string{testEvent.TestName, testEvent.TestDate.Format("2006-01-02")},
 		ID:   testEvent.ID,
 		Buttons: []components.TableButton{
 			{

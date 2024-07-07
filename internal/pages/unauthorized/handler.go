@@ -21,6 +21,7 @@ func Mount(e *echo.Echo, h domain.UnauthorizedHandler) {
 }
 
 func (h handler) UnauthorizedHandler(c echo.Context) error {
+	c.Response().Header().Set("HX-Retarget", "#page")
 	if util.IsHTMX(c) {
 		return util.RenderTempl(UnauthorizedPage(), c, http.StatusOK)
 	}

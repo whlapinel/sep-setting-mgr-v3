@@ -10,6 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const sessionLifeSpan = time.Minute * 5
+
 type jwtCustomClaims struct {
 	Email string `json:"email"`
 	ID    int    `json:"id"`
@@ -32,7 +34,7 @@ func IssueToken(email string, id int) (string, error) {
 		Email: email,
 		ID:    id,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 5)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(sessionLifeSpan)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

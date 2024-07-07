@@ -2,10 +2,13 @@ package dashboard
 
 import (
 	"log"
+	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
+	"sep_setting_mgr/internal/constants"
 	"sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/pages/dashboard/components"
@@ -56,8 +59,20 @@ func (h handler) DashboardHandler(c echo.Context) error {
 }
 
 func (h handler) ShowCalendar(c echo.Context) error {
-	if util.IsHTMX(c) {
-		return util.RenderTempl(components.CalendarComponent(), c, 200)
+	log.SetPrefix("ShowCalendar: ")
+	classID, err := strconv.Atoi(c.Param(string(constants.ClassID)))
+	if err != nil {
+		log.Println("Failed to convert class ID to int: ", err)
+		return c.String(400, "Invalid class ID")
 	}
-	return util.RenderTempl(layouts.MainLayout(components.CalendarComponent()), c, 200)
+	assignments, err := h.service.GetAssignments(classID, time.Now(), time.Now().AddDate(0, 1, 0))
+	if err != nil {
+		log.Println("Failed to get assignments: ", err)
+		return c.String(500, "Failed to get assignments. See server logs for details.")
+	}
+	calendar := util.RenderTempl(components.CalendarComponent(assignments), c, 200)
+	if util.IsHTMX(c) {
+		return calendar
+	}
+	return calendar
 }

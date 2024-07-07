@@ -39,7 +39,7 @@ func (s service) DeleteTestEvent(testEventID int) error {
 	return nil
 }
 
-func (s service) ListAllTestEvents(classID int) (*domain.TestEvents, error) {
+func (s service) ListAllTestEvents(classID int) (domain.TestEvents, error) {
 	testEvents, err := s.testEvents.FindByClass(classID)
 	if err != nil {
 		return nil, err

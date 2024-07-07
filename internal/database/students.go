@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"log"
 	"sep_setting_mgr/internal/domain/models"
 )
 
@@ -87,6 +88,7 @@ func convertToStudent(tableRow studentTableRow) *models.Student {
 }
 
 func createStudentsTable(db *sql.DB) error {
+	log.Println("Creating students table")
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS students (
 		id INT AUTO_INCREMENT PRIMARY KEY,

@@ -20,13 +20,15 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	classes := database.NewClassesRepo(db)
 	students := database.NewStudentsRepo(db)
 	testEvents := database.NewTestEventsRepo(db)
+	rooms := database.NewRoomsRepo(db)
+	assignments := database.NewAssignmentsRepo(db)
 	home.Mount(e, home.NewHandler())
 	signout.Mount(e, signout.NewHandler())
 	unauthorized.Mount(e, unauthorized.NewHandler())
 	about.Mount(e, about.NewHandler())
 	signup.Mount(e, signup.NewHandler(signup.NewService(users)))
 	signin.Mount(e, signin.NewHandler(signin.NewService(users)))
-	dashboard.Mount(e, dashboard.NewHandler(dashboard.NewService(classes, users, students, testEvents)))
+	dashboard.Mount(e, dashboard.NewHandler(dashboard.NewService(classes, users, students, testEvents, rooms, assignments)))
 	admin.Mount(e, admin.NewHandler(admin.NewService(users)))
 	return nil
 }

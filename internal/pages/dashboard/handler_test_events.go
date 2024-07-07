@@ -10,6 +10,7 @@ import (
 )
 
 func (h handler) TestEvents(c echo.Context) error {
+	log.SetPrefix("TestEvents Handler: ")
 	if !util.IsHTMX(c) {
 		return c.String(400, "Invalid request")
 	}
@@ -19,6 +20,7 @@ func (h handler) TestEvents(c echo.Context) error {
 	}
 	testEvents, err := h.service.ListAllTestEvents(classID)
 	if err != nil {
+		log.Println("Failed to list test events: ", err)
 		return c.String(500, "Failed to list test events. See server logs for details.")
 	}
 	return util.RenderTempl(components.TestEventsTableComponent(testEvents, classID), c, 200)

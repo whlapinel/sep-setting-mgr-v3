@@ -1,5 +1,10 @@
 # PROGRESS LOG
 
+## 7/5
+
+- Went around in circles today. Trying to figure out the most complex part of this app, which is how to assign students to rooms automatically. Thought I could do it without creating a repository or persisting assignments and just provide assignments when display is requested. But that started to feel like it wouldn't work.
+
+
 ## 7/4
 
 - Added test events functionality from nearly scratch with lightning speed. Basically just my other objects as examples and tailored accordingly. Amazed at how much faster this was. Didn't really get stuck anywhere.  Things are beginning to make a lot more sense, and I feel confident that this stack could work very well for production development.
