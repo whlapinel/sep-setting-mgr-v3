@@ -2,13 +2,12 @@ package dashboard
 
 import (
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
 
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/constants"
+	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/pages/dashboard/components"
@@ -60,16 +59,23 @@ func (h handler) DashboardHandler(c echo.Context) error {
 
 func (h handler) ShowCalendar(c echo.Context) error {
 	log.SetPrefix("ShowCalendar: ")
-	classID, err := strconv.Atoi(c.Param(string(constants.ClassID)))
+	teacherID := c.Get("id").(int)
+	classes, err := h.service.List(teacherID)
 	if err != nil {
-		log.Println("Failed to convert class ID to int: ", err)
-		return c.String(400, "Invalid class ID")
+		return err
 	}
-	assignments, err := h.service.GetAssignments(classID, time.Now(), time.Now().AddDate(0, 1, 0))
-	if err != nil {
-		log.Println("Failed to get assignments: ", err)
-		return c.String(500, "Failed to get assignments. See server logs for details.")
+	var assignments models.Assignments
+	for _, class := range classes {
+		eventAssignments, err := h.service.GetAssignments(class.ID, time.Now(), time.Now().AddDate(0, 1, 0))
+		log.Println("eventAssignments: ", eventAssignments)
+		log.Println("len(eventAssignments): ", len(eventAssignments))
+		if err != nil {
+			log.Println("Failed to get assignments: ", err)
+			return c.String(500, "Failed to get assignments. See server logs for details.")
+		}
+		assignments = append(assignments, eventAssignments...)
 	}
+	log.Println("len(assignments): ", len(assignments))
 	calendar := util.RenderTempl(components.CalendarComponent(assignments), c, 200)
 	if util.IsHTMX(c) {
 		return calendar

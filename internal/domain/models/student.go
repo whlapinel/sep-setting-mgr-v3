@@ -1,5 +1,10 @@
 package models
 
+type StudentTestEvent struct {
+	Room  Room
+	Event TestEvent
+}
+
 type (
 	Student struct {
 		ID         int
@@ -7,7 +12,7 @@ type (
 		LastName   string
 		Teacher    User
 		Class      Class
-		TestEvents []*TestEvent
+		TestEvents StudentTestEvent
 		OneOnOne   bool
 	}
 

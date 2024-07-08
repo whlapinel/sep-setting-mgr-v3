@@ -2,7 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"log"
 	"sep_setting_mgr/internal/domain/models"
+	"time"
 )
 
 type roomsTableRow struct {
@@ -38,6 +40,7 @@ func (rr *roomRepo) Store(room *models.Room) (int, error) {
 }
 
 func (rr *roomRepo) All() ([]*models.Room, error) {
+	log.SetPrefix("Rooms Repo: All()")
 	var rooms []*models.Room
 	var tableRows []roomsTableRow
 	rows, err := rr.db.Query(`
@@ -61,10 +64,47 @@ func (rr *roomRepo) All() ([]*models.Room, error) {
 	return rooms, nil
 }
 
+func (rr *roomRepo) GetRoomAssignments(room *models.Room, date time.Time) (models.Assignments, error) {
+	var assignments models.Assignments
+	var tableRows []assignmentTableRow
+	rows, err := rr.db.Query(`SELECT * FROM assignments WHERE room_id = ?`, room.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var tableRow assignmentTableRow
+		err := rows.Scan(
+			&tableRow.id,
+			&tableRow.student_id,
+			&tableRow.room_id,
+			&tableRow.event_id,
+		)
+		if err != nil {
+			return nil, err
+		}
+		tableRows = append(tableRows, tableRow)
+	}
+	for _, tableRow := range tableRows {
+		assignment := convertToAssignment(tableRow)
+		assignments = append(assignments, assignment)
+	}
+	return assignments, nil
+}
+
 func (rr *roomRepo) FindByID(id int) (*models.Room, error) {
 	var roomTableRow roomsTableRow
 	rr.db.QueryRow(`SELECT * FROM rooms WHERE id = ?`, id).
 		Scan(&roomTableRow.id, &roomTableRow.name, &roomTableRow.number, &roomTableRow.max_capacity, &roomTableRow.priority)
+	room := convertToRoom(roomTableRow)
+	return room, nil
+}
+
+func (rr *roomRepo) FindByPriority(priority int) (*models.Room, error) {
+	var roomTableRow roomsTableRow
+	rr.db.QueryRow(`SELECT * FROM rooms WHERE priority = ?`, priority).
+		Scan(&roomTableRow.id, &roomTableRow.name, &roomTableRow.number, &roomTableRow.max_capacity, &roomTableRow.priority)
+
 	room := convertToRoom(roomTableRow)
 	return room, nil
 }

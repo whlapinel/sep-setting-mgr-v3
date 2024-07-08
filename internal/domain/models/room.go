@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type (
 	Room struct {
 		ID          int
@@ -15,5 +17,7 @@ type (
 		All() ([]*Room, error)
 		FindByID(roomID int) (*Room, error)
 		Update(*Room) error
+		FindByPriority(priority int) (*Room, error)
+		GetRoomAssignments(room *Room, date time.Time) (Assignments, error)
 	}
 )

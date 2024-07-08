@@ -33,6 +33,7 @@ func (h handler) Students(c echo.Context) error {
 }
 
 func (h handler) AddStudent(c echo.Context) error {
+	log.SetPrefix("Handler: ")
 	log.Println("Handler: Adding student")
 	firstName := c.FormValue("first-name")
 	lastName := c.FormValue("last-name")

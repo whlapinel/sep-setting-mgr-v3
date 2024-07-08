@@ -1,0 +1,54 @@
+package components
+
+import "sep_setting_mgr/internal/components"
+
+templ AddRoomForm(showForm bool) {
+	@components.FormComponent(components.Form{
+		ID:       "add-room-form",
+		Title:    "Add Room",
+		SubTitle: "Add a Testing Room",
+		HxAttr: templ.Attributes{
+			"hx-post":      "/admin/rooms",
+			"hx-target":    "#rooms-table",
+			"hx-swap":      "afterbegin",
+			"hx-indicator": "#indicator",
+		},
+		ShowDialog:     showForm,
+		SubmitBtnTitle: "Add",
+		Cancelable:     true,
+	}) {
+		@components.InputComponent(components.Input{
+			Label:       "Room Name",
+			Placeholder: "e.g. Media Center",
+			ID:          "room-name",
+			Type:        "text",
+			Name:        "room-name",
+			Required:    true,
+		})
+		@components.InputComponent(components.Input{
+			Label:       "Room Number",
+			Placeholder: "e.g. F-204",
+			ID:          "room-number",
+			Type:        "text",
+			Name:        "room-number",
+			Required:    true,
+		})
+		@components.RadioComponent(components.RadioGroup{
+			Name: "priority",
+			Options: []*components.RadioOption{
+				{ID: "1", Value: "1", Label: "1", Checked: true},
+				{ID: "2", Value: "2", Label: "2", Checked: false},
+				{ID: "3", Value: "3", Label: "3", Checked: false},
+			},
+		})
+		@components.InputComponent(components.Input{
+			Label:       "Capacity",
+			Placeholder: "e.g. 12",
+			ID:          "capacity",
+			Type:        "number",
+			Required:    true,
+			Min:         1,
+			Max:         12,
+		})
+	}
+}

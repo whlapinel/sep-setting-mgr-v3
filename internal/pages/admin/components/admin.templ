@@ -1,6 +1,19 @@
 package components
 
+import "sep_setting_mgr/internal/components"
+
 templ AdminPage() {
 	<h1>Admin</h1>
-	<p>Welcome to the admin page</p>
+	<p>What is HAPPENING</p>
+	<button>What the hell is going on here</button>
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":    "/admin/rooms",
+			"hx-target": "#details",
+		},
+	}) {
+		Show Rooms
+	}
+	@AddRoomForm(false)
+	<div id="details"></div>
 }

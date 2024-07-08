@@ -19,7 +19,7 @@ type DashboardService interface {
 	ListAllTestEvents(classID int) (models.TestEvents, error)
 	CreateTestEvent(classID int, testName string, testDate string) (*models.TestEvent, error)
 	DeleteTestEvent(testEventID int) error
-	GetAssignments(eventID int, start, end time.Time) (models.Assignments, error)
+	GetAssignments(teacherID int, start, end time.Time) (models.Assignments, error)
 }
 
 type DashboardHandler interface {
@@ -57,11 +57,18 @@ type DashboardHandler interface {
 type AdminHandler interface {
 	// GET /admin
 	AdminHandler(c echo.Context) error
+
+	// GET /admin/rooms
+	Rooms(c echo.Context) error
+
+	// POST /admin/rooms
+	CreateRoom(c echo.Context) error
 }
 
 type AdminService interface {
-	// GET /admin/users
 	ListUsers() ([]*models.User, error)
+	ListRooms() ([]*models.Room, error)
+	AddRoom(*models.Room) (id int, err error)
 }
 
 type HomeHandler interface {

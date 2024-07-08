@@ -32,40 +32,59 @@ func (ar *assignmentRepo) Delete(assignmentID int) error {
 	return nil
 }
 
-func (ar *assignmentRepo) Update(assignment *models.Assignment) error {
-	dbAssignment := convertToAssignmentTable(assignment)
-	_, err := ar.db.Exec(`
-	UPDATE assignments 
-	SET event_id = ?, student_id = ?, room_id = ?
-	WHERE id = ?`, dbAssignment.event_id, dbAssignment.student_id, dbAssignment.room_id, dbAssignment.id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) {
-	var assignments []*models.Assignment
-	var tableRows []assignmentTableRow
+	var assignments models.Assignments
+
 	rows, err := ar.db.Query(`
-	SELECT * FROM assignments 
-	where event_id = ?`, eventID)
+	SELECT a.*, te.*, s.* 
+	FROM assignments a
+	JOIN test_events te ON a.event_id = te.id
+	JOIN students s ON a.student_id = s.id
+	WHERE a.event_id = ?
+	`, eventID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		var assignmentTable assignmentTableRow
-		err := rows.Scan(&assignmentTable.id, &assignmentTable.event_id, &assignmentTable.student_id, &assignmentTable.room_id)
+		var eventTable testEventTableRow
+		var studentTable studentTableRow
+
+		err := rows.Scan(
+			&assignmentTable.id,
+			&assignmentTable.event_id,
+			&assignmentTable.student_id,
+			&assignmentTable.room_id,
+			&eventTable.id,
+			&eventTable.test_name,
+			&eventTable.test_date,
+			&eventTable.class_id,
+			&studentTable.id,
+			&studentTable.first_name,
+			&studentTable.last_name,
+			&studentTable.class_id,
+			&studentTable.one_on_one,
+		)
 		if err != nil {
 			return nil, err
 		}
-		tableRows = append(tableRows, assignmentTable)
-	}
-	for _, tableRow := range tableRows {
-		assignment := convertToAssignment(tableRow)
+
+		assignment := convertToAssignment(assignmentTable)
+		event := convertToTestEvent(eventTable)
+		student := convertToStudent(studentTable)
+
+		assignment.TestEvent = event
+		assignment.Student = student
+
 		assignments = append(assignments, assignment)
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return assignments, nil
 }
 
@@ -93,7 +112,7 @@ func createAssignmentsTable(db *sql.DB) error {
 		room_id int,
 		FOREIGN KEY (event_id) REFERENCES test_events(id),
 		FOREIGN KEY (student_id) REFERENCES students(id),
-		FOREIGN KEY (room_id) REFERENCES rooms(id),
+		FOREIGN KEY (room_id) REFERENCES rooms(id)
 		)`)
 	if err != nil {
 		return err

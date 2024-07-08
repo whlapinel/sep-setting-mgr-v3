@@ -28,6 +28,11 @@ func NewStudentsRepo(db *sql.DB) models.StudentRepository {
 	return &studentRepo{db: db}
 }
 
+func (sr *studentRepo) GetAssignments(studentID int) (models.Assignments, error) {
+	return nil, nil
+}
+
+
 func (sr *studentRepo) Store(student *models.Student) (int, error) {
 	dbStudent := convertToStudentTable(student)
 	_, err := sr.db.Exec(`
