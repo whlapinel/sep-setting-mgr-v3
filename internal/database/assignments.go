@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"sep_setting_mgr/internal/domain/models"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -32,6 +33,66 @@ func (ar *assignmentRepo) Delete(assignmentID int) error {
 	return nil
 }
 
+func (ar *assignmentRepo) All() (models.Assignments, error) {
+	var assignments models.Assignments
+
+	rows, err := ar.db.Query(`
+	SELECT a.*, te.*, s.* 
+	FROM assignments a
+	JOIN test_events te ON a.event_id = te.id
+	JOIN students s ON a.student_id = s.id
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var assignmentTable assignmentTableRow
+		var eventTable testEventTableRow
+		var studentTable studentTableRow
+
+		var temp []uint8
+
+		err := rows.Scan(
+			&assignmentTable.id,
+			&assignmentTable.event_id,
+			&assignmentTable.student_id,
+			&assignmentTable.room_id,
+			&eventTable.id,
+			&eventTable.test_name,
+			&temp,
+			&eventTable.class_id,
+			&studentTable.id,
+			&studentTable.first_name,
+			&studentTable.last_name,
+			&studentTable.class_id,
+			&studentTable.one_on_one,
+		)
+		if err != nil {
+			return nil, err
+		}
+		eventTable.test_date, err = time.Parse("2006-01-02", string(temp))
+		if err != nil {
+			return nil, err
+		}
+		assignment := convertToAssignment(assignmentTable)
+		event := convertToTestEvent(eventTable)
+		student := convertToStudent(studentTable)
+
+		assignment.TestEvent = event
+		assignment.Student = student
+
+		assignments = append(assignments, assignment)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return assignments, nil
+}
+
 func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) {
 	var assignments models.Assignments
 
@@ -52,6 +113,8 @@ func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) 
 		var eventTable testEventTableRow
 		var studentTable studentTableRow
 
+		var temp []uint8
+
 		err := rows.Scan(
 			&assignmentTable.id,
 			&assignmentTable.event_id,
@@ -59,7 +122,7 @@ func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) 
 			&assignmentTable.room_id,
 			&eventTable.id,
 			&eventTable.test_name,
-			&eventTable.test_date,
+			&temp,
 			&eventTable.class_id,
 			&studentTable.id,
 			&studentTable.first_name,
@@ -70,10 +133,15 @@ func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) 
 		if err != nil {
 			return nil, err
 		}
-
+		eventTable.test_date, err = time.Parse("2006-01-02", string(temp))
+		if err != nil {
+			return nil, err
+		}
 		assignment := convertToAssignment(assignmentTable)
 		event := convertToTestEvent(eventTable)
+		log.Println("event date: ", event.TestDate.Format("2006-01-02"))
 		student := convertToStudent(studentTable)
+		log.Println("student first name: ", student.FirstName)
 
 		assignment.TestEvent = event
 		assignment.Student = student

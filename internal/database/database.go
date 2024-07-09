@@ -48,3 +48,33 @@ func InitializeDB(production bool) (*sql.DB, error) {
 	log.Fatal("Failed to connect to the database after 5 attempts. Exiting...")
 	return nil, nil
 }
+
+func ClearDatabase(db *sql.DB) error {
+	log.Println("Clearing database...")
+	log.Println("Dropping assignments")
+	_, err := db.Exec("DROP TABLE IF EXISTS assignments")
+	if err != nil {
+		return err
+	}
+	log.Println("Dropping students")
+	_, err = db.Exec("DROP TABLE IF EXISTS students")
+	if err != nil {
+		return err
+	}
+	log.Println("Dropping test_events")
+	_, err = db.Exec("DROP TABLE IF EXISTS test_events")
+	if err != nil {
+		return err
+	}
+	log.Println("Dropping classes")
+	_, err = db.Exec("DROP TABLE IF EXISTS classes")
+	if err != nil {
+		return err
+	}
+	log.Println("Dropping rooms")
+	_, err = db.Exec("DROP TABLE IF EXISTS rooms")
+	if err != nil {
+		return err
+	}
+	return nil
+}

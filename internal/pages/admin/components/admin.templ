@@ -14,6 +14,13 @@ templ AdminPage() {
 	}) {
 		Show Rooms
 	}
-	@AddRoomForm(false)
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":    "/admin/calendar",
+			"hx-target": "#details",
+		},
+	}) {
+		Show Calendar
+	}
 	<div id="details"></div>
 }

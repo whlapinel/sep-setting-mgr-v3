@@ -3,6 +3,7 @@ package dashboard
 import (
 	"log"
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/util"
 	"time"
 )
 
@@ -14,6 +15,11 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 	if err != nil {
 		return nil, err
 	}
+	class, err := s.classes.FindByID(classID)
+	if err != nil {
+		return nil, err
+	}
+	student.Class = *class
 	log.Println("new student created")
 	id, err := s.students.Store(student)
 	if err != nil {
@@ -25,7 +31,9 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 	if err != nil {
 		return nil, err
 	}
+
 	log.Println("test events retrieved")
+	// TODO: this should be a models.TestEvents method
 	var futureEvents models.TestEvents
 	for _, event := range testEvents {
 		if event.TestDate.After(time.Now()) {
@@ -33,14 +41,22 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 		}
 	}
 	log.Println("test events filtered for future events")
+	var notAssignedErr error = nil
 	for _, futureEvent := range futureEvents {
 		log.Println("creating assignment for event")
-		_, err := s.CreateAssignment(student, futureEvent)
+		futureEvent.Class = class
+		assignment, err := s.CreateAssignment(student, futureEvent)
 		if err != nil {
-			return nil, err
+			return student, err
+		}
+		if assignment == nil {
+			log.Println("Assignment not created")
+			notAssignedErr = util.ErrNotAssigned
+		} else {
+			log.Println("Assignment created")
 		}
 	}
-	return student, nil
+	return student, notAssignedErr
 }
 
 func (s service) DeleteStudent(studentID int) error {

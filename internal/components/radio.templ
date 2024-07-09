@@ -1,6 +1,7 @@
 package components
 
 type RadioGroup struct {
+	Title    string
 	Name     string
 	Options  []*RadioOption
 	Required bool
@@ -23,7 +24,7 @@ func boolToString(b bool) string {
 
 templ RadioComponent(r RadioGroup) {
 	<fieldset>
-		<legend class="block text-sm font-medium text-gray-700">{ r.Name }</legend>
+		<legend class="block text-sm font-medium text-gray-700">{ r.Title }</legend>
 		<div class="flex gap-2">
 			for _, option := range r.Options {
 				<input

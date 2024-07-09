@@ -1,0 +1,29 @@
+package components
+
+templ MessageComponent() {
+	<dialog>
+		<div class="bg-blue-600 rounded p-2 text-white min-w-24">
+			<p>Message</p>
+			<button>Close</button>
+			<script>
+                (() => {
+                    script = document.currentScript;
+                    console.log("Hello from the message component");
+                    let message = "Hello from the message component";
+                    let dialog = script.closest("dialog");
+                    document.body.addEventListener("showMessage", (e) => {
+                        console.log("Message: " + e.detail.value);
+                        message = e.detail.value;
+                        elt = script.previousElementSibling.previousElementSibling;
+                        elt.innerText = message;
+                        dialog.showModal();
+                    });
+                    let closeButton = script.previousElementSibling;
+                    closeButton.addEventListener("click", () => {
+                        dialog.close();
+                    });
+                })();
+        </script>
+		</div>
+	</dialog>
+}

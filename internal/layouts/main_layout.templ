@@ -19,11 +19,13 @@ templ MainLayout(page templ.Component) {
 				NavItems: []components.NavItem{
 					{Text: "Home", URL: "/"},
 					{Text: "Dashboard", URL: "/dashboard"},
+					{Text: "Admin", URL: "/admin"},
 					{Text: "About", URL: "/about"},
 					{Text: "Sign In", URL: "/signin"},
 					{Text: "Sign Up", URL: "/signup"},
 				},
 			})
+			@components.MessageComponent()
 			<main id="page">
 				@page
 			</main>

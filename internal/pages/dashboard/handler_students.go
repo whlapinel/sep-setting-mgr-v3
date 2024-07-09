@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"sep_setting_mgr/internal/pages/dashboard/components"
@@ -37,7 +38,7 @@ func (h handler) AddStudent(c echo.Context) error {
 	log.Println("Handler: Adding student")
 	firstName := c.FormValue("first-name")
 	lastName := c.FormValue("last-name")
-	oneOnOne := c.FormValue("one-on-one") == "on"
+	oneOnOne := c.FormValue("one-on-one") == "yes"
 	log.Println("First name:", firstName)
 	log.Println("Last name:", lastName)
 	classID, err := strconv.Atoi(c.Param("class-id"))
@@ -46,7 +47,12 @@ func (h handler) AddStudent(c echo.Context) error {
 	}
 	student, err := h.service.AddStudent(firstName, lastName, classID, oneOnOne)
 	if err != nil {
-		return c.String(500, "Failed to add student. See server logs for details.")
+		if errors.Is(err, util.ErrNotAssigned) {
+			message := "Rooms were full for this event and not all students were assigned to a room. Please contact your administrator."
+			util.SetMessage(c, message)
+		} else {
+			return c.String(500, "Failed to add student. See server logs for details.")
+		}
 	}
 	return util.RenderTempl(components.StudentRowComponent(student), c, 201)
 }

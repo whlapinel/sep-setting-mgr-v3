@@ -18,6 +18,6 @@ type (
 		FindByID(roomID int) (*Room, error)
 		Update(*Room) error
 		FindByPriority(priority int) (*Room, error)
-		GetRoomAssignments(room *Room, date time.Time) (Assignments, error)
+		GetRoomAssignments(room *Room, block int, date time.Time) (Assignments, error)
 	}
 )

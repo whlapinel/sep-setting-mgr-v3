@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"errors"
 	"log"
 	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
@@ -38,8 +39,13 @@ func (h handler) CreateTestEvent(c echo.Context) error {
 	testDate := c.FormValue("test-date")
 	testEvent, err := h.service.CreateTestEvent(classID, testName, testDate)
 	if err != nil {
-		log.Println("Failed to create test event:", err)
-		return c.String(500, "Failed to create test event. See server logs for details.")
+		if errors.Is(err, util.ErrNotAssigned) {
+			message := "Rooms were full for this event and not all students were assigned to a room. Please contact your administrator."
+			util.SetMessage(c, message)
+		} else {
+			log.Println("Failed to create test event:", err)
+			return c.String(500, "Failed to create test event. See server logs for details.")
+		}
 	}
 	return util.RenderTempl(components.TestEventRowComponent(testEvent), c, 201)
 }

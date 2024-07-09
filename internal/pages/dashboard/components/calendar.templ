@@ -22,9 +22,19 @@ templ CalendarComponent(assignments []*models.Assignment) {
 	@WeekComponent(getThisMonday().AddDate(0, 0, 7), assignments)
 }
 
+func filterAssignmentsForDay(date time.Time, assignments []*models.Assignment) []*models.Assignment {
+	var filtered []*models.Assignment
+	for _, assignment := range assignments {
+		if assignment.TestEvent.TestDate.Format(format) == date.Format(format) {
+			filtered = append(filtered, assignment)
+		}
+	}
+	return filtered
+}
+
 templ DayComponent(date time.Time, assignments []*models.Assignment) {
 	<h3>{ date.Format(format) }</h3>
-	@TestEventTable(assignments)
+	@TestEventTable(filterAssignmentsForDay(date, assignments))
 }
 
 func getFriday(date time.Time) time.Time {

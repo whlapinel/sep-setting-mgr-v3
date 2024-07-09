@@ -17,6 +17,7 @@ type Assignment struct {
 type AssignmentRepository interface {
 	Store(*Assignment) error
 	GetByEventID(eventID int) (Assignments, error)
+	All() (Assignments, error)
 }
 
 type Assignments []*Assignment
@@ -55,14 +56,6 @@ func NewAssignment(student *Student, room *Room, testEvent *TestEvent) *Assignme
 	return &Assignment{
 		Student:   student,
 		Room:      room,
-		TestEvent: testEvent,
-	}
-}
-
-func CreateAssignment(student *Student, testEvent *TestEvent) *Assignment {
-
-	return &Assignment{
-		Student:   student,
 		TestEvent: testEvent,
 	}
 }

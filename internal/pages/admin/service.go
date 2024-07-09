@@ -6,12 +6,13 @@ import (
 )
 
 type service struct {
-	users models.UserRepository
-	rooms models.RoomRepository
+	users       models.UserRepository
+	rooms       models.RoomRepository
+	assignments models.AssignmentRepository
 }
 
-func NewService(users models.UserRepository, rooms models.RoomRepository) pages.AdminService {
-	return &service{users: users, rooms: rooms}
+func NewService(users models.UserRepository, rooms models.RoomRepository, assignments models.AssignmentRepository) pages.AdminService {
+	return &service{users, rooms, assignments}
 }
 
 func (s service) ListUsers() ([]*models.User, error) {
@@ -36,4 +37,12 @@ func (s service) AddRoom(room *models.Room) (id int, err error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func (s service) GetAllAssignments() (models.Assignments, error) {
+	assignments, err := s.assignments.All()
+	if err != nil {
+		return nil, err
+	}
+	return assignments, nil
 }

@@ -1,0 +1,10 @@
+package components
+
+import (
+	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/pages/dashboard/components"
+)
+
+templ AdminCalendarComponent(assignments models.Assignments) {
+	@components.CalendarComponent(assignments)
+}

@@ -1,11 +1,18 @@
 package util
 
 import (
+	"errors"
 	"time"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
+
+var ErrNotAssigned = errors.New("one or more students not assigned to a room")
+
+func SetMessage(c echo.Context, message string) {
+	c.Response().Header().Set("HX-Trigger", "{\"showMessage\":\""+message+"\"}")
+}
 
 func IsHTMX(e echo.Context) bool {
 	// Check for "HX-Request" header

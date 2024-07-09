@@ -37,7 +37,8 @@ templ AddStudentForm(classID int) {
 			Required:    true,
 		})
 		@components.RadioComponent(components.RadioGroup{
-			Name: "One on One?",
+			Title: "One on One?",
+			Name:  "one-on-one",
 			Options: []*components.RadioOption{
 				{
 					ID:    "one-on-one-yes",

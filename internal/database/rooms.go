@@ -64,10 +64,17 @@ func (rr *roomRepo) All() ([]*models.Room, error) {
 	return rooms, nil
 }
 
-func (rr *roomRepo) GetRoomAssignments(room *models.Room, date time.Time) (models.Assignments, error) {
+func (rr *roomRepo) GetRoomAssignments(room *models.Room, block int, date time.Time) (models.Assignments, error) {
 	var assignments models.Assignments
 	var tableRows []assignmentTableRow
-	rows, err := rr.db.Query(`SELECT * FROM assignments WHERE room_id = ?`, room.ID)
+	log.Println("Getting assignments for room: ", room.ID, " block: ", block, " date: ", date)
+	rows, err := rr.db.Query(`
+	SELECT a.*
+	FROM assignments a
+	LEFT JOIN test_events te ON a.event_id = te.id
+	LEFT JOIN classes c ON te.class_id = c.id
+	WHERE a.room_id = ? AND c.block = ? AND te.test_date = ?
+	`, room.ID, block, date)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +109,14 @@ func (rr *roomRepo) FindByID(id int) (*models.Room, error) {
 
 func (rr *roomRepo) FindByPriority(priority int) (*models.Room, error) {
 	var roomTableRow roomsTableRow
-	rr.db.QueryRow(`SELECT * FROM rooms WHERE priority = ?`, priority).
+	err := rr.db.QueryRow(`SELECT * FROM rooms WHERE priority = ?`, priority).
 		Scan(&roomTableRow.id, &roomTableRow.name, &roomTableRow.number, &roomTableRow.max_capacity, &roomTableRow.priority)
-
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
 	room := convertToRoom(roomTableRow)
 	return room, nil
 }

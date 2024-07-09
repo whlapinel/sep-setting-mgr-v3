@@ -74,6 +74,13 @@ func (classRepo *classRepo) FindByID(classID int) (*models.Class, error) {
 	log.Println("Finding class by ID")
 	log.Println("Class ID: ", classID)
 	var dbClass classTableRow
+	err := classRepo.db.QueryRow(`
+	SELECT * FROM classes
+	WHERE id = ?
+	`, classID).Scan(&dbClass.id, &dbClass.name, &dbClass.block, &dbClass.teacher_id)
+	if err != nil {
+		return nil, err
+	}
 	dbClass.id = classID
 	class := convertToClass(dbClass)
 	return class, nil

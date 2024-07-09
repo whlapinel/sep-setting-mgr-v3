@@ -63,12 +63,16 @@ type AdminHandler interface {
 
 	// POST /admin/rooms
 	CreateRoom(c echo.Context) error
+
+	// GET /admin/calendar
+	Calendar(c echo.Context) error
 }
 
 type AdminService interface {
 	ListUsers() ([]*models.User, error)
 	ListRooms() ([]*models.Room, error)
 	AddRoom(*models.Room) (id int, err error)
+	GetAllAssignments() (models.Assignments, error)
 }
 
 type HomeHandler interface {

@@ -1,9 +1,14 @@
 # PROGRESS LOG
 
+## 7/9
+
+- Over the last several days I've been slogging through the room assignments functionality, but have made good, albeit slow, progress.
+- When students or test events are created, a room assignment is created, according to the priority of the room. If the rooms are all full, then a message is sent to the user.
+- Especially excited to have implemented a client-side messaging system using HX-Trigger response headers. Beautiful system for triggering client-side events, very excited to use this.
+
 ## 7/5
 
 - Went around in circles today. Trying to figure out the most complex part of this app, which is how to assign students to rooms automatically. Thought I could do it without creating a repository or persisting assignments and just provide assignments when display is requested. But that started to feel like it wouldn't work.
-
 
 ## 7/4
 
@@ -28,3 +33,8 @@
 - Starting to really feel like this stack could rival NextJS in terms of developer experience.
 - Tried merging dev to main, resulted in merge conflict which I'm not sure how to resolve. Need to figure this out (preferred) or delete main.
 - still brainstorming how I might be able to create a data structure that holds urls so that I don't have to write the same url in the component (hx-get, hx-post, etc) as well as in the handler. Seems like an unnecessary source of cognitive overhead that could easily be resolved by exposing a single source of truth about paths for data mutation and view changes.
+
+## 6/28
+
+After completing summer 1st term I resumed working on this project in earnest. I'm having an issue with the templ-vscode extension that's really bugging me. I went to the Gopher slack and posted a question about it in the #templ channel, and got a nice response from the developer "a-h" himself, who indicated that this issue has been identified and is being addressed.  Things are continuing to work alright, aside from the annoying message that keeps popping up "Request textDocument/codeAction failed." I am not sure if there is any impact to the development process, and the code runs correctly.
+

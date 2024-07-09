@@ -41,6 +41,7 @@ func roomToRow(room *models.Room) components.Row {
 }
 
 templ RoomsTableComponent(rooms []*models.Room) {
+	@AddRoomForm(false)
 	@components.TableComponent(prepareRoomsForTable(rooms))
 }
 

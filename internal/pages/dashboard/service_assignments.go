@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"fmt"
 	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"time"
@@ -13,23 +12,22 @@ func (s service) CreateAssignment(student *models.Student, testEvent *models.Tes
 	foundOpenRoom := false
 	var max int
 	for !foundOpenRoom {
-		log.Println("looping again")
-		log.Println("priority: ", priority)
+		if priority > 2 {
+			log.Println("looping again")
+			log.Println("priority: ", priority)
+		}
 		room, err := s.rooms.FindByPriority(priority)
 		if err != nil {
 			return nil, err
 		}
-		log.Println("room: ", room)
-		log.Println("room name: ", room.Name)
-		log.Println("room max capacity: ", room.MaxCapacity)
-		if room.Name == "" {
-			return nil, fmt.Errorf("all rooms are full")
+		if room == nil {
+			return nil, nil
 		}
 		max = room.MaxCapacity
 		if student.OneOnOne {
 			max = 1
 		}
-		roomAssignments, err := s.rooms.GetRoomAssignments(room, *testEvent.TestDate)
+		roomAssignments, err := s.rooms.GetRoomAssignments(room, testEvent.Class.Block, *testEvent.TestDate)
 		if err != nil {
 			return nil, err
 		}
@@ -59,14 +57,11 @@ func (s service) GetAssignments(classID int, start, end time.Time) (models.Assig
 	for _, event := range testEvents {
 		if event.TestDate.After(start) && event.TestDate.Before(end) {
 			eventAssignments, err := s.assignments.GetByEventID(event.ID)
-			log.Println("eventAssignments[0].TestEvent.ID: ", eventAssignments[0].TestEvent.ID)
-			log.Println("eventAssignments[0].TestEvent.TestDate: ", eventAssignments[0].TestEvent.TestDate)
 			if err != nil {
 				return nil, err
 			}
 			assignments = append(assignments, eventAssignments...)
 		}
 	}
-	testEvent := 
 	return assignments, nil
 }
