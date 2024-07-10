@@ -17,7 +17,16 @@ templ DashboardPage(classes []*models.Class) {
 	}) {
 		Calendar
 	}
-	@AddClassForm(false)
-	@ClassesTable(classes)
-	<div id="details"></div>
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":      "/dashboard/classes",
+			"hx-target":   "#details",
+			"hx-push-url": "true",
+		},
+	}) {
+		Classes
+	}
+	<div id="details">
+		@ClassesTable(classes)
+	</div>
 }

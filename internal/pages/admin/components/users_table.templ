@@ -1,0 +1,49 @@
+package components
+
+import (
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
+)
+
+func prepareUsersForTable(users []*models.User) components.TableData {
+	var rows []components.Row
+	headers := []string{"Email", "Admin"}
+	for _, user := range users {
+		rows = append(rows, userToRow(user))
+	}
+	return components.TableData{ID: "users-table", Title: "Users", Headers: headers, Rows: rows}
+}
+
+func userToRow(user *models.User) components.Row {
+	adminStringFalse := "No"
+	adminStringTrue := "Yes"
+	var adminString string
+	switch user.Admin {
+	case true:
+		adminString = adminStringTrue
+	case false:
+		adminString = adminStringFalse
+	}
+	return components.Row{
+		Data: []string{user.Email, adminString},
+		ID:   user.ID,
+		Buttons: []components.TableButton{
+			{
+				Text: "Edit",
+			},
+			{
+				Text: "Delete",
+				Attr: templ.Attributes{
+					"hx-delete":  "/admin/users/" + strconv.Itoa(user.ID),
+					"hx-target":  "closest tr",
+					"hx-confirm": "Are you sure you want to delete this user?",
+				},
+			},
+		},
+	}
+}
+
+templ UsersTableComponent(users []*models.User) {
+	@components.TableComponent(prepareUsersForTable(users))
+}

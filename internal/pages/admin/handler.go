@@ -2,6 +2,7 @@ package admin
 
 import (
 	"log"
+	"sep_setting_mgr/internal/auth"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
@@ -22,10 +23,14 @@ func NewHandler(svc pages.AdminService) pages.AdminHandler {
 
 func Mount(e *echo.Echo, h pages.AdminHandler) {
 	r := e.Group("/admin")
+	r.Use(auth.AddCookieToHeader)
+	r.Use(auth.JWTMiddleware)
+	r.Use(auth.GetClaims)
 	r.GET("", h.AdminHandler)
 	r.GET("/calendar", h.Calendar)
 	r.GET("/rooms", h.Rooms)
 	r.POST("/rooms", h.CreateRoom)
+	r.GET("/users", h.Users)
 }
 
 func (h handler) AdminHandler(c echo.Context) error {
@@ -82,4 +87,17 @@ func (h handler) CreateRoom(c echo.Context) error {
 	}
 	room.ID = id
 	return util.RenderTempl(components.RoomsRowComponent(&room), c, 201)
+}
+
+func (h handler) Users(c echo.Context) error {
+	log.SetPrefix("AdminHandler: Users()")
+	users, err := h.service.ListUsers()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving users")
+	}
+	if util.IsHTMX(c) {
+		return util.RenderTempl(components.UsersTableComponent(users), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
 }

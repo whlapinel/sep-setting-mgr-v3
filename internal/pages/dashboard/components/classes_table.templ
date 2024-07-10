@@ -16,6 +16,7 @@ func prepareClassesForTable(classes []*models.Class) components.TableData {
 }
 
 templ ClassesTable(classes []*models.Class) {
+	@AddClassForm(false)
 	@components.TableComponent(prepareClassesForTable(classes))
 }
 

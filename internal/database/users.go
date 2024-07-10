@@ -36,7 +36,20 @@ func (ur *userRepo) Store(user *models.User) error {
 
 func (ur *userRepo) All() ([]*models.User, error) {
 	var users []*models.User
-
+	rows, err := ur.db.Query(`SELECT * FROM users`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var dbUser userTable
+		err := rows.Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
+		if err != nil {
+			return nil, err
+		}
+		user := convertFromTable(dbUser)
+		users = append(users, user)
+	}
 	return users, nil
 }
 

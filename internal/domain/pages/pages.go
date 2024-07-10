@@ -24,6 +24,9 @@ type DashboardService interface {
 
 type DashboardHandler interface {
 	// GET /dashboard
+	Redirect(c echo.Context) error
+
+	// GET /dashboard/classes
 	DashboardHandler(c echo.Context) error
 
 	// GET /dashboard/calendar
@@ -66,6 +69,9 @@ type AdminHandler interface {
 
 	// GET /admin/calendar
 	Calendar(c echo.Context) error
+
+	// GET /admin/users
+	Users(c echo.Context) error
 }
 
 type AdminService interface {

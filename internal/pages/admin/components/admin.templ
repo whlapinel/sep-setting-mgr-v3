@@ -20,7 +20,15 @@ templ AdminPage() {
 			"hx-target": "#details",
 		},
 	}) {
-		Show Calendar
+		Calendar
+	}
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":    "/admin/users",
+			"hx-target": "#details",
+		},
+	}) {
+		Users
 	}
 	<div id="details"></div>
 }
