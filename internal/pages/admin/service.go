@@ -15,6 +15,14 @@ func NewService(users models.UserRepository, rooms models.RoomRepository, assign
 	return &service{users, rooms, assignments}
 }
 
+func (s service) IsAdmin(userID int) bool {
+	user, err := s.users.FindByID(userID)
+	if err != nil {
+		return false
+	}
+	return user.Admin
+}
+
 func (s service) ListUsers() ([]*models.User, error) {
 	users, err := s.users.All()
 	if err != nil {

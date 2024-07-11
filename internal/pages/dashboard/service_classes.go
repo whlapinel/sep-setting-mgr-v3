@@ -2,7 +2,7 @@ package dashboard
 
 import (
 	"log"
-	domain "sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/domain/models"
 )
 
 func (s service) DeleteClass(classID int) error {
@@ -14,10 +14,25 @@ func (s service) DeleteClass(classID int) error {
 	return nil
 }
 
-func (s service) AddClass(name string, block int, teacherID int) (*domain.Class, error) {
+func (s service) UpdateClass(classID int, name string) (*models.Class, error) {
+	log.SetPrefix("Class Service: ")
+	log.Println("Updating class in database")
+	log.Println("Class ID: ", classID)
+	class, err := s.classes.FindByID(classID)
+	if err != nil {
+		return nil, err
+	}
+	class.Name = name
+	err = s.classes.Update(class)
+	if err != nil {
+		return nil, err
+	}
+	return class, nil
+}
+
+func (s service) AddClass(name string, block int, teacherID int) (*models.Class, error) {
 	log.Println("Service: Adding class to database")
-	// find teacher id
-	class := domain.NewClass(name, block, teacherID)
+	class := models.NewClass(name, block, teacherID)
 	id, err := s.classes.Store(class)
 	if err != nil {
 		return nil, err
@@ -26,7 +41,7 @@ func (s service) AddClass(name string, block int, teacherID int) (*domain.Class,
 	return class, nil
 }
 
-func (s service) FindClassByID(classID int) (*domain.Class, error) {
+func (s service) FindClassByID(classID int) (*models.Class, error) {
 	class, err := s.classes.FindByID(classID)
 	if err != nil {
 		return nil, err
@@ -34,7 +49,7 @@ func (s service) FindClassByID(classID int) (*domain.Class, error) {
 	return class, nil
 }
 
-func (s service) List(teacherID int) ([]*domain.Class, error) {
+func (s service) List(teacherID int) ([]*models.Class, error) {
 	classes, err := s.classes.All(teacherID)
 	if err != nil {
 		return nil, err

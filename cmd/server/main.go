@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	clearData := true
+	clearData := false
 	LoadEnvironment()
 	e := echo.New()
 	e.Use(logger)

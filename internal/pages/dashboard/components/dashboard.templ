@@ -19,9 +19,9 @@ templ DashboardPage(classes []*models.Class) {
 	}
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":      "/dashboard/classes",
+			"hx-get":      "/dashboard/hx-classes",
 			"hx-target":   "#details",
-			"hx-push-url": "true",
+			"hx-push-url": "/dashboard/classes",
 		},
 	}) {
 		Classes

@@ -10,6 +10,7 @@ type TableButton struct {
 type Row struct {
 	Data    []string
 	ID      int
+	Form    templ.Component
 	Buttons []TableButton
 }
 
@@ -54,6 +55,11 @@ templ TableRowComponent(row Row) {
 				}) {
 					{ button.Text }
 				}
+			</td>
+		}
+		if row.Form != nil {
+			<td id={ "form-cell-" + strconv.Itoa(row.ID) }>
+				@row.Form
 			</td>
 		}
 	</tr>

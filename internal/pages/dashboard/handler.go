@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"log"
-	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -31,6 +30,7 @@ func Mount(e *echo.Echo, h pages.DashboardHandler) {
 	r.Use(auth.JWTMiddleware)
 	r.Use(auth.GetClaims)
 	r.GET("", h.Redirect)
+	r.GET("/hx-classes", h.Classes)
 	r.GET("/calendar", h.ShowCalendar)
 	r.DELETE("/students/:student-id", h.DeleteStudent)
 	r.DELETE("/test-events/:test-event-id", h.DeleteTestEvent)
@@ -38,6 +38,7 @@ func Mount(e *echo.Echo, h pages.DashboardHandler) {
 	classesGroup.GET("", h.DashboardHandler)
 	classesGroup.POST("", h.CreateClass)
 	classIDgroup := classesGroup.Group("/:class-id")
+	classIDgroup.POST("/edit", h.EditClass)
 	classIDgroup.DELETE("", h.DeleteClass)
 	classIDgroup.GET("/students", h.Students)
 	classIDgroup.GET("/test-events", h.TestEvents)
@@ -52,24 +53,26 @@ func (h handler) Redirect(c echo.Context) error {
 func (h handler) DashboardHandler(c echo.Context) error {
 	log.SetPrefix("DashboardHandler: ")
 	teacherID := c.Get("id").(int)
-	// if the current page is dashboard, don't return entire page, just the classes component
-	prevUrl := c.Request().Header.Get("HX-Current-URL")
-	host := c.Request().Host
-	prevPath := strings.ReplaceAll(prevUrl, "http://"+host, "")
-	log.Println("prevPath: ", prevPath)
 	classes, err := h.service.List(teacherID)
 	if err != nil {
 		log.Println("Failed to list classes: ", err)
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
-	if strings.Contains(prevPath, "/dashboard") {
-		log.Println("Returning classes table only")
-		return util.RenderTempl(components.ClassesTable(classes), c, 200)
-	}
 	if util.IsHTMX(c) {
 		return util.RenderTempl(components.DashboardPage(classes), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes)), c, 200)
+}
+
+func (h handler) Classes(c echo.Context) error {
+	log.SetPrefix("Classes: ")
+	teacherID := c.Get("id").(int)
+	classes, err := h.service.List(teacherID)
+	if err != nil {
+		log.Println("Failed to list classes: ", err)
+		return c.String(500, "Failed to list classes. See server logs for details.")
+	}
+	return util.RenderTempl(components.ClassesTable(classes), c, 200)
 }
 
 func (h handler) ShowCalendar(c echo.Context) error {

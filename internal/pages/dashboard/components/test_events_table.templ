@@ -22,11 +22,18 @@ templ TestEventsTableComponent(testEvents models.TestEvents, classID int) {
 
 func testEventToRow(testEvent *models.TestEvent) components.Row {
 	return components.Row{
+		Form: AddTestEventForm(0),
 		Data: []string{testEvent.TestName, testEvent.TestDate.Format("2006-01-02")},
 		ID:   testEvent.ID,
 		Buttons: []components.TableButton{
 			{
 				Text: "Edit",
+				Attr: templ.Attributes{
+					"hx-get":      "/test-events/" + strconv.Itoa(testEvent.ID) + "/edit",
+					"hx-target":   "#details",
+					"hx-push-url": "true",
+					"hx-swap":     "afterbegin",
+				},
 			},
 			{
 				Text: "Delete",

@@ -20,7 +20,8 @@ type (
 
 	UserRepository interface {
 		Store(*User) error
-		Find(username string) (*User, error)
+		Find(email string) (*User, error)
+		FindByID(id int) (*User, error)
 		GetClasses(user *User) ([]*Class, error)
 		GetStudents(user *User) ([]*Student, error)
 		All() ([]*User, error)

@@ -3,8 +3,8 @@ let activityTimeout;
 let timeOutWarning;
 let isSignedIn;
 
-const warningTimer = 60000; // 1 minute
-const signoutTimer = 120000; // 2 minutes
+const warningTimer = 10 * 60000;
+const signoutTimer = 15 * 60000;
 
 function setIsSignedIn(signedIn) {
     isSignedIn = signedIn;
@@ -32,8 +32,20 @@ async function onSignin() {
     setIsSignedIn(true);
 }
 
+function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
 function onActive() {
     console.log("active")
+    // debounce this function
+
     ResetActivityTimeout();
 }
 
@@ -50,10 +62,10 @@ function ResetActivityTimeout() {
 
 document.addEventListener("signin", (e) => {
     console.log("signin event triggered")
-    document.addEventListener("mousemove", onActive)
-    document.addEventListener("click", onActive)
-    document.addEventListener("scroll", onActive)
-    document.addEventListener("keydown", onActive)
+    document.addEventListener("mousemove", debounce(onActive, 1000))
+    document.addEventListener("click", debounce(onActive, 1000))
+    document.addEventListener("scroll", debounce(onActive, 1000))
+    document.addEventListener("keydown", debounce(onActive, 1000))
     ResetActivityTimeout();
 })
 

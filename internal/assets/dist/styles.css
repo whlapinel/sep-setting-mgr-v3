@@ -578,6 +578,10 @@ video {
   display: table;
 }
 
+.hidden {
+  display: none;
+}
+
 .w-full {
   width: 100%;
 }
@@ -592,6 +596,10 @@ video {
 
 .min-w-\[30vw\] {
   min-width: 30vw;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
 }
 
 .flex-col {
@@ -697,6 +705,10 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.opacity-50 {
+  opacity: 0.5;
 }
 
 .shadow-sm {

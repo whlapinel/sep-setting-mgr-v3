@@ -1,24 +1,83 @@
 package components
 
-import "sep_setting_mgr/internal/components"
+import (
+	"sep_setting_mgr/internal/components"
+	"strconv"
+)
 
-templ AddClassForm(showForm bool) {
+func getValue(isEdit bool, value string) string {
+	if isEdit {
+		return value
+	}
+	return ""
+}
+
+func getPostTarget(isEdit bool, id int) string {
+	if isEdit {
+		return "/dashboard/classes/" + strconv.Itoa(id) + "/edit"
+	}
+	return "/dashboard/classes"
+}
+
+func getClassFormTitle(isEdit bool) string {
+	if isEdit {
+		return "Edit Class"
+	}
+	return "Add Class"
+}
+
+func getID(isEdit bool, classID int) string {
+	if isEdit {
+		return "edit-class-form-" + strconv.Itoa(classID)
+	}
+	return "add-class-form"
+}
+
+func getSubtitle(isEdit bool) string {
+	if isEdit {
+		return "Edit a Class"
+	}
+	return "Add a Class to User"
+}
+
+func getTarget(isEdit bool) string {
+	if isEdit {
+		return "closest tr"
+	}
+	return "#classes-table"
+}
+
+func getSwap(isEdit bool) string {
+	if isEdit {
+		return "outerHTML"
+	}
+	return "afterbegin"
+}
+
+func getBtnTitle(isEdit bool) string {
+	if isEdit {
+		return "Submit"
+	}
+	return "Add"
+}
+
+templ AddClassForm(showForm bool, isEdit bool, name string, block int, id int) {
 	@components.FormComponent(components.Form{
-		ID:       "add-class-form",
-		Title:    "Add Class",
-		SubTitle: "Add a Class to User",
+		ID:       getID(isEdit, id),
+		Title:    getClassFormTitle(isEdit),
+		SubTitle: getSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      "/dashboard/classes",
-			"hx-target":    "#classes-table",
-			"hx-swap":      "afterbegin",
+			"hx-post":      getPostTarget(isEdit, id),
+			"hx-target":    getTarget(isEdit),
+			"hx-swap":      getSwap(isEdit),
 			"hx-indicator": "#indicator",
 		},
 		ShowDialog:     showForm,
-		SubmitBtnTitle: "Add",
+		SubmitBtnTitle: getBtnTitle(isEdit),
 		Cancelable:     true,
-		ShowFormPath:   "/show-add-class-form",
 	}) {
 		@components.InputComponent(components.Input{
+			Value:       getValue(isEdit, name),
 			Label:       "Class Name",
 			Placeholder: "e.g. Biology",
 			ID:          "name",
@@ -27,6 +86,7 @@ templ AddClassForm(showForm bool) {
 			Required:    true,
 		})
 		@components.InputComponent(components.Input{
+			Value:       getValue(isEdit, strconv.Itoa(block)),
 			Label:       "Class Block",
 			Placeholder: "e.g. 2",
 			ID:          "block",
@@ -35,6 +95,14 @@ templ AddClassForm(showForm bool) {
 			Required:    true,
 			Min:         1,
 			Max:         4,
+			Disabled:    isEdit,
 		})
+		if isEdit {
+			@components.InputComponent(components.Input{
+				Name:  "id",
+				Value: strconv.Itoa(id),
+				Type:  "hidden",
+			})
+		}
 	}
 }

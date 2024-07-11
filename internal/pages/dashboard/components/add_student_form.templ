@@ -5,22 +5,86 @@ import (
 	"strconv"
 )
 
-templ AddStudentForm(classID int) {
+func getStudentFormTitle(isEdit bool) string {
+	if isEdit {
+		return "Edit Student"
+	}
+	return "Add Student"
+}
+
+func getStudentFormSubtitle(isEdit bool) string {
+	if isEdit {
+		return "Edit a Student"
+	}
+	return "Add a Student to Class"
+}
+
+func getStudentFormID(isEdit bool, studentID int) string {
+	if isEdit {
+		return "edit-student-form-" + strconv.Itoa(studentID)
+	}
+	return "add-student-form"
+}
+
+func getStudentFormPostTarget(isEdit bool, studentID int) string {
+	if isEdit {
+		return "/dashboard/students/" + strconv.Itoa(studentID) + "/edit"
+	}
+	return "/dashboard/students"
+}
+
+func getStudentFormTarget(isEdit bool) string {
+	if isEdit {
+		return "closest tr"
+	}
+	return "#students-table"
+}
+
+func getStudentFormSwap(isEdit bool) string {
+	if isEdit {
+		return "outerHTML"
+	}
+	return "afterbegin"
+}
+
+func getStudentFirstNameInputValue(isEdit bool, firstName string) string {
+	if isEdit {
+		return firstName
+	}
+	return ""
+}
+
+func getStudentLastNameInputValue(isEdit bool, lastName string) string {
+	if isEdit {
+		return lastName
+	}
+	return ""
+}
+
+func getStudentFormOneOnOneChecked(isEdit bool, defaultVal bool, oneOnOne bool) bool {
+	if isEdit {
+		return oneOnOne
+	}
+	return defaultVal
+}
+
+templ AddStudentForm(classID int, isEdit bool, studentID int, firstName string, lastName string, oneOnOne bool) {
 	@components.FormComponent(components.Form{
-		Title:    "Add Student",
-		SubTitle: "Add a Student to Class",
+		ID:       getStudentFormID(isEdit, studentID),
+		Title:    getStudentFormTitle(isEdit),
+		SubTitle: getStudentFormSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      "/dashboard/classes/" + strconv.Itoa(classID) + "/students",
-			"hx-target":    "#students-table",
-			"hx-swap":      "afterbegin",
+			"hx-post":      getStudentFormPostTarget(isEdit, studentID),
+			"hx-target":    getStudentFormTarget(isEdit),
+			"hx-swap":      getStudentFormSwap(isEdit),
 			"hx-indicator": "#students-indicator",
 		},
 		ShowDialog:     false,
 		SubmitBtnTitle: "Add",
 		Cancelable:     true,
-		ID:             "add-student-form",
 	}) {
 		@components.InputComponent(components.Input{
+			Value:       getStudentFirstNameInputValue(isEdit, firstName),
 			Label:       "First Name",
 			Placeholder: "e.g. James",
 			ID:          "first-name",
@@ -29,6 +93,7 @@ templ AddStudentForm(classID int) {
 			Required:    true,
 		})
 		@components.InputComponent(components.Input{
+			Value:       getStudentLastNameInputValue(isEdit, lastName),
 			Label:       "Last Name",
 			Placeholder: "e.g. Wilson",
 			ID:          "last-name",
@@ -41,15 +106,16 @@ templ AddStudentForm(classID int) {
 			Name:  "one-on-one",
 			Options: []*components.RadioOption{
 				{
-					ID:    "one-on-one-yes",
-					Value: "yes",
-					Label: "Yes",
+					ID:      "one-on-one-yes",
+					Value:   "yes",
+					Label:   "Yes",
+					Checked: getStudentFormOneOnOneChecked(isEdit, false, oneOnOne),
 				},
 				{
 					ID:      "one-on-one-no",
 					Value:   "no",
 					Label:   "No",
-					Checked: true,
+					Checked: getStudentFormOneOnOneChecked(isEdit, true, oneOnOne),
 				},
 			},
 		})

@@ -41,7 +41,7 @@ templ FormComponent(f Form) {
 		if f.ShowDialog {
 			open
 		}
-		id={ f.ID + "-dialog" }
+		id={ "form-dialog-" + f.ID }
 	>
 		<script type="text/javascript">
 			(() => {
@@ -107,21 +107,36 @@ templ FormComponent(f Form) {
 		</form>
 	</dialog>
 	if !f.ShowDialog {
-		<button id={ getOpenDialogID(f.ID) }>
+		@ButtonComponent(Button{Attr: templ.Attributes{"id": getOpenDialogID(f.ID)}}) {
 			{ f.Title }
 			<script>
-			(() => {
-				const showDialogScript = document.currentScript;
-				const showDialogButton = showDialogScript.closest("button");
-				console.log("hello from the button script element")
-				showDialogButton.addEventListener("click", () => {
-					console.log("hello from the button click event listener");
-					const dialog = showDialogButton.previousElementSibling;
-					dialog.showModal();
-				});
-				}
-			)();
+				(() => {
+					const showDialogScript = document.currentScript;
+					const showDialogButton = showDialogScript.closest("button");
+					console.log("hello from the button script element")
+					showDialogButton.addEventListener("click", () => {
+						console.log("hello from the button click event listener");
+						const dialog = showDialogButton.previousElementSibling;
+						dialog.showModal();
+					});
+				})();
 			</script>
-		</button>
+		}
+		// <button id={ getOpenDialogID(f.ID) }>
+		// 	{ f.Title }
+		// 	<script>
+		// 	(() => {
+		// 		const showDialogScript = document.currentScript;
+		// 		const showDialogButton = showDialogScript.closest("button");
+		// 		console.log("hello from the button script element")
+		// 		showDialogButton.addEventListener("click", () => {
+		// 			console.log("hello from the button click event listener");
+		// 			const dialog = showDialogButton.previousElementSibling;
+		// 			dialog.showModal();
+		// 		});
+		// 		}
+		// 	)();
+		// 	</script>
+		// </button>
 	}
 }

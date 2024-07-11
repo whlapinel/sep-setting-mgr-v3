@@ -12,6 +12,7 @@ type DashboardService interface {
 	List(teacherID int) ([]*models.Class, error)
 	AddClass(name string, block int, teacherID int) (*models.Class, error)
 	DeleteClass(classID int) error
+	UpdateClass(classID int, name string) (*models.Class, error)
 	AddStudent(firstName string, lastName string, classID int, oneOneOne bool) (*models.Student, error)
 	DeleteStudent(studentID int) error
 	ListStudents(classID int) ([]*models.Student, error)
@@ -26,6 +27,9 @@ type DashboardHandler interface {
 	// GET /dashboard
 	Redirect(c echo.Context) error
 
+	// GET /classes
+	Classes(c echo.Context) error
+
 	// GET /dashboard/classes
 	DashboardHandler(c echo.Context) error
 
@@ -34,6 +38,9 @@ type DashboardHandler interface {
 
 	// POST /dashboard/classes
 	CreateClass(c echo.Context) error
+
+	// POST /dashboard/classes/:class-id/edit
+	EditClass(c echo.Context) error
 
 	// DELETE /dashboard/classes/:class-id
 	DeleteClass(c echo.Context) error
@@ -72,6 +79,9 @@ type AdminHandler interface {
 
 	// GET /admin/users
 	Users(c echo.Context) error
+
+	// Middleware for /admin/* routes
+	Authorization(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 type AdminService interface {
@@ -79,6 +89,7 @@ type AdminService interface {
 	ListRooms() ([]*models.Room, error)
 	AddRoom(*models.Room) (id int, err error)
 	GetAllAssignments() (models.Assignments, error)
+	IsAdmin(userID int) bool
 }
 
 type HomeHandler interface {

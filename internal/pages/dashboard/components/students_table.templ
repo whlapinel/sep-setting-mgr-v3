@@ -6,28 +6,26 @@ import (
 	"strconv"
 )
 
-func prepareStudentsForTable(students []*models.Student) components.TableData {
+func prepareStudentsForTable(students []*models.Student, classID int) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, student := range students {
-		rows = append(rows, studentToRow(student))
+		rows = append(rows, studentToRow(student, classID))
 	}
 	return components.TableData{ID: "students-table", Title: "Students", Headers: headers, Rows: rows}
 }
 
 templ StudentTableComponent(students []*models.Student, classID int) {
-	@AddStudentForm(classID)
-	@components.TableComponent(prepareStudentsForTable(students))
+	@AddStudentForm(classID, false, 0, "", "", false)
+	@components.TableComponent(prepareStudentsForTable(students, classID))
 }
 
-func studentToRow(student *models.Student) components.Row {
+func studentToRow(student *models.Student, classID int) components.Row {
 	return components.Row{
+		Form: AddStudentForm(classID, true, student.ID, student.FirstName, student.LastName, student.OneOnOne),
 		Data: []string{student.FirstName, student.LastName},
 		ID:   student.ID,
 		Buttons: []components.TableButton{
-			{
-				Text: "Edit",
-			},
 			{
 				Text: "Delete",
 				Attr: templ.Attributes{
@@ -40,6 +38,6 @@ func studentToRow(student *models.Student) components.Row {
 	}
 }
 
-templ StudentRowComponent(student *models.Student) {
-	@components.TableRowComponent(studentToRow(student))
+templ StudentRowComponent(student *models.Student, classID int) {
+	@components.TableRowComponent(studentToRow(student, classID))
 }

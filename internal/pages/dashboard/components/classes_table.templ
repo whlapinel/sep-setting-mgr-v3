@@ -16,18 +16,17 @@ func prepareClassesForTable(classes []*models.Class) components.TableData {
 }
 
 templ ClassesTable(classes []*models.Class) {
-	@AddClassForm(false)
+	@AddClassForm(false, false, "", 0, 0)
 	@components.TableComponent(prepareClassesForTable(classes))
 }
 
 func classToRow(class *models.Class) components.Row {
 	return components.Row{
+		// passing class directly will return nil pointer error, have to pass the values individually
+		Form: AddClassForm(false, true, class.Name, class.Block, class.ID),
 		Data: []string{class.Name, strconv.Itoa(class.Block)},
 		ID:   class.ID,
 		Buttons: []components.TableButton{
-			{
-				Text: "Edit",
-			},
 			{
 				Text: "Delete",
 				Attr: templ.Attributes{

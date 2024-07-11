@@ -81,9 +81,26 @@ func (classRepo *classRepo) FindByID(classID int) (*models.Class, error) {
 	if err != nil {
 		return nil, err
 	}
-	dbClass.id = classID
 	class := convertToClass(dbClass)
+	log.Println("Class Name: ", class.Name)
+	log.Println("Class ID: ", class.ID)
 	return class, nil
+}
+
+func (classRepo *classRepo) Update(class *models.Class) error {
+	log.SetPrefix("Repository: ")
+	log.Println("Updating class")
+	dbClass := convertToClassTable(class)
+	log.Println("Class ID: ", dbClass.id)
+	log.Println("Class Name: ", dbClass.name)
+	_, err := classRepo.db.Exec(`
+	UPDATE classes
+	SET name = ?
+	WHERE id = ?`, dbClass.name, dbClass.id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func createClassesTable(db *sql.DB) error {
@@ -110,12 +127,15 @@ func convertToClass(dbClass classTableRow) *models.Class {
 		ID:    dbClass.id,
 		Name:  dbClass.name,
 		Block: dbClass.block,
+		Teacher: models.User{
+			ID: dbClass.teacher_id,
+		},
 	}
 }
 
 func convertToClassTable(class *models.Class) classTableRow {
 	var classTable classTableRow
-	// if this is a new class then the ID will be 0
+	classTable.id = class.ID
 	classTable.name = class.Name
 	classTable.block = class.Block
 	classTable.teacher_id = class.Teacher.ID

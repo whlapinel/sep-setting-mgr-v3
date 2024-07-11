@@ -61,6 +61,14 @@ func (ur *userRepo) Find(email string) (*models.User, error) {
 	return user, nil
 }
 
+func (ur *userRepo) FindByID(id int) (*models.User, error) {
+	var dbUser userTable
+	ur.db.QueryRow(`SELECT * FROM users WHERE id = ?`, id).
+		Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
+	user := convertFromTable(dbUser)
+	return user, nil
+}
+
 func (ur *userRepo) GetClasses(user *models.User) ([]*models.Class, error) {
 	var classes []*models.Class
 

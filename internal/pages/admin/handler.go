@@ -7,6 +7,7 @@ import (
 	"sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/pages/admin/components"
+	"sep_setting_mgr/internal/pages/unauthorized"
 	"sep_setting_mgr/internal/util"
 	"strconv"
 
@@ -22,10 +23,12 @@ func NewHandler(svc pages.AdminService) pages.AdminHandler {
 }
 
 func Mount(e *echo.Echo, h pages.AdminHandler) {
+
 	r := e.Group("/admin")
 	r.Use(auth.AddCookieToHeader)
 	r.Use(auth.JWTMiddleware)
 	r.Use(auth.GetClaims)
+	r.Use(h.Authorization)
 	r.GET("", h.AdminHandler)
 	r.GET("/calendar", h.Calendar)
 	r.GET("/rooms", h.Rooms)
@@ -100,4 +103,15 @@ func (h handler) Users(c echo.Context) error {
 		return util.RenderTempl(components.UsersTableComponent(users), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
+}
+
+func (h handler) Authorization(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		userID := c.Get("id").(int)
+		isAdmin := h.service.IsAdmin(userID)
+		if !isAdmin {
+			return util.RenderTempl(unauthorized.UnauthorizedPage(), c, 200)
+		}
+		return next(c)
+	}
 }

@@ -15,6 +15,7 @@ type (
 		Delete(classID int) error
 		All(teacherID int) ([]*Class, error)
 		FindByID(classID int) (*Class, error)
+		Update(*Class) error
 	}
 )
 

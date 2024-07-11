@@ -54,7 +54,7 @@ func (h handler) AddStudent(c echo.Context) error {
 			return c.String(500, "Failed to add student. See server logs for details.")
 		}
 	}
-	return util.RenderTempl(components.StudentRowComponent(student), c, 201)
+	return util.RenderTempl(components.StudentRowComponent(student, classID), c, 201)
 }
 
 func (h handler) DeleteStudent(c echo.Context) error {

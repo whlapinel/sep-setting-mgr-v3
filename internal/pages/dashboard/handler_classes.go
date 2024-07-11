@@ -52,3 +52,20 @@ func (h handler) CreateClass(c echo.Context) error {
 	}
 	return nil
 }
+
+func (h handler) EditClass(c echo.Context) error {
+	log.SetPrefix("Class Handler: ")
+	log.Println("Handler: Editing class")
+	classID, err := strconv.Atoi(c.Param("class-id"))
+	if err != nil {
+		return c.String(400, "Invalid class ID")
+	}
+	name := c.FormValue("name")
+	log.Println("Class ID:", classID)
+	log.Println("Name:", name)
+	class, err := h.service.UpdateClass(classID, name)
+	if err != nil {
+		return c.String(500, "Failed to edit class. See server logs for details.")
+	}
+	return util.RenderTempl(components.ClassRowComponent(class), c, 200)
+}
