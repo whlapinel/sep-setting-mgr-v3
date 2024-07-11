@@ -2,11 +2,13 @@
 
 ## PENDING
 
+- complete edit students functionality (including room assignments, the biggest pain in the butt!!)
 - edit test events functionality
 - test rooms functionality
 - admin functionality (rooms, users)
 - refresh token before expiration if user is active
 - implement Google Sign In
+- (low priority) should keep classes section at the top and create a new section for students and test events, so that the classes table can be viewed and selected while students or test events tables are displayed
 
 ## COMPLETE
 
