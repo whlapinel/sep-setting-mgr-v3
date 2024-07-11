@@ -59,6 +59,14 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 	return student, notAssignedErr
 }
 
+func (s service) FindStudentByID(studentID int) (*models.Student, error) {
+	student, err := s.students.FindByID(studentID)
+	if err != nil {
+		return nil, err
+	}
+	return student, nil
+}
+
 func (s service) DeleteStudent(studentID int) error {
 	log.Println("Service: Deleting student from database")
 	err := s.students.Delete(studentID)

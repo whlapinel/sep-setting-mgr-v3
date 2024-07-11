@@ -6,26 +6,40 @@ import (
 	"strconv"
 )
 
+const (
+	classesTableID = "classes-table"
+)
+
 func prepareClassesForTable(classes []*models.Class) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, class := range classes {
 		rows = append(rows, classToRow(class))
 	}
-	return components.TableData{ID: "classes-table", Title: "Classes", Headers: headers, Rows: rows}
+	return components.TableData{ID: classesTableID, Title: "Classes", Headers: headers, Rows: rows}
 }
 
 templ ClassesTable(classes []*models.Class) {
-	@AddClassForm(false, false, "", 0, 0)
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":      "/dashboard/classes/add",
+			"hx-target":   "next",
+			"hx-swap":     "beforebegin",
+			"hx-push-url": "true",
+		},
+	}) {
+		Add Class
+	}
 	@components.TableComponent(prepareClassesForTable(classes))
 }
 
 func classToRow(class *models.Class) components.Row {
 	return components.Row{
 		// passing class directly will return nil pointer error, have to pass the values individually
-		Form: AddClassForm(false, true, class.Name, class.Block, class.ID),
-		Data: []string{class.Name, strconv.Itoa(class.Block)},
-		ID:   class.ID,
+		Editable: true,
+		TableID:  classesTableID,
+		Data:     []string{class.Name, strconv.Itoa(class.Block)},
+		ID:       class.ID,
 		Buttons: []components.TableButton{
 			{
 				Text: "Delete",
@@ -48,6 +62,14 @@ func classToRow(class *models.Class) components.Row {
 				Attr: templ.Attributes{
 					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/test-events",
 					"hx-target":   "#details",
+					"hx-push-url": "true",
+				},
+			},
+			{
+				Text: "Edit",
+				Attr: templ.Attributes{
+					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/edit",
+					"hx-target":   "#" + classesTableID + "-form-cell-" + strconv.Itoa(class.ID),
 					"hx-push-url": "true",
 				},
 			},

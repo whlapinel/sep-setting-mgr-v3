@@ -2,8 +2,6 @@
 
 ## PENDING
 
-- edit classes functionality
-- edit students functionality
 - edit test events functionality
 - test rooms functionality
 - admin functionality (rooms, users)
@@ -12,6 +10,8 @@
 
 ## COMPLETE
 
+- edit students functionality
+- edit classes functionality
 - change dashboard target link to dashboard/classes (add class button currently shows up in dashboard/calendar resulting in error when submitting due to no classes-table being present)
 - error: GetRoomAssignments is getting passed a value of 0 for block resulting in len(assignments) always being 0
 - change hx-post url in add-student-form component and url of handler

@@ -20,6 +20,7 @@ type (
 		Store(*Student) (int, error)
 		All(classID int) ([]*Student, error)
 		Delete(studentID int) error
+		FindByID(studentID int) (*Student, error)
 	}
 )
 

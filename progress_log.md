@@ -1,5 +1,13 @@
 # PROGRESS LOG
 
+## 7/11
+
+- Worked on editing functionality. Had to rework the forms but I'm happy now.  The only thing I don't like is that I currently remove the form with JS upon clicking cancel, and that puts a little warning in the console log. But probably not really an issue unless there's something with accessibility.
+- Still need to test edit students functionality but edit classes works.
+- Haven't started with editing test event functionality yet.
+- Overall, making great progress and learning a lot.
+- Still spending more time fussing with route paths than it seems I should, would love to have a better system for auto-syncing up the hx-targets with the handlers so I'm not constantly having to remember (and forgetting).
+
 ## 7/9
 
 - Over the last several days I've been slogging through the room assignments functionality, but have made good, albeit slow, progress.

@@ -32,6 +32,17 @@ func (sr *studentRepo) GetAssignments(studentID int) (models.Assignments, error)
 	return nil, nil
 }
 
+func (sr *studentRepo) FindByID(studentID int) (*models.Student, error) {
+	var studentTable studentTableRow
+	err := sr.db.QueryRow(`
+	SELECT * FROM students
+	WHERE id = ?`, studentID).Scan(&studentTable.id, &studentTable.first_name, &studentTable.last_name, &studentTable.class_id, &studentTable.one_on_one)
+	if err != nil {
+		return nil, err
+	}
+	student := convertToStudent(studentTable)
+	return student, nil
+}
 
 func (sr *studentRepo) Store(student *models.Student) (int, error) {
 	dbStudent := convertToStudentTable(student)

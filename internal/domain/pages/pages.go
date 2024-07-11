@@ -14,6 +14,7 @@ type DashboardService interface {
 	DeleteClass(classID int) error
 	UpdateClass(classID int, name string) (*models.Class, error)
 	AddStudent(firstName string, lastName string, classID int, oneOneOne bool) (*models.Student, error)
+	FindStudentByID(studentID int) (*models.Student, error)
 	DeleteStudent(studentID int) error
 	ListStudents(classID int) ([]*models.Student, error)
 	FindClassByID(classID int) (*models.Class, error)
@@ -36,6 +37,12 @@ type DashboardHandler interface {
 	// GET /dashboard/calendar
 	ShowCalendar(c echo.Context) error
 
+	// GET /dashboard/classes/add
+	ShowAddClassForm(c echo.Context) error
+
+	// GET /dashboard/classes/:class-id/edit
+	ShowEditClassForm(c echo.Context) error
+
 	// POST /dashboard/classes
 	CreateClass(c echo.Context) error
 
@@ -48,8 +55,14 @@ type DashboardHandler interface {
 	// GET /dashboard/classes/:class-id/students
 	Students(c echo.Context) error
 
+	// GET /dashboard/classes/:class-id/students/add
+	ShowAddStudentForm(c echo.Context) error
+
 	// POST /dashboard/classes/:class-id/students
 	AddStudent(c echo.Context) error
+
+	// GET /dashboard/classes/:class-id/students/:student-id/edit
+	ShowEditStudentForm(c echo.Context) error
 
 	// DELETE /students/:student-id
 	DeleteStudent(c echo.Context) error

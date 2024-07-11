@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
 	"strconv"
@@ -30,7 +31,7 @@ func (h handler) Students(c echo.Context) error {
 		return c.String(500, "Failed to list students. See server logs for details.")
 	}
 	class.Students = students
-	return util.RenderTempl(components.StudentTableComponent(class.Students, classID), c, 200)
+	return util.RenderTempl(components.StudentTableComponent(class.Students), c, 200)
 }
 
 func (h handler) AddStudent(c echo.Context) error {
@@ -54,7 +55,38 @@ func (h handler) AddStudent(c echo.Context) error {
 			return c.String(500, "Failed to add student. See server logs for details.")
 		}
 	}
-	return util.RenderTempl(components.StudentRowComponent(student, classID), c, 201)
+	return util.RenderTempl(components.StudentRowComponent(student), c, 201)
+}
+
+func (h handler) ShowEditStudentForm(c echo.Context) error {
+	log.SetPrefix("Handler: ")
+	log.Println("Handler: Showing edit student form")
+	studentID, err := strconv.Atoi(c.Param("student-id"))
+	if err != nil {
+		return c.String(400, "Invalid student ID")
+	}
+	student, err := h.service.FindStudentByID(studentID)
+	if err != nil {
+		return c.String(500, "Failed to get student. See server logs for details.")
+	}
+	switch util.IsHTMX(c) {
+	case true:
+		return util.RenderTempl(components.AddStudentForm(true, student), c, 200)
+	default:
+		return c.Redirect(303, "/")
+	}
+}
+
+func (h handler) ShowAddStudentForm(c echo.Context) error {
+	log.SetPrefix("Handler: ")
+	log.Println("Handler: Showing add student form")
+	switch util.IsHTMX(c) {
+	case true:
+		student := models.Student{}
+		return util.RenderTempl(components.AddStudentForm(false, &student), c, 200)
+	default:
+		return c.Redirect(303, "/")
+	}
 }
 
 func (h handler) DeleteStudent(c echo.Context) error {

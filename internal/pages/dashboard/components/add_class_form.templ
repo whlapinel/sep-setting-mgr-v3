@@ -2,6 +2,7 @@ package components
 
 import (
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
 	"strconv"
 )
 
@@ -61,23 +62,22 @@ func getBtnTitle(isEdit bool) string {
 	return "Add"
 }
 
-templ AddClassForm(showForm bool, isEdit bool, name string, block int, id int) {
+templ AddClassForm(isEdit bool, class *models.Class) {
 	@components.FormComponent(components.Form{
-		ID:       getID(isEdit, id),
+		ID:       getID(isEdit, class.ID),
 		Title:    getClassFormTitle(isEdit),
 		SubTitle: getSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      getPostTarget(isEdit, id),
+			"hx-post":      getPostTarget(isEdit, class.ID),
 			"hx-target":    getTarget(isEdit),
 			"hx-swap":      getSwap(isEdit),
 			"hx-indicator": "#indicator",
 		},
-		ShowDialog:     showForm,
 		SubmitBtnTitle: getBtnTitle(isEdit),
 		Cancelable:     true,
 	}) {
 		@components.InputComponent(components.Input{
-			Value:       getValue(isEdit, name),
+			Value:       getValue(isEdit, class.Name),
 			Label:       "Class Name",
 			Placeholder: "e.g. Biology",
 			ID:          "name",
@@ -86,7 +86,7 @@ templ AddClassForm(showForm bool, isEdit bool, name string, block int, id int) {
 			Required:    true,
 		})
 		@components.InputComponent(components.Input{
-			Value:       getValue(isEdit, strconv.Itoa(block)),
+			Value:       getValue(isEdit, strconv.Itoa(class.Block)),
 			Label:       "Class Block",
 			Placeholder: "e.g. 2",
 			ID:          "block",
@@ -100,7 +100,7 @@ templ AddClassForm(showForm bool, isEdit bool, name string, block int, id int) {
 		if isEdit {
 			@components.InputComponent(components.Input{
 				Name:  "id",
-				Value: strconv.Itoa(id),
+				Value: strconv.Itoa(class.ID),
 				Type:  "hidden",
 			})
 		}

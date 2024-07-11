@@ -2,6 +2,7 @@ package components
 
 import (
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
 	"strconv"
 )
 
@@ -68,13 +69,13 @@ func getStudentFormOneOnOneChecked(isEdit bool, defaultVal bool, oneOnOne bool) 
 	return defaultVal
 }
 
-templ AddStudentForm(classID int, isEdit bool, studentID int, firstName string, lastName string, oneOnOne bool) {
+templ AddStudentForm(isEdit bool, student *models.Student) {
 	@components.FormComponent(components.Form{
-		ID:       getStudentFormID(isEdit, studentID),
+		ID:       getStudentFormID(isEdit, student.ID),
 		Title:    getStudentFormTitle(isEdit),
 		SubTitle: getStudentFormSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      getStudentFormPostTarget(isEdit, studentID),
+			"hx-post":      getStudentFormPostTarget(isEdit, student.ID),
 			"hx-target":    getStudentFormTarget(isEdit),
 			"hx-swap":      getStudentFormSwap(isEdit),
 			"hx-indicator": "#students-indicator",
@@ -84,7 +85,7 @@ templ AddStudentForm(classID int, isEdit bool, studentID int, firstName string, 
 		Cancelable:     true,
 	}) {
 		@components.InputComponent(components.Input{
-			Value:       getStudentFirstNameInputValue(isEdit, firstName),
+			Value:       getStudentFirstNameInputValue(isEdit, student.FirstName),
 			Label:       "First Name",
 			Placeholder: "e.g. James",
 			ID:          "first-name",
@@ -93,7 +94,7 @@ templ AddStudentForm(classID int, isEdit bool, studentID int, firstName string, 
 			Required:    true,
 		})
 		@components.InputComponent(components.Input{
-			Value:       getStudentLastNameInputValue(isEdit, lastName),
+			Value:       getStudentLastNameInputValue(isEdit, student.LastName),
 			Label:       "Last Name",
 			Placeholder: "e.g. Wilson",
 			ID:          "last-name",
@@ -109,13 +110,13 @@ templ AddStudentForm(classID int, isEdit bool, studentID int, firstName string, 
 					ID:      "one-on-one-yes",
 					Value:   "yes",
 					Label:   "Yes",
-					Checked: getStudentFormOneOnOneChecked(isEdit, false, oneOnOne),
+					Checked: getStudentFormOneOnOneChecked(isEdit, false, student.OneOnOne),
 				},
 				{
 					ID:      "one-on-one-no",
 					Value:   "no",
 					Label:   "No",
-					Checked: getStudentFormOneOnOneChecked(isEdit, true, oneOnOne),
+					Checked: getStudentFormOneOnOneChecked(isEdit, true, !student.OneOnOne),
 				},
 			},
 		})

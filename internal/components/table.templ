@@ -8,10 +8,11 @@ type TableButton struct {
 }
 
 type Row struct {
-	Data    []string
-	ID      int
-	Form    templ.Component
-	Buttons []TableButton
+	TableID  string
+	Data     []string
+	ID       int
+	Editable bool
+	Buttons  []TableButton
 }
 
 type TableData struct {
@@ -57,10 +58,8 @@ templ TableRowComponent(row Row) {
 				}
 			</td>
 		}
-		if row.Form != nil {
-			<td id={ "form-cell-" + strconv.Itoa(row.ID) }>
-				@row.Form
-			</td>
+		if row.Editable {
+			<td id={ row.TableID + "-form-cell-" + strconv.Itoa(row.ID) }></td>
 		}
 	</tr>
 }
