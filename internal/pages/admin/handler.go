@@ -22,8 +22,10 @@ func NewHandler(svc pages.AdminService) pages.AdminHandler {
 	return &handler{service: svc}
 }
 
-func Mount(e *echo.Echo, h pages.AdminHandler) {
+var router *echo.Echo
 
+func Mount(e *echo.Echo, h pages.AdminHandler) {
+	router = e
 	r := e.Group("/admin")
 	r.Use(auth.AddCookieToHeader)
 	r.Use(auth.JWTMiddleware)
@@ -32,6 +34,7 @@ func Mount(e *echo.Echo, h pages.AdminHandler) {
 	r.GET("", h.AdminHandler)
 	r.GET("/calendar", h.Calendar)
 	r.GET("/rooms", h.Rooms)
+	r.GET("/rooms/add", h.ShowAddRoomForm)
 	r.POST("/rooms", h.CreateRoom)
 	r.GET("/users", h.Users)
 }
@@ -90,6 +93,30 @@ func (h handler) CreateRoom(c echo.Context) error {
 	}
 	room.ID = id
 	return util.RenderTempl(components.RoomsRowComponent(&room), c, 201)
+}
+
+func (h handler) ShowAddRoomForm(c echo.Context) error {
+	log.SetPrefix("AdminHandler: ShowAddRoomForm()")
+	if util.IsHTMX(c) {
+		return util.RenderTempl(components.AddRoomForm(false, &models.Room{}), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
+}
+
+func (h handler) ShowEditRoomForm(c echo.Context) error {
+	log.SetPrefix("AdminHandler: ShowEditRoomForm()")
+	roomID, err := strconv.Atoi(c.Param("room-id"))
+	if err != nil {
+		return c.String(400, "Invalid room ID")
+	}
+	room, err := h.service.FindRoomByID(roomID)
+	if err != nil {
+		return c.String(500, "Failed to get room. See server logs for details.")
+	}
+	if util.IsHTMX(c) {
+		return util.RenderTempl(components.AddRoomForm(true, room), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
 }
 
 func (h handler) Users(c echo.Context) error {

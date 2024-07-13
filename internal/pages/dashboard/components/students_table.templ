@@ -49,8 +49,9 @@ func studentToRow(student *models.Student) components.Row {
 			{
 				Text: "Edit",
 				Attr: templ.Attributes{
-					"hx-get":    "/dashboard/classes/" + strconv.Itoa(student.Class.ID) + "/students/" + strconv.Itoa(student.ID) + "/edit",
-					"hx-target": "#" + studentTableID + "-form-cell-" + strconv.Itoa(student.ID),
+					"hx-get":      "/dashboard/classes/" + strconv.Itoa(student.Class.ID) + "/students/" + strconv.Itoa(student.ID) + "/edit",
+					"hx-target":   "#" + studentTableID + "-form-cell-" + strconv.Itoa(student.ID),
+					"hx-push-url": "true",
 				},
 			},
 		},

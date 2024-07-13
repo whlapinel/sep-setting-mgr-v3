@@ -47,6 +47,14 @@ func (s service) AddRoom(room *models.Room) (id int, err error) {
 	return id, nil
 }
 
+func (s service) FindRoomByID(id int) (*models.Room, error) {
+	room, err := s.rooms.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return room, nil
+}
+
 func (s service) GetAllAssignments() (models.Assignments, error) {
 	assignments, err := s.assignments.All()
 	if err != nil {

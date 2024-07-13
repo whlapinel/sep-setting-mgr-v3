@@ -3,6 +3,7 @@ package dashboard
 import (
 	"errors"
 	"log"
+	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/pages/dashboard/components"
 	"sep_setting_mgr/internal/util"
 	"strconv"
@@ -25,6 +26,32 @@ func (h handler) TestEvents(c echo.Context) error {
 		return c.String(500, "Failed to list test events. See server logs for details.")
 	}
 	return util.RenderTempl(components.TestEventsTableComponent(testEvents, classID), c, 200)
+}
+
+func (h handler) ShowAddTestEventForm(c echo.Context) error {
+	classID, err := strconv.Atoi(c.Param("class-id"))
+	if err != nil {
+		return c.String(400, "Invalid class ID")
+	}
+	if !util.IsHTMX(c) {
+		return c.String(400, "Invalid request")
+	}
+	return util.RenderTempl(components.AddTestEventForm(false, classID, &models.TestEvent{}), c, 200)
+}
+
+func (h handler) ShowEditTestEventForm(c echo.Context) error {
+	testEventID, err := strconv.Atoi(c.Param("test-event-id"))
+	if err != nil {
+		return c.String(400, "Invalid test event ID")
+	}
+	testEvent, err := h.service.FindTestEventByID(testEventID)
+	if err != nil {
+		return c.String(500, "Failed to find test event. See server logs for details.")
+	}
+	if !util.IsHTMX(c) {
+		return c.String(400, "Invalid request")
+	}
+	return util.RenderTempl(components.AddTestEventForm(true, testEvent.Class.ID, testEvent), c, 200)
 }
 
 func (h handler) CreateTestEvent(c echo.Context) error {

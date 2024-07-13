@@ -2,22 +2,75 @@ package components
 
 import (
 	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
 	"strconv"
 )
 
-templ AddTestEventForm(classID int) {
+func eventsBaseUrl(classID int) string {
+	return "/dashboard/classes/" + strconv.Itoa(classID) + "/test-events"
+}
+func getEventFormTitle(isEdit bool) string {
+	if isEdit {
+		return "Edit Event"
+	}
+	return "Add Event"
+}
+
+func getEventFormSubtitle(isEdit bool) string {
+	if isEdit {
+		return "Edit a Test Event"
+	}
+	return "Add a Test Event to Class"
+}
+
+func getEventFormID(isEdit bool, eventID int) string {
+	if isEdit {
+		return "edit-event-form-" + strconv.Itoa(eventID)
+	}
+	return "add-event-form"
+}
+
+func getEventFormPostTarget(isEdit bool, classID, eventID int) string {
+	if isEdit {
+		return eventsBaseUrl(classID) + "/" + strconv.Itoa(eventID)
+	}
+	return eventsBaseUrl(classID)
+}
+
+func getEventFormTarget(isEdit bool) string {
+	if isEdit {
+		return "closest tr"
+	}
+	return "#" + testEventsTableID
+}
+
+func getEventFormSwap(isEdit bool) string {
+	if isEdit {
+		return "outerHTML"
+	}
+	return "afterbegin"
+}
+
+func getSubmitBtnTitle(isEdit bool) string {
+	if isEdit {
+		return "Submit"
+	}
+	return "Add"
+}
+
+templ AddTestEventForm(isEdit bool, classID int, event *models.TestEvent) {
 	@components.FormComponent(components.Form{
-		Title:    "Add Test Event",
-		SubTitle: "Add a Test Event to Class",
+		ID:       getEventFormID(isEdit, event.ID),
+		Title:    getEventFormTitle(isEdit),
+		SubTitle: getEventFormSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      "/dashboard/classes/" + strconv.Itoa(classID) + "/test-events",
-			"hx-target":    "#test-events-table",
-			"hx-swap":      "afterbegin",
+			"hx-post":      getEventFormPostTarget(isEdit, classID, event.ID),
+			"hx-target":    getEventFormTarget(isEdit),
+			"hx-swap":      getEventFormSwap(isEdit),
 			"hx-indicator": "#test-events-indicator",
 		},
-		SubmitBtnTitle: "Add",
+		SubmitBtnTitle: getSubmitBtnTitle(isEdit),
 		Cancelable:     true,
-		ID:             "add-test-event-form",
 	}) {
 		@components.InputComponent(components.Input{
 			Label:       "Test Name",

@@ -65,3 +65,7 @@ func (s service) GetAssignments(classID int, start, end time.Time) (models.Assig
 	}
 	return assignments, nil
 }
+
+func (s service) DeleteAssignments(studentID int) error {
+	return s.assignments.DeleteByStudentID(studentID)
+}

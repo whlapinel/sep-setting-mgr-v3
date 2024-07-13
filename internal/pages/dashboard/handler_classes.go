@@ -17,7 +17,11 @@ func (h handler) ShowAddClassForm(c echo.Context) error {
 	switch util.IsHTMX(c) {
 	case true:
 		class := models.Class{}
-		return util.RenderTempl(components.AddClassForm(false, &class), c, 200)
+		return util.RenderTempl(components.AddClassForm(&components.AddClassFormProperties{
+			IsEdit:     false,
+			Class:      &class,
+			AddPostURI: router.Reverse(string(addClass)),
+		}), c, 200)
 	default:
 		return c.Redirect(303, "/")
 	}
@@ -36,7 +40,12 @@ func (h handler) ShowEditClassForm(c echo.Context) error {
 	}
 	switch util.IsHTMX(c) {
 	case true:
-		return util.RenderTempl(components.AddClassForm(true, class), c, 200)
+		return util.RenderTempl(components.AddClassForm(&components.AddClassFormProperties{
+			IsEdit:      true,
+			Class:       class,
+			EditPostURI: router.Reverse("edit-class", class.ID),
+			AddPostURI:  router.Reverse("add-class"),
+		}), c, 200)
 	default:
 		return c.Redirect(303, "/")
 	}
@@ -74,7 +83,7 @@ func (h handler) CreateClass(c echo.Context) error {
 	switch util.IsHTMX(c) {
 	case true:
 
-		err := util.RenderTempl(components.ClassRowComponent(class), c, 201)
+		err := util.RenderTempl(components.ClassRowComponent(class, router, deleteClass), c, 201)
 		if err != nil {
 			return c.String(500, "Failed to render class row component. See server logs for details.")
 		}
@@ -98,5 +107,5 @@ func (h handler) EditClass(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to edit class. See server logs for details.")
 	}
-	return util.RenderTempl(components.ClassRowComponent(class), c, 200)
+	return util.RenderTempl(components.ClassRowComponent(class, router, deleteClass), c, 200)
 }

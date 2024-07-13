@@ -8,20 +8,30 @@ import (
 )
 
 type DashboardService interface {
-	// List returns a copy of the todos list
+	// classes service
 	List(teacherID int) ([]*models.Class, error)
 	AddClass(name string, block int, teacherID int) (*models.Class, error)
 	DeleteClass(classID int) error
 	UpdateClass(classID int, name string) (*models.Class, error)
+	FindClassByID(classID int) (*models.Class, error)
+
+	// students  service
 	AddStudent(firstName string, lastName string, classID int, oneOneOne bool) (*models.Student, error)
+	UpdateStudent(firstName string, lastName string, oneOnOne bool, studentID int) (*models.Student, error)
 	FindStudentByID(studentID int) (*models.Student, error)
 	DeleteStudent(studentID int) error
 	ListStudents(classID int) ([]*models.Student, error)
-	FindClassByID(classID int) (*models.Class, error)
+
+	// test events
 	ListAllTestEvents(classID int) (models.TestEvents, error)
 	CreateTestEvent(classID int, testName string, testDate string) (*models.TestEvent, error)
 	DeleteTestEvent(testEventID int) error
+	FindTestEventByID(testEventID int) (*models.TestEvent, error)
+
+	// assignments
 	GetAssignments(teacherID int, start, end time.Time) (models.Assignments, error)
+	CreateAssignment(student *models.Student, testEvent *models.TestEvent) (*models.Assignment, error)
+	DeleteAssignments(studentID int) error
 }
 
 type DashboardHandler interface {
@@ -64,11 +74,20 @@ type DashboardHandler interface {
 	// GET /dashboard/classes/:class-id/students/:student-id/edit
 	ShowEditStudentForm(c echo.Context) error
 
+	// POST /dashboard/students/:student-id/edit
+	EditStudent(c echo.Context) error
+
 	// DELETE /students/:student-id
 	DeleteStudent(c echo.Context) error
 
 	// GET /dashboard/classes/:class-id/test-events
 	TestEvents(c echo.Context) error
+
+	// GET /dashboard/classes/:class-id/test-events/add
+	ShowAddTestEventForm(c echo.Context) error
+
+	// GET /dashboard/classes/:class-id/test-events/:test-event-id/edit
+	ShowEditTestEventForm(c echo.Context) error
 
 	// POST /dashboard/classes/:class-id/test-events
 	CreateTestEvent(c echo.Context) error
@@ -83,6 +102,9 @@ type AdminHandler interface {
 
 	// GET /admin/rooms
 	Rooms(c echo.Context) error
+
+	// GET /admin/rooms/add
+	ShowAddRoomForm(c echo.Context) error
 
 	// POST /admin/rooms
 	CreateRoom(c echo.Context) error
@@ -101,6 +123,7 @@ type AdminService interface {
 	ListUsers() ([]*models.User, error)
 	ListRooms() ([]*models.Room, error)
 	AddRoom(*models.Room) (id int, err error)
+	FindRoomByID(id int) (*models.Room, error)
 	GetAllAssignments() (models.Assignments, error)
 	IsAdmin(userID int) bool
 }

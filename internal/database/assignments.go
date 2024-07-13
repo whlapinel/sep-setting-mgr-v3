@@ -93,6 +93,14 @@ func (ar *assignmentRepo) All() (models.Assignments, error) {
 	return assignments, nil
 }
 
+func (ar *assignmentRepo) DeleteByStudentID(studentID int) error {
+	_, err := ar.db.Exec(`DELETE FROM assignments WHERE student_id = ?`, studentID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) {
 	var assignments models.Assignments
 

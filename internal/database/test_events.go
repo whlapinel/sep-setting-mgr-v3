@@ -73,6 +73,23 @@ func (tr *testEventsRepo) FindByClass(classID int) (models.TestEvents, error) {
 	return testEvents, nil
 }
 
+func (tr *testEventsRepo) FindByID(eventID int) (*models.TestEvent, error) {
+	var testEventTableRow testEventTableRow
+	var tempDate []uint8
+	err := tr.db.QueryRow(`
+	SELECT * FROM test_events
+	WHERE id = ?`, eventID).Scan(&testEventTableRow.id, &testEventTableRow.test_name, &tempDate, &testEventTableRow.class_id)
+	if err != nil {
+		return nil, err
+	}
+	testEventTableRow.test_date, err = time.Parse("2006-01-02", string(tempDate))
+	if err != nil {
+		return nil, err
+	}
+	testEvent := convertToTestEvent(testEventTableRow)
+	return testEvent, nil
+}
+
 func convertTestEventToTable(testEvent *models.TestEvent) testEventTableRow {
 	return testEventTableRow{
 		id:        testEvent.ID,

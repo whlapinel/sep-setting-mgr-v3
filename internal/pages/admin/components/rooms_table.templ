@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+const roomsTableID = "rooms-table"
+
 func prepareRoomsForTable(rooms []*models.Room) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Number", "Priority", "Capacity"}
@@ -41,7 +43,16 @@ func roomToRow(room *models.Room) components.Row {
 }
 
 templ RoomsTableComponent(rooms []*models.Room) {
-	@AddRoomForm(false)
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":      roomsBaseUrl() + "/add",
+			"hx-target":   "next",
+			"hx-swap":     "beforebegin",
+			"hx-push-url": "true",
+		},
+	}) {
+		Add Room
+	}
 	@components.TableComponent(prepareRoomsForTable(rooms))
 }
 

@@ -21,6 +21,7 @@ type TestEventRepository interface {
 	Store(testEvent *TestEvent) (id int, err error)
 	Delete(id int) error
 	FindByClass(classID int) (TestEvents, error)
+	FindByID(id int) (*TestEvent, error)
 }
 
 func (t *TestEvent) Update(testName string, testDate *time.Time) {

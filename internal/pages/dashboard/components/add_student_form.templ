@@ -6,6 +6,10 @@ import (
 	"strconv"
 )
 
+func studentsBaseUrl(classID int) string {
+	return "/dashboard/classes/" + strconv.Itoa(classID) + "/students"
+}
+
 func getStudentFormTitle(isEdit bool) string {
 	if isEdit {
 		return "Edit Student"
@@ -27,18 +31,18 @@ func getStudentFormID(isEdit bool, studentID int) string {
 	return "add-student-form"
 }
 
-func getStudentFormPostTarget(isEdit bool, studentID int) string {
+func getStudentFormPostTarget(isEdit bool, classID, studentID int) string {
 	if isEdit {
-		return "/dashboard/students/" + strconv.Itoa(studentID) + "/edit"
+		return studentsBaseUrl(classID) + "/" + strconv.Itoa(studentID)
 	}
-	return "/dashboard/students"
+	return studentsBaseUrl(classID)
 }
 
 func getStudentFormTarget(isEdit bool) string {
 	if isEdit {
 		return "closest tr"
 	}
-	return "#students-table"
+	return "#" + studentTableID
 }
 
 func getStudentFormSwap(isEdit bool) string {
@@ -69,18 +73,17 @@ func getStudentFormOneOnOneChecked(isEdit bool, defaultVal bool, oneOnOne bool) 
 	return defaultVal
 }
 
-templ AddStudentForm(isEdit bool, student *models.Student) {
+templ AddStudentForm(isEdit bool, classID int, student *models.Student) {
 	@components.FormComponent(components.Form{
 		ID:       getStudentFormID(isEdit, student.ID),
 		Title:    getStudentFormTitle(isEdit),
 		SubTitle: getStudentFormSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      getStudentFormPostTarget(isEdit, student.ID),
+			"hx-post":      getStudentFormPostTarget(isEdit, classID, student.ID),
 			"hx-target":    getStudentFormTarget(isEdit),
 			"hx-swap":      getStudentFormSwap(isEdit),
 			"hx-indicator": "#students-indicator",
 		},
-		ShowDialog:     false,
 		SubmitBtnTitle: "Add",
 		Cancelable:     true,
 	}) {

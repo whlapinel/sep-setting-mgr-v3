@@ -1,5 +1,10 @@
 # PROGRESS LOG
 
+## 7/12
+
+- Finally took the time to research echo capabilities and lo and behold, I found the solution to the thing that's been bugging me since I started this project. It would have saved me a lot of trouble if I did that sooner, but better late than never!  I can pass into my templates the echo instance and generate URIs using handlers or named routes. I can also just pass in paths for those without dynamic parameters. The parameters for my templates will get a bit lengthy so I think I may want to define them in a struct.
+- Update: I couldn't get the echo.URI() method to work passing in my method handlers, but tests using echo.Reverse() using named routes. Very happy with this breakthrough.
+
 ## 7/11
 
 - Worked on editing functionality. Had to rework the forms but I'm happy now.  The only thing I don't like is that I currently remove the form with JS upon clicking cancel, and that puts a little warning in the console log. But probably not really an issue unless there's something with accessibility.

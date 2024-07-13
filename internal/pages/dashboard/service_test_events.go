@@ -67,3 +67,11 @@ func (s service) ListAllTestEvents(classID int) (models.TestEvents, error) {
 	}
 	return testEvents, nil
 }
+
+func (s service) FindTestEventByID(testEventID int) (*models.TestEvent, error) {
+	testEvent, err := s.testEvents.FindByID(testEventID)
+	if err != nil {
+		return nil, err
+	}
+	return testEvent, nil
+}

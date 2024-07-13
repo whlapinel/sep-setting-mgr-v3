@@ -24,7 +24,29 @@ func NewHandler(svc pages.DashboardService) pages.DashboardHandler {
 	return &handler{service: svc}
 }
 
+var router *echo.Echo
+var showAddClassFormRoute *echo.Route
+
+const (
+	deleteClass      components.RouteName = "delete-class"
+	editClassForm    components.RouteName = "edit-class-form"
+	editClass        components.RouteName = "edit-class"
+	classes          components.RouteName = "classes"
+	addClass         components.RouteName = "add-class"
+	students         components.RouteName = "students"
+	addStudentForm   components.RouteName = "add-student-form"
+	editStudentForm  components.RouteName = "edit-student-form"
+	deleteStudent    components.RouteName = "delete-student"
+	editStudent      components.RouteName = "edit-student"
+	deleteTestEvent  components.RouteName = "delete-test-event"
+	addTestEventForm components.RouteName = "add-test-event-form"
+	testEvents       components.RouteName = "test-events"
+	addTestEvent     components.RouteName = "add-test-event"
+	addStudent       components.RouteName = "add-student"
+)
+
 func Mount(e *echo.Echo, h pages.DashboardHandler) {
+	router = e
 	r := e.Group("/dashboard")
 	r.Use(auth.AddCookieToHeader)
 	r.Use(auth.JWTMiddleware)
@@ -32,23 +54,25 @@ func Mount(e *echo.Echo, h pages.DashboardHandler) {
 	r.GET("", h.Redirect)
 	r.GET("/hx-classes", h.Classes)
 	r.GET("/calendar", h.ShowCalendar)
-	r.DELETE("/students/:student-id", h.DeleteStudent)
-	r.DELETE("/test-events/:test-event-id", h.DeleteTestEvent)
+	r.DELETE("/students/:student-id", h.DeleteStudent).Name = string(deleteStudent)
+	r.POST("/students/:student-id", h.EditStudent).Name = string(editStudent)
+	r.DELETE("/test-events/:test-event-id", h.DeleteTestEvent).Name = string(deleteTestEvent)
 	classesGroup := r.Group("/classes")
-	classesGroup.GET("/add", h.ShowAddClassForm)
-	classesGroup.GET("", h.DashboardHandler)
-	classesGroup.POST("", h.CreateClass)
+	showAddClassFormRoute = classesGroup.GET("/add", h.ShowAddClassForm)
+	classesGroup.GET("", h.DashboardHandler).Name = string(classes)
+	classesGroup.POST("", h.CreateClass).Name = string(addClass)
 	classIDgroup := classesGroup.Group("/:class-id")
-	classIDgroup.GET("/edit", h.ShowEditClassForm)
-	classIDgroup.POST("/edit", h.EditClass)
-	classIDgroup.DELETE("", h.DeleteClass)
-	classIDgroup.GET("/students", h.Students)
-	classIDgroup.GET("/students/add", h.ShowAddStudentForm)
+	classIDgroup.GET("/edit", h.ShowEditClassForm).Name = string(editClassForm)
+	classIDgroup.POST("/edit", h.EditClass).Name = string(editClass)
+	classIDgroup.DELETE("", h.DeleteClass).Name = string(deleteClass)
+	classIDgroup.GET("/students", h.Students).Name = string(students)
+	classIDgroup.GET("/students/add", h.ShowAddStudentForm).Name = string(addStudentForm)
 	studentIDgroup := classIDgroup.Group("/students/:student-id")
-	studentIDgroup.GET("/edit", h.ShowEditStudentForm)
-	classIDgroup.GET("/test-events", h.TestEvents)
-	classIDgroup.POST("/test-events", h.CreateTestEvent)
-	classIDgroup.POST("/students", h.AddStudent)
+	studentIDgroup.GET("/edit", h.ShowEditStudentForm).Name = string(editStudentForm)
+	classIDgroup.GET("/test-events/add", h.ShowAddTestEventForm).Name = string(addTestEventForm)
+	classIDgroup.GET("/test-events", h.TestEvents).Name = string(testEvents)
+	classIDgroup.POST("/test-events", h.CreateTestEvent).Name = string(addTestEvent)
+	classIDgroup.POST("/students", h.AddStudent).Name = string(addStudent)
 }
 
 func (h handler) Redirect(c echo.Context) error {
@@ -64,9 +88,9 @@ func (h handler) DashboardHandler(c echo.Context) error {
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.DashboardPage(classes), c, 200)
+		return util.RenderTempl(components.DashboardPage(classes, router, showAddClassFormRoute, deleteClass), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes, router, showAddClassFormRoute, deleteClass)), c, 200)
 }
 
 func (h handler) Classes(c echo.Context) error {
@@ -77,7 +101,9 @@ func (h handler) Classes(c echo.Context) error {
 		log.Println("Failed to list classes: ", err)
 		return c.String(500, "Failed to list classes. See server logs for details.")
 	}
-	return util.RenderTempl(components.ClassesTable(classes), c, 200)
+	test := router.Reverse("delete-class", 1)
+	log.Println("test: ", test)
+	return util.RenderTempl(components.ClassesTable(classes, router, showAddClassFormRoute, deleteClass), c, 200)
 }
 
 func (h handler) ShowCalendar(c echo.Context) error {

@@ -71,19 +71,39 @@ func (h handler) ShowEditStudentForm(c echo.Context) error {
 	}
 	switch util.IsHTMX(c) {
 	case true:
-		return util.RenderTempl(components.AddStudentForm(true, student), c, 200)
+		return util.RenderTempl(components.AddStudentForm(true, student.Class.ID, student), c, 200)
 	default:
 		return c.Redirect(303, "/")
 	}
 }
 
+func (h handler) EditStudent(c echo.Context) error {
+	log.SetPrefix("Handler: ")
+	log.Println("Handler: Editing student")
+	firstName := c.FormValue("first-name")
+	lastName := c.FormValue("last-name")
+	oneOnOne := c.FormValue("one-on-one") == "yes"
+	studentID, err := strconv.Atoi(c.Param("student-id"))
+	if err != nil {
+		return c.String(400, "Invalid student ID")
+	}
+	student, err := h.service.UpdateStudent(firstName, lastName, oneOnOne, studentID)
+	if err != nil {
+		return c.String(500, "Failed to update student. See server logs for details.")
+	}
+	return util.RenderTempl(components.StudentRowComponent(student), c, 200)
+}
+
 func (h handler) ShowAddStudentForm(c echo.Context) error {
+	classID, err := strconv.Atoi(c.Param("class-id"))
+	if err != nil {
+		return c.String(400, "Invalid class ID")
+	}
 	log.SetPrefix("Handler: ")
 	log.Println("Handler: Showing add student form")
 	switch util.IsHTMX(c) {
 	case true:
-		student := models.Student{}
-		return util.RenderTempl(components.AddStudentForm(false, &student), c, 200)
+		return util.RenderTempl(components.AddStudentForm(false, classID, &models.Student{}), c, 200)
 	default:
 		return c.Redirect(303, "/")
 	}

@@ -56,6 +56,18 @@ func (sr *studentRepo) Store(student *models.Student) (int, error) {
 	return student.ID, nil
 }
 
+func (sr *studentRepo) Update(student *models.Student) error {
+	dbStudent := convertToStudentTable(student)
+	_, err := sr.db.Exec(`
+	UPDATE students
+	SET first_name = ?, last_name = ?, class_id = ?, one_on_one = ?
+	WHERE id = ?`, dbStudent.first_name, dbStudent.last_name, dbStudent.class_id, dbStudent.one_on_one, dbStudent.id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (sr *studentRepo) All(classID int) ([]*models.Student, error) {
 	var students []*models.Student
 	var tableRows []studentTableRow

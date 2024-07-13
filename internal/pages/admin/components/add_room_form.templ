@@ -1,20 +1,76 @@
 package components
 
-import "sep_setting_mgr/internal/components"
+import (
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
+)
 
-templ AddRoomForm(showForm bool) {
+func roomsBaseUrl() string {
+	return "/admin/rooms"
+}
+
+func getRoomFormTitle(isEdit bool) string {
+	if isEdit {
+		return "Edit Room"
+	}
+	return "Add Room"
+}
+
+func getRoomFormSubtitle(isEdit bool) string {
+	if isEdit {
+		return "Edit a Testing Room"
+	}
+	return "Add a Testing Room"
+}
+
+func getRoomFormID(isEdit bool, roomID int) string {
+	if isEdit {
+		return "edit-room-form-" + strconv.Itoa(roomID)
+	}
+	return "add-room-form"
+}
+
+func getRoomFormPostTarget(isEdit bool, roomID int) string {
+	if isEdit {
+		return roomsBaseUrl() + "/" + strconv.Itoa(roomID)
+	}
+	return roomsBaseUrl()
+}
+
+func getRoomFormTarget(isEdit bool) string {
+	if isEdit {
+		return "closest tr"
+	}
+	return "#" + roomsTableID
+}
+
+func getRoomFormSwap(isEdit bool) string {
+	if isEdit {
+		return "outerHTML"
+	}
+	return "afterbegin"
+}
+
+func getSubmitBtnTitle(isEdit bool) string {
+	if isEdit {
+		return "Submit"
+	}
+	return "Add"
+}
+
+templ AddRoomForm(isEdit bool, room *models.Room) {
 	@components.FormComponent(components.Form{
-		ID:       "add-room-form",
-		Title:    "Add Room",
-		SubTitle: "Add a Testing Room",
+		ID:       getRoomFormID(isEdit, room.ID),
+		Title:    getRoomFormTitle(isEdit),
+		SubTitle: getRoomFormSubtitle(isEdit),
 		HxAttr: templ.Attributes{
-			"hx-post":      "/admin/rooms",
-			"hx-target":    "#rooms-table",
-			"hx-swap":      "afterbegin",
+			"hx-post":      getRoomFormPostTarget(isEdit, room.ID),
+			"hx-target":    getRoomFormTarget(isEdit),
+			"hx-swap":      getRoomFormSwap(isEdit),
 			"hx-indicator": "#indicator",
 		},
-		ShowDialog:     showForm,
-		SubmitBtnTitle: "Add",
+		SubmitBtnTitle: getSubmitBtnTitle(isEdit),
 		Cancelable:     true,
 	}) {
 		@components.InputComponent(components.Input{
@@ -39,6 +95,8 @@ templ AddRoomForm(showForm bool) {
 				{ID: "1", Value: "1", Label: "1", Checked: true},
 				{ID: "2", Value: "2", Label: "2", Checked: false},
 				{ID: "3", Value: "3", Label: "3", Checked: false},
+				{ID: "4", Value: "4", Label: "4", Checked: false},
+				{ID: "5", Value: "5", Label: "5", Checked: false},
 			},
 		})
 		@components.InputComponent(components.Input{

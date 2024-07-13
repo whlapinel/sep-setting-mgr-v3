@@ -6,22 +6,34 @@ import (
 	"strconv"
 )
 
+const testEventsTableID = "test-events-table"
+
 func prepareTestEventsForTable(testEvents models.TestEvents) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Date"}
 	for _, testEvent := range testEvents {
 		rows = append(rows, testEventToRow(testEvent))
 	}
-	return components.TableData{ID: "test-events-table", Title: "Test Events", Headers: headers, Rows: rows}
+	return components.TableData{ID: testEventsTableID, Title: "Test Events", Headers: headers, Rows: rows}
 }
 
 templ TestEventsTableComponent(testEvents models.TestEvents, classID int) {
-	@AddTestEventForm(classID)
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":      eventsBaseUrl(classID) + "/add",
+			"hx-target":   "next",
+			"hx-swap":     "beforebegin",
+			"hx-push-url": "true",
+		},
+	}) {
+		Add Test Event
+	}
 	@components.TableComponent(prepareTestEventsForTable(testEvents))
 }
 
 func testEventToRow(testEvent *models.TestEvent) components.Row {
 	return components.Row{
+		TableID:  testEventsTableID,
 		Editable: true,
 		Data:     []string{testEvent.TestName, testEvent.TestDate.Format("2006-01-02")},
 		ID:       testEvent.ID,
@@ -30,9 +42,8 @@ func testEventToRow(testEvent *models.TestEvent) components.Row {
 				Text: "Edit",
 				Attr: templ.Attributes{
 					"hx-get":      "/test-events/" + strconv.Itoa(testEvent.ID) + "/edit",
-					"hx-target":   "#details",
+					"hx-target":   "#" + testEventsTableID + "-form-cell-" + strconv.Itoa(testEvent.ID),
 					"hx-push-url": "true",
-					"hx-swap":     "afterbegin",
 				},
 			},
 			{
