@@ -2,9 +2,7 @@ package users
 
 import (
 	"sep_setting_mgr/internal/domain/models"
-	"sep_setting_mgr/internal/domain/pages"
 )
-
 
 type UsersService interface {
 	ListUsers() ([]*models.User, error)
@@ -12,14 +10,13 @@ type UsersService interface {
 	IsAdmin(userID int) bool
 }
 
-
 type service struct {
 	users       models.UserRepository
 	rooms       models.RoomRepository
 	assignments models.AssignmentRepository
 }
 
-func NewService(users models.UserRepository, rooms models.RoomRepository, assignments models.AssignmentRepository) pages.AdminService {
+func NewService(users models.UserRepository, rooms models.RoomRepository, assignments models.AssignmentRepository) UsersService {
 	return &service{users, rooms, assignments}
 }
 

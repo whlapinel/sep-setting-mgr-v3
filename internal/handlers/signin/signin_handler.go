@@ -2,9 +2,9 @@ package signin
 
 import (
 	"sep_setting_mgr/internal/auth"
-	domain "sep_setting_mgr/internal/domain/pages"
 	"sep_setting_mgr/internal/handlers/components"
 	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/services/signin"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -18,10 +18,10 @@ type SigninHandler interface {
 }
 
 type handler struct {
-	service domain.SigninService
+	service signin.SigninService
 }
 
-func NewHandler(svc domain.SigninService) SigninHandler {
+func NewHandler(svc signin.SigninService) SigninHandler {
 	return &handler{service: svc}
 }
 

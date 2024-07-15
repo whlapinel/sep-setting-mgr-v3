@@ -2,11 +2,10 @@ package users
 
 import (
 	"log"
-	"sep_setting_mgr/internal/services/users"
-
-	handlerscommon "sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/handlers/components"
 	"sep_setting_mgr/internal/layouts"
-	"sep_setting_mgr/internal/pages/admin/components"
+	"sep_setting_mgr/internal/services/users"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +26,7 @@ func NewHandler(service users.UsersService) UsersHandler {
 }
 
 func Mount(e *echo.Echo, h UsersHandler) {
-	handlerscommon.AdminGroup.GET("/users", h.Users)
+	common.AdminGroup.GET("/users", h.Users)
 }
 
 func (h handler) Users(c echo.Context) error {
