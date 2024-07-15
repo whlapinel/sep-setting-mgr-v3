@@ -1,0 +1,113 @@
+package components
+
+import (
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
+)
+
+func roomsBaseUrl() string {
+	return "/admin/rooms"
+}
+
+func getRoomFormTitle(isEdit bool) string {
+	if isEdit {
+		return "Edit Room"
+	}
+	return "Add Room"
+}
+
+func getRoomFormSubtitle(isEdit bool) string {
+	if isEdit {
+		return "Edit a Testing Room"
+	}
+	return "Add a Testing Room"
+}
+
+func getRoomFormID(isEdit bool, roomID int) string {
+	if isEdit {
+		return "edit-room-form-" + strconv.Itoa(roomID)
+	}
+	return "add-room-form"
+}
+
+func getRoomFormPostTarget(isEdit bool, roomID int) string {
+	if isEdit {
+		return roomsBaseUrl() + "/" + strconv.Itoa(roomID)
+	}
+	return roomsBaseUrl()
+}
+
+func getRoomFormTarget(isEdit bool) string {
+	if isEdit {
+		return "closest tr"
+	}
+	return "#" + roomsTableID
+}
+
+func getRoomFormSwap(isEdit bool) string {
+	if isEdit {
+		return "outerHTML"
+	}
+	return "afterbegin"
+}
+
+func getRoomFormSubmitBtnTitle(isEdit bool) string {
+	if isEdit {
+		return "Submit"
+	}
+	return "Add"
+}
+
+templ AddRoomForm(isEdit bool, room *models.Room) {
+	@components.FormComponent(components.Form{
+		ID:       getRoomFormID(isEdit, room.ID),
+		Title:    getRoomFormTitle(isEdit),
+		SubTitle: getRoomFormSubtitle(isEdit),
+		HxAttr: templ.Attributes{
+			"hx-post":      getRoomFormPostTarget(isEdit, room.ID),
+			"hx-target":    getRoomFormTarget(isEdit),
+			"hx-swap":      getRoomFormSwap(isEdit),
+			"hx-indicator": "#indicator",
+		},
+		SubmitBtnTitle: getRoomFormSubmitBtnTitle(isEdit),
+		Cancelable:     true,
+	}) {
+		@components.InputComponent(components.Input{
+			Label:       "Room Name",
+			Placeholder: "e.g. Media Center",
+			ID:          "room-name",
+			Type:        "text",
+			Name:        "room-name",
+			Required:    true,
+		})
+		@components.InputComponent(components.Input{
+			Label:       "Room Number",
+			Placeholder: "e.g. F-204",
+			ID:          "room-number",
+			Type:        "text",
+			Name:        "room-number",
+			Required:    true,
+		})
+		@components.RadioComponent(components.RadioGroup{
+			Name: "priority",
+			Options: []*components.RadioOption{
+				{ID: "1", Value: "1", Label: "1", Checked: true},
+				{ID: "2", Value: "2", Label: "2", Checked: false},
+				{ID: "3", Value: "3", Label: "3", Checked: false},
+				{ID: "4", Value: "4", Label: "4", Checked: false},
+				{ID: "5", Value: "5", Label: "5", Checked: false},
+			},
+		})
+		@components.InputComponent(components.Input{
+			Label:       "Capacity",
+			Placeholder: "e.g. 12",
+			ID:          "capacity",
+			Type:        "number",
+			Name:        "capacity",
+			Required:    true,
+			Min:         1,
+			Max:         12,
+		})
+	}
+}

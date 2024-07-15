@@ -1,0 +1,78 @@
+package components
+
+import (
+	"sep_setting_mgr/internal/domain/models"
+	"time"
+)
+
+const format string = "2006-01-02"
+
+func getToday() time.Time {
+	return time.Now()
+}
+
+func getThisMonday() time.Time {
+	today := getToday()
+	return today.AddDate(0, 0, -int(today.Weekday())+1)
+}
+
+templ CalendarComponent(assignments []*models.Assignment) {
+	<h1>Calendar</h1>
+	@WeekComponent(getThisMonday(), assignments)
+	@WeekComponent(getThisMonday().AddDate(0, 0, 7), assignments)
+}
+
+func filterAssignmentsForDay(date time.Time, assignments []*models.Assignment) []*models.Assignment {
+	var filtered []*models.Assignment
+	for _, assignment := range assignments {
+		if assignment.TestEvent.TestDate.Format(format) == date.Format(format) {
+			filtered = append(filtered, assignment)
+		}
+	}
+	return filtered
+}
+
+templ DayComponent(date time.Time, assignments []*models.Assignment) {
+	<h3>{ date.Format(format) }</h3>
+	@TestEventTable(filterAssignmentsForDay(date, assignments))
+}
+
+func getFriday(date time.Time) time.Time {
+	return date.AddDate(0, 0, 4)
+}
+
+templ WeekComponent(date time.Time, assignments []*models.Assignment) {
+	if date.Weekday() != time.Monday {
+		return
+	}
+	<h2>Week of { date.Format(format) } to { getFriday(date).Format(format) } </h2>
+	// filter assignments for this day
+	<div class="flex gap-2">
+		for i := 0; i < 5; i++ {
+			@DayComponent(date.AddDate(0, 0, i), assignments)
+		}
+	</div>
+}
+
+templ TestEventTable(assignments []*models.Assignment) {
+	<table>
+		<thead>
+			<tr>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Test Name</th>
+				<th>Room</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, assignment := range assignments {
+				<tr>
+					<td>{ assignment.Student.FirstName }</td>
+					<td>{ assignment.Student.LastName }</td>
+					<td>{ assignment.TestEvent.TestName }</td>
+					<td>{ assignment.Room.Number }</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

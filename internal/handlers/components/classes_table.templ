@@ -8,8 +8,6 @@ import (
 	"strconv"
 )
 
-type RouteName string
-
 const (
 	classesTableID = "classes-table"
 )
@@ -18,7 +16,7 @@ func getURI(router *echo.Echo, handler echo.HandlerFunc, id int) string {
 	return router.URI(handler, strconv.Itoa(id))
 }
 
-func prepareClassesForTable(classes []*models.Class, router *echo.Echo, deleteRoute RouteName) components.TableData {
+func prepareClassesForTable(classes []*models.Class, router *echo.Echo, deleteRoute common.RouteName) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, class := range classes {
@@ -27,7 +25,7 @@ func prepareClassesForTable(classes []*models.Class, router *echo.Echo, deleteRo
 	return components.TableData{ID: classesTableID, Title: "Classes", Headers: headers, Rows: rows}
 }
 
-templ ClassesTable(classes []*models.Class, router *echo.Echo, showAddClassForm common.RouteName, deleteRoute RouteName) {
+templ ClassesTable(classes []*models.Class, router *echo.Echo, showAddClassForm common.RouteName, deleteRoute common.RouteName) {
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
 			"hx-get":      router.Reverse(string(showAddClassForm)),
@@ -41,7 +39,7 @@ templ ClassesTable(classes []*models.Class, router *echo.Echo, showAddClassForm 
 	@components.TableComponent(prepareClassesForTable(classes, router, deleteRoute))
 }
 
-func classToRow(class *models.Class, router *echo.Echo, deleteRoute RouteName) components.Row {
+func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.RouteName) components.Row {
 	return components.Row{
 		// passing class directly will return nil pointer error, have to pass the values individually
 		Editable: true,
@@ -85,6 +83,6 @@ func classToRow(class *models.Class, router *echo.Echo, deleteRoute RouteName) c
 	}
 }
 
-templ ClassRowComponent(class *models.Class, router *echo.Echo, deleteClassRoute RouteName) {
+templ ClassRowComponent(class *models.Class, router *echo.Echo, deleteClassRoute common.RouteName) {
 	@components.TableRowComponent(classToRow(class, router, deleteClassRoute))
 }

@@ -3,6 +3,7 @@ package auth
 import (
 	"log"
 	"net/http"
+	"sep_setting_mgr/internal/domain/models"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -88,4 +89,24 @@ func IsSignedIn(c echo.Context) bool {
 		return false
 	}
 	return cookie.Value != ""
+}
+
+func Authorization(userRepo models.UserRepository) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			userID := c.Get("id").(int)
+			log.Println("User ID: ", userID)
+			user, err := userRepo.FindByID(userID)
+			if err != nil {
+				return c.String(500, "Failed to get user. See server logs for details.")
+			}
+			if user == nil {
+				return c.String(401, "Unauthorized")
+			}
+			if !user.Admin {
+				return c.Redirect(303, "/unauthorized")
+			}
+			return next(c)
+		}
+	}
 }

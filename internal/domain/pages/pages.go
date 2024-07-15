@@ -120,11 +120,11 @@ type AdminHandler interface {
 }
 
 type AdminService interface {
-	ListUsers() ([]*models.User, error)
-	ListRooms() ([]*models.Room, error)
-	AddRoom(*models.Room) (id int, err error)
-	FindRoomByID(id int) (*models.Room, error)
 	GetAllAssignments() (models.Assignments, error)
+	ListUsers() ([]*models.User, error)
+	AddRoom(*models.Room) (id int, err error)
+	ListRooms() ([]*models.Room, error)
+	FindRoomByID(id int) (*models.Room, error)
 	IsAdmin(userID int) bool
 }
 

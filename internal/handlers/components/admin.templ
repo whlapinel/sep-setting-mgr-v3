@@ -1,0 +1,34 @@
+package components
+
+import "sep_setting_mgr/internal/components"
+
+templ AdminPage() {
+	<h1>Admin</h1>
+	<p>What is HAPPENING</p>
+	<button>What the hell is going on here</button>
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":    "/admin/rooms",
+			"hx-target": "#details",
+		},
+	}) {
+		Show Rooms
+	}
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":    "/admin/calendar",
+			"hx-target": "#details",
+		},
+	}) {
+		Calendar
+	}
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":    "/admin/users",
+			"hx-target": "#details",
+		},
+	}) {
+		Users
+	}
+	<div id="details"></div>
+}

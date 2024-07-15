@@ -1,0 +1,115 @@
+package components
+
+import (
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
+)
+
+func getValue(isEdit bool, value string) string {
+	if isEdit {
+		return value
+	}
+	return ""
+}
+
+func getPostTarget(isEdit bool, id int) string {
+	if isEdit {
+		return "/dashboard/classes/" + strconv.Itoa(id) + "/edit"
+	}
+	return "/dashboard/classes"
+}
+
+func getClassFormTitle(isEdit bool) string {
+	if isEdit {
+		return "Edit Class"
+	}
+	return "Add Class"
+}
+
+func getID(isEdit bool, classID int) string {
+	if isEdit {
+		return "edit-class-form-" + strconv.Itoa(classID)
+	}
+	return "add-class-form"
+}
+
+func getSubtitle(isEdit bool) string {
+	if isEdit {
+		return "Edit a Class"
+	}
+	return "Add a Class to User"
+}
+
+func getTarget(isEdit bool) string {
+	if isEdit {
+		return "closest tr"
+	}
+	return "#" + classesTableID
+}
+
+func getSwap(isEdit bool) string {
+	if isEdit {
+		return "outerHTML"
+	}
+	return "afterbegin"
+}
+
+func getBtnTitle(isEdit bool) string {
+	if isEdit {
+		return "Submit"
+	}
+	return "Add"
+}
+
+type AddClassFormProperties struct {
+	IsEdit      bool
+	Class       *models.Class
+	EditPostURI string
+	AddPostURI  string
+}
+
+templ AddClassForm(props *AddClassFormProperties) {
+	@components.FormComponent(components.Form{
+		ID:       getID(props.IsEdit, props.Class.ID),
+		Title:    getClassFormTitle(props.IsEdit),
+		SubTitle: getSubtitle(props.IsEdit),
+		HxAttr: templ.Attributes{
+			"hx-post":      getPostTarget(props.IsEdit, props.Class.ID),
+			"hx-target":    getTarget(props.IsEdit),
+			"hx-swap":      getSwap(props.IsEdit),
+			"hx-indicator": "#indicator",
+		},
+		SubmitBtnTitle: getBtnTitle(props.IsEdit),
+		Cancelable:     true,
+	}) {
+		@components.InputComponent(components.Input{
+			Value:       getValue(props.IsEdit, props.Class.Name),
+			Label:       "Class Name",
+			Placeholder: "e.g. Biology",
+			ID:          "name",
+			Type:        "text",
+			Name:        "name",
+			Required:    true,
+		})
+		@components.InputComponent(components.Input{
+			Value:       getValue(props.IsEdit, strconv.Itoa(props.Class.Block)),
+			Label:       "Class Block",
+			Placeholder: "e.g. 2",
+			ID:          "block",
+			Type:        "number",
+			Name:        "block",
+			Required:    true,
+			Min:         1,
+			Max:         4,
+			Disabled:    props.IsEdit,
+		})
+		if props.IsEdit {
+			@components.InputComponent(components.Input{
+				Name:  "id",
+				Value: strconv.Itoa(props.Class.ID),
+				Type:  "hidden",
+			})
+		}
+	}
+}

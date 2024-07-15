@@ -7,7 +7,7 @@ import (
 	"sep_setting_mgr/internal/handlers/common"
 )
 
-templ DashboardPage(classes []*models.Class, router *echo.Echo, showAddClassForm common.RouteName, deleteClassRoute RouteName) {
+templ DashboardPage(classes []*models.Class, router *echo.Echo, showAddClassForm common.RouteName, deleteClassRoute common.RouteName) {
 	<h1>Dashboard</h1>
 	<p>Welcome to the dashboard</p>
 	@components.ButtonComponent(components.Button{

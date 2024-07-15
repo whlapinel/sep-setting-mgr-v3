@@ -1,0 +1,61 @@
+package components
+
+import (
+	"sep_setting_mgr/internal/components"
+	"sep_setting_mgr/internal/domain/models"
+	"strconv"
+)
+
+const roomsTableID = "rooms-table"
+
+func prepareRoomsForTable(rooms []*models.Room) components.TableData {
+	var rows []components.Row
+	headers := []string{"Name", "Number", "Priority", "Capacity"}
+	if len(rooms) == 0 {
+		rows = []components.Row{}
+	} else {
+		for _, room := range rooms {
+			rows = append(rows, roomToRow(room))
+		}
+	}
+	return components.TableData{ID: "rooms-table", Title: "Rooms", Headers: headers, Rows: rows}
+
+}
+
+func roomToRow(room *models.Room) components.Row {
+	return components.Row{
+		Data: []string{room.Name, room.Number, strconv.Itoa(room.Priority), strconv.Itoa(room.MaxCapacity)},
+		ID:   room.ID,
+		Buttons: []components.TableButton{
+			{
+				Text: "Edit",
+			},
+			{
+				Text: "Delete",
+				Attr: templ.Attributes{
+					"hx-delete":  "/admin/rooms/" + strconv.Itoa(room.ID),
+					"hx-target":  "closest tr",
+					"hx-confirm": "Are you sure you want to delete this room?",
+				},
+			},
+		},
+	}
+}
+
+templ RoomsTableComponent(rooms []*models.Room) {
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":      roomsBaseUrl() + "/add",
+			"hx-target":   "next",
+			"hx-swap":     "beforebegin",
+			"hx-push-url": "true",
+		},
+	}) {
+		Add Room
+	}
+	@components.TableComponent(prepareRoomsForTable(rooms))
+}
+
+templ RoomsRowComponent(room *models.Room) {
+	@components.TableRowComponent(roomToRow(room))
+}
