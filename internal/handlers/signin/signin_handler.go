@@ -2,6 +2,7 @@ package signin
 
 import (
 	"sep_setting_mgr/internal/auth"
+	"sep_setting_mgr/internal/handlers/common"
 	"sep_setting_mgr/internal/handlers/components"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/services/signin"
@@ -14,7 +15,7 @@ type SigninHandler interface {
 	// signin : GET /
 	SignInHandler(e echo.Context) error
 	// signin : POST /
-	HxHandleSignin(e echo.Context) error
+	HxSignin(e echo.Context) error
 }
 
 type handler struct {
@@ -26,8 +27,8 @@ func NewHandler(svc signin.SigninService) SigninHandler {
 }
 
 func Mount(e *echo.Echo, h SigninHandler) {
-	e.GET("/signin", h.SignInHandler)
-	e.POST("/hx-signin", h.HxHandleSignin)
+	e.GET("/signin", h.SignInHandler).Name = string(common.SigninPage)
+	e.POST("/hx-signin", h.HxSignin).Name = string(common.SigninPostRoute)
 }
 
 func (h handler) SignInHandler(c echo.Context) error {
@@ -38,7 +39,7 @@ func (h handler) SignInHandler(c echo.Context) error {
 	return util.RenderTempl(layouts.MainLayout(components.SignInPage(isSignedIn)), c, 200)
 }
 
-func (h handler) HxHandleSignin(c echo.Context) error {
+func (h handler) HxSignin(c echo.Context) error {
 	if !(util.IsHTMX(c)) {
 		c.Redirect(303, "/signin")
 	}

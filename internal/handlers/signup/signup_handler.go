@@ -29,8 +29,8 @@ func NewHandler(svc signup.SignupService) SignupHandler {
 }
 
 func Mount(e *echo.Echo, h SignupHandler) {
-	e.GET("/signup", h.SignUpPage)
-	e.POST("/hx-signup", h.Signup)
+	e.GET("/signup", h.SignUpPage).Name = string(common.SignupPage)
+	e.POST("/hx-signup", h.Signup).Name = string(common.Signup)
 }
 
 func (h handler) Signup(c echo.Context) error {
@@ -52,7 +52,7 @@ func (h handler) Signup(c echo.Context) error {
 func (h handler) SignUpPage(c echo.Context) error {
 	signUpProps := components.SignupData{
 		Router:    common.Router,
-		PostRoute: common.SignupPostRoute,
+		PostRoute: common.Signup,
 	}
 	if util.IsHTMX(c) {
 		return util.RenderTempl(components.SignUpPage(signUpProps), c, 200)

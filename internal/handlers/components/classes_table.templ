@@ -16,19 +16,19 @@ func getURI(router *echo.Echo, handler echo.HandlerFunc, id int) string {
 	return router.URI(handler, strconv.Itoa(id))
 }
 
-func prepareClassesForTable(classes []*models.Class, router *echo.Echo, deleteRoute common.RouteName) components.TableData {
+func prepareClassesForTable(classes []*models.Class, router *echo.Echo) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, class := range classes {
-		rows = append(rows, classToRow(class, router, deleteRoute))
+		rows = append(rows, classToRow(class, router))
 	}
 	return components.TableData{ID: classesTableID, Title: "Classes", Headers: headers, Rows: rows}
 }
 
-templ ClassesTable(classes []*models.Class, router *echo.Echo, showAddClassForm common.RouteName, deleteRoute common.RouteName) {
+templ ClassesTable(classes []*models.Class, router *echo.Echo) {
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":      router.Reverse(string(showAddClassForm)),
+			"hx-get":      router.Reverse(string(common.ShowAddClassForm)),
 			"hx-target":   "next",
 			"hx-swap":     "beforebegin",
 			"hx-push-url": "true",
@@ -36,10 +36,10 @@ templ ClassesTable(classes []*models.Class, router *echo.Echo, showAddClassForm 
 	}) {
 		Add Class
 	}
-	@components.TableComponent(prepareClassesForTable(classes, router, deleteRoute))
+	@components.TableComponent(prepareClassesForTable(classes, router))
 }
 
-func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.RouteName) components.Row {
+func classToRow(class *models.Class, router *echo.Echo) components.Row {
 	return components.Row{
 		// passing class directly will return nil pointer error, have to pass the values individually
 		Editable: true,
@@ -50,7 +50,7 @@ func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.Route
 			{
 				Text: "Delete",
 				Attr: templ.Attributes{
-					"hx-delete":  router.Reverse(string(deleteRoute), class.ID),
+					"hx-delete":  router.Reverse(string(common.DeleteClass), class.ID),
 					"hx-target":  "closest tr",
 					"hx-confirm": "Are you sure you want to delete this class?",
 				},
@@ -58,7 +58,7 @@ func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.Route
 			{
 				Text: "Students",
 				Attr: templ.Attributes{
-					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/students",
+					"hx-get":      router.Reverse(string(common.Students), class.ID),
 					"hx-target":   "#details",
 					"hx-push-url": "true",
 				},
@@ -66,7 +66,7 @@ func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.Route
 			{
 				Text: "Tests",
 				Attr: templ.Attributes{
-					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/test-events",
+					"hx-get":      router.Reverse(string(common.TestEvents), class.ID),
 					"hx-target":   "#details",
 					"hx-push-url": "true",
 				},
@@ -74,7 +74,7 @@ func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.Route
 			{
 				Text: "Edit",
 				Attr: templ.Attributes{
-					"hx-get":      "/dashboard/classes/" + strconv.Itoa(class.ID) + "/edit",
+					"hx-get":      router.Reverse(string(common.ShowEditClassForm), class.ID),
 					"hx-target":   "#" + classesTableID + "-form-cell-" + strconv.Itoa(class.ID),
 					"hx-push-url": "true",
 				},
@@ -83,6 +83,6 @@ func classToRow(class *models.Class, router *echo.Echo, deleteRoute common.Route
 	}
 }
 
-templ ClassRowComponent(class *models.Class, router *echo.Echo, deleteClassRoute common.RouteName) {
-	@components.TableRowComponent(classToRow(class, router, deleteClassRoute))
+templ ClassRowComponent(class *models.Class, router *echo.Echo) {
+	@components.TableRowComponent(classToRow(class, router))
 }

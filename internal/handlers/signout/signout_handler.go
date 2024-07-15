@@ -11,7 +11,7 @@ import (
 
 type SignoutHandler interface {
 	// signout : POST /
-	HxHandleSignOut(c echo.Context) error
+	Signout(c echo.Context) error
 }
 
 type handler struct {
@@ -22,10 +22,10 @@ func NewHandler() SignoutHandler {
 }
 
 func Mount(e *echo.Echo, h SignoutHandler) {
-	e.POST("/hx-signout", h.HxHandleSignOut).Name = string(common.SignoutPostRoute)
+	e.POST("/hx-signout", h.Signout).Name = string(common.Signout)
 }
 
-func (h handler) HxHandleSignOut(c echo.Context) error {
+func (h handler) Signout(c echo.Context) error {
 
 	// if not signed in show alert "you are already signed out"
 	if !auth.IsSignedIn(c) {

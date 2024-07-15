@@ -2,6 +2,7 @@ package unauthorized
 
 import (
 	"net/http"
+	"sep_setting_mgr/internal/handlers/common"
 	"sep_setting_mgr/internal/handlers/components"
 	"sep_setting_mgr/internal/layouts"
 	"sep_setting_mgr/internal/util"
@@ -11,7 +12,7 @@ import (
 
 type UnauthorizedHandler interface {
 	// redirect after middleware credential check fails
-	UnauthorizedHandler(c echo.Context) error
+	Unauthorized(c echo.Context) error
 }
 
 type handler struct {
@@ -22,10 +23,10 @@ func NewHandler() UnauthorizedHandler {
 }
 
 func Mount(e *echo.Echo, h UnauthorizedHandler) {
-	e.GET("/unauthorized", h.UnauthorizedHandler)
+	e.GET("/unauthorized", h.Unauthorized).Name = string(common.Unauthorized)
 }
 
-func (h handler) UnauthorizedHandler(c echo.Context) error {
+func (h handler) Unauthorized(c echo.Context) error {
 	c.Response().Header().Set("HX-Retarget", "#page")
 	c.Response().Header().Set("HX-Reswap", "innerHTML")
 	if util.IsHTMX(c) {

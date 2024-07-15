@@ -34,16 +34,19 @@ func NewHandler(classes classes.ClassesService, assignments assignments.Assignme
 	}
 }
 
+var router *echo.Echo
+
 func Mount(e *echo.Echo, h DashboardHandler) {
+	router = e
 	common.DashboardGroup.Use(auth.AddCookieToHeader)
 	common.DashboardGroup.Use(auth.JWTMiddleware)
 	common.DashboardGroup.Use(auth.GetClaims)
 	common.DashboardGroup.GET("", h.Redirect)
-	common.DashboardGroup.GET("/calendar", h.ShowCalendar)
+	common.DashboardGroup.GET("/calendar", h.ShowCalendar).Name = string(common.Calendar)
 }
 
 func (h handler) Redirect(c echo.Context) error {
-	return c.Redirect(303, "/dashboard/classes")
+	return c.Redirect(303, router.Reverse(string(common.Classes)))
 }
 
 func (h handler) ShowCalendar(c echo.Context) error {

@@ -30,8 +30,11 @@ type ClassesHandler interface {
 	// DELETE /dashboard/classes/:class-id
 	DeleteClass(c echo.Context) error
 
-	// GET /classes
+	// GET /dashboard/classes
 	Classes(c echo.Context) error
+
+	// GET /dashboard/hx-classes
+	HxClasses(c echo.Context) error
 }
 
 type (
@@ -51,11 +54,31 @@ var router *echo.Echo
 func Mount(e *echo.Echo, h ClassesHandler) {
 	router = e
 	common.ClassesGroup.GET("", h.Classes).Name = string(common.Classes)
+	common.ClassesGroup.GET("/hx-classes", h.HxClasses).Name = string(common.HxClasses)
 	common.ClassesGroup.GET("/add", h.ShowAddClassForm).Name = string(common.ShowAddClassForm)
 	common.ClassesGroup.POST("", h.CreateClass).Name = string(common.CreateClass)
 	common.ClassIDGroup.GET("/edit", h.ShowEditClassForm).Name = string(common.ShowEditClassForm)
 	common.ClassIDGroup.POST("/edit", h.EditClass).Name = string(common.EditClass)
 	common.ClassIDGroup.DELETE("", h.DeleteClass).Name = string(common.DeleteClass)
+}
+
+func (h handler) HxClasses(c echo.Context) error {
+	log.SetPrefix("Classes: ")
+	if err := c.Get("id"); err == nil {
+		log.Println("Failed to get teacher ID.")
+		log.Println("c.Get(id): ", c.Get("id"))
+		return c.String(500, "Failed to get teacher ID.")
+	}
+	teacherID := c.Get("id").(int)
+	classes, err := h.classes.List(teacherID)
+	if err != nil {
+		log.Println("Failed to list classes: ", err)
+		return c.String(500, "Failed to list classes. See server logs for details.")
+	}
+	if !util.IsHTMX(c) {
+		return c.Redirect(303, router.Reverse(string(common.Classes)))
+	}
+	return util.RenderTempl(components.ClassesTable(classes, router), c, 200)
 }
 
 func (h handler) Classes(c echo.Context) error {
@@ -77,12 +100,9 @@ func (h handler) Classes(c echo.Context) error {
 	log.Println("Current URL: ", currentUrl)
 	// return util.RenderTempl(components.ClassesTable(classes, router, common.ShowAddClassForm, common.DeleteClass), c, 200)
 	if util.IsHTMX(c) {
-		if currentUrl == router.Reverse(string(common.Classes)) {
-			return util.RenderTempl(components.ClassesTable(classes, router, common.ShowAddClassForm, common.DeleteClass), c, 200)
-		}
-		return util.RenderTempl(components.DashboardPage(classes, router, common.ShowAddClassForm, common.DeleteClass), c, 200)
+		return util.RenderTempl(components.DashboardPage(classes, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes, router, common.ShowAddClassForm, common.DeleteClass)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes, router)), c, 200)
 
 }
 
@@ -158,7 +178,7 @@ func (h handler) CreateClass(c echo.Context) error {
 	switch util.IsHTMX(c) {
 	case true:
 
-		err := util.RenderTempl(components.ClassRowComponent(class, router, common.DeleteClass), c, 201)
+		err := util.RenderTempl(components.ClassRowComponent(class, router), c, 201)
 		if err != nil {
 			return c.String(500, "Failed to render class row component. See server logs for details.")
 		}
@@ -182,5 +202,5 @@ func (h handler) EditClass(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to edit class. See server logs for details.")
 	}
-	return util.RenderTempl(components.ClassRowComponent(class, router, common.DeleteClass), c, 200)
+	return util.RenderTempl(components.ClassRowComponent(class, router), c, 200)
 }

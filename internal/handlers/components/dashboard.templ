@@ -7,12 +7,12 @@ import (
 	"sep_setting_mgr/internal/handlers/common"
 )
 
-templ DashboardPage(classes []*models.Class, router *echo.Echo, showAddClassForm common.RouteName, deleteClassRoute common.RouteName) {
+templ DashboardPage(classes []*models.Class, router *echo.Echo) {
 	<h1>Dashboard</h1>
 	<p>Welcome to the dashboard</p>
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":      "/dashboard/calendar",
+			"hx-get":      router.Reverse(string(common.Calendar)),
 			"hx-target":   "#details",
 			"hx-push-url": "true",
 		},
@@ -21,14 +21,14 @@ templ DashboardPage(classes []*models.Class, router *echo.Echo, showAddClassForm
 	}
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":      "/dashboard/hx-classes",
+			"hx-get":      router.Reverse(string(common.HxClasses)),
 			"hx-target":   "#details",
-			"hx-push-url": "/dashboard/classes",
+			"hx-push-url": "true",
 		},
 	}) {
 		Classes
 	}
 	<div id="details">
-		@ClassesTable(classes, router, showAddClassForm, deleteClassRoute)
+		@ClassesTable(classes, router)
 	</div>
 }

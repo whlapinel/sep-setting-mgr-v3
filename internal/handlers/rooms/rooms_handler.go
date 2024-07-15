@@ -36,8 +36,8 @@ func NewHandler(service rooms.RoomsService) RoomsHandler {
 
 func Mount(e *echo.Echo, h RoomsHandler) {
 	common.RoomsGroup.GET("", h.Rooms).Name = string(common.Rooms)
-	common.RoomsGroup.GET("/add", h.ShowAddRoomForm)
-	common.RoomsGroup.POST("", h.CreateRoom)
+	common.RoomsGroup.GET("/add", h.ShowAddRoomForm).Name = string(common.ShowAddRoomForm)
+	common.RoomsGroup.POST("", h.CreateRoom).Name = string(common.CreateRoom)
 }
 
 func (h handler) Rooms(c echo.Context) error {

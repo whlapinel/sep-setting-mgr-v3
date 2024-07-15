@@ -26,7 +26,7 @@ func NewHandler(service users.UsersService) UsersHandler {
 }
 
 func Mount(e *echo.Echo, h UsersHandler) {
-	common.AdminGroup.GET("/users", h.Users)
+	common.AdminGroup.GET("/users", h.Users).Name = string(common.Users)
 }
 
 func (h handler) Users(c echo.Context) error {

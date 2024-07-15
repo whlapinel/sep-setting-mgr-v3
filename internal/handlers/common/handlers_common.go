@@ -18,6 +18,7 @@ const (
 	ShowEditClassForm    RouteName = "show-edit-class-form"
 	EditClass            RouteName = "edit-class"
 	Classes              RouteName = "classes"
+	HxClasses            RouteName = "hx-classes"
 	CreateClass          RouteName = "create-class"
 	Students             RouteName = "students"
 	ShowAddStudentForm   RouteName = "show-add-student-form"
@@ -29,8 +30,16 @@ const (
 	TestEvents           RouteName = "test-events"
 	CreateTestEvent      RouteName = "create-test-event"
 	CreateStudent        RouteName = "create-student"
-	SignupPostRoute      RouteName = "signup"
-	SignoutPostRoute     RouteName = "signout"
+	SignupPage           RouteName = "signup-page"
+	Signup               RouteName = "signup-post"
+	Signout              RouteName = "signout"
+	Calendar             RouteName = "calendar"
+	ShowAddRoomForm      RouteName = "show-add-room-form"
+	CreateRoom           RouteName = "create-room"
+	SigninPostRoute      RouteName = "signin-post"
+	SigninPage           RouteName = "signin-page"
+	Unauthorized         RouteName = "unauthorized"
+	Users                RouteName = "users"
 )
 
 var (
