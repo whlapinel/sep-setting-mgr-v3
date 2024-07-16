@@ -1,8 +1,8 @@
 package home
 
 import (
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +27,7 @@ func Mount(e *echo.Echo, h HomeHandler) {
 
 func (h handler) Home(c echo.Context) error {
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.HomePage(), c, 200)
+		return util.RenderTempl(views.HomePage(), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.HomePage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.HomePage()), c, 200)
 }

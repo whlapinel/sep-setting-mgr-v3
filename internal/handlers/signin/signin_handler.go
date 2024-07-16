@@ -3,8 +3,8 @@ package signin
 import (
 	"sep_setting_mgr/internal/auth"
 	"sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/signin"
 	"sep_setting_mgr/internal/util"
 
@@ -34,9 +34,9 @@ func Mount(e *echo.Echo, h SigninHandler) {
 func (h handler) SignInHandler(c echo.Context) error {
 	isSignedIn := auth.IsSignedIn(c)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.SignInPage(isSignedIn), c, 200)
+		return util.RenderTempl(views.SignInPage(isSignedIn), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.SignInPage(isSignedIn)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn)), c, 200)
 }
 
 func (h handler) HxSignin(c echo.Context) error {

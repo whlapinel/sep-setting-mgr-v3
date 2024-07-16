@@ -3,8 +3,8 @@ package users
 import (
 	"log"
 	"sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/users"
 	"sep_setting_mgr/internal/util"
 
@@ -37,7 +37,7 @@ func (h handler) Users(c echo.Context) error {
 		return c.String(500, "Error retrieving users")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.UsersTableComponent(users), c, 200)
+		return util.RenderTempl(views.UsersTableComponent(users), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
 }

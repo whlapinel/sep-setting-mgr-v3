@@ -9,8 +9,6 @@ import (
 
 type RouteName string
 
-var Router *echo.Echo
-
 const (
 	Rooms                RouteName = "rooms"
 	ShowAddClassForm     RouteName = "show-add-class-form"
@@ -74,10 +72,6 @@ var (
 	StudentIDGroup *echo.Group
 )
 
-func PassRouter(e *echo.Echo) {
-	Router = e
-}
-
 func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	AdminGroup = e.Group("/admin", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo))
 	RoomsGroup = AdminGroup.Group("/rooms")
@@ -94,13 +88,3 @@ func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	TestEventsGroup = ClassIDGroup.Group("/test-events")
 	TestEventsIDGroup = TestEventsGroup.Group("/:test-event-id")
 }
-
-// func ProtectRoutes(groups ...*echo.Group) {
-// 	log.Println("Applying middleware to groups")
-// 	for _, group := range groups {
-// 		log.Println("Applying middleware to group: ", group)
-// 		group.Use(auth.AddCookieToHeader)
-// 		group.Use(auth.JWTMiddleware)
-// 		group.Use(auth.GetClaims)
-// 	}
-// }

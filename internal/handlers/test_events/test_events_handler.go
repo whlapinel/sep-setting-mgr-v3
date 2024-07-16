@@ -5,7 +5,7 @@ import (
 	"log"
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
+	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/services/assignments"
 	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
@@ -61,7 +61,7 @@ func (h handler) TestEvents(c echo.Context) error {
 		log.Println("Failed to list test events: ", err)
 		return c.String(500, "Failed to list test events. See server logs for details.")
 	}
-	return util.RenderTempl(components.TestEventsTableComponent(testEvents, classID), c, 200)
+	return util.RenderTempl(views.TestEventsTableComponent(testEvents, classID), c, 200)
 }
 
 func (h handler) ShowAddTestEventForm(c echo.Context) error {
@@ -72,7 +72,7 @@ func (h handler) ShowAddTestEventForm(c echo.Context) error {
 	if !util.IsHTMX(c) {
 		return c.String(400, "Invalid request")
 	}
-	return util.RenderTempl(components.AddTestEventForm(false, classID, &models.TestEvent{}), c, 200)
+	return util.RenderTempl(views.AddTestEventForm(false, classID, &models.TestEvent{}), c, 200)
 }
 
 func (h handler) ShowEditTestEventForm(c echo.Context) error {
@@ -87,7 +87,7 @@ func (h handler) ShowEditTestEventForm(c echo.Context) error {
 	if !util.IsHTMX(c) {
 		return c.String(400, "Invalid request")
 	}
-	return util.RenderTempl(components.AddTestEventForm(true, testEvent.Class.ID, testEvent), c, 200)
+	return util.RenderTempl(views.AddTestEventForm(true, testEvent.Class.ID, testEvent), c, 200)
 }
 
 func (h handler) CreateTestEvent(c echo.Context) error {
@@ -110,7 +110,7 @@ func (h handler) CreateTestEvent(c echo.Context) error {
 			return c.String(500, "Failed to create test event. See server logs for details.")
 		}
 	}
-	return util.RenderTempl(components.TestEventRowComponent(testEvent), c, 201)
+	return util.RenderTempl(views.TestEventRowComponent(testEvent), c, 201)
 }
 
 func (h handler) DeleteTestEvent(c echo.Context) error {

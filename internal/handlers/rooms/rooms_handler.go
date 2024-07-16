@@ -4,8 +4,8 @@ import (
 	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/rooms"
 	"sep_setting_mgr/internal/util"
 	"strconv"
@@ -48,9 +48,9 @@ func (h handler) Rooms(c echo.Context) error {
 		return c.String(500, "Error retrieving rooms")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.RoomsTableComponent(rooms), c, 200)
+		return util.RenderTempl(views.RoomsTableComponent(rooms), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
 }
 
 func (h handler) CreateRoom(c echo.Context) error {
@@ -72,15 +72,15 @@ func (h handler) CreateRoom(c echo.Context) error {
 		return c.String(500, "Error adding room")
 	}
 	room.ID = id
-	return util.RenderTempl(components.RoomsRowComponent(&room), c, 201)
+	return util.RenderTempl(views.RoomsRowComponent(&room), c, 201)
 }
 
 func (h handler) ShowAddRoomForm(c echo.Context) error {
 	log.SetPrefix("AdminHandler: ShowAddRoomForm()")
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.AddRoomForm(false, &models.Room{}), c, 200)
+		return util.RenderTempl(views.AddRoomForm(false, &models.Room{}), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
 }
 
 func (h handler) ShowEditRoomForm(c echo.Context) error {
@@ -94,7 +94,7 @@ func (h handler) ShowEditRoomForm(c echo.Context) error {
 		return c.String(500, "Failed to get room. See server logs for details.")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.AddRoomForm(true, room), c, 200)
+		return util.RenderTempl(views.AddRoomForm(true, room), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.AdminPage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
 }

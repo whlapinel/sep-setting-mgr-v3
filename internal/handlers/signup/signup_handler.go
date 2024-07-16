@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/signup"
 	"sep_setting_mgr/internal/util"
 
@@ -28,7 +28,10 @@ func NewHandler(svc signup.SignupService) SignupHandler {
 	return &handler{service: svc}
 }
 
+var router *echo.Echo
+
 func Mount(e *echo.Echo, h SignupHandler) {
+	router = e
 	e.GET("/signup", h.SignUpPage).Name = string(common.SignupPage)
 	e.POST("/hx-signup", h.Signup).Name = string(common.Signup)
 }
@@ -50,12 +53,8 @@ func (h handler) Signup(c echo.Context) error {
 }
 
 func (h handler) SignUpPage(c echo.Context) error {
-	signUpProps := components.SignupData{
-		Router:    common.Router,
-		PostRoute: common.Signup,
-	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.SignUpPage(signUpProps), c, 200)
+		return util.RenderTempl(views.SignUpPage(router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.SignUpPage(signUpProps)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignUpPage(router)), c, 200)
 }

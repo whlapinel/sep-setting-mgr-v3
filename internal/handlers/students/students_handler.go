@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
+	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/services/classes"
 	"sep_setting_mgr/internal/services/students"
 	"sep_setting_mgr/internal/util"
@@ -44,10 +44,13 @@ func NewHandler(students students.StudentsService, classes classes.ClassesServic
 	return &handler{students, classes}
 }
 
+var router *echo.Echo
+
 func Mount(e *echo.Echo, h StudentsHandler) {
+	router = e
 	common.StudentsGroup.GET("", h.Students).Name = string(common.Students)
+	common.StudentsGroup.POST("", h.CreateStudent).Name = string(common.CreateStudent)
 	common.StudentsGroup.GET("/add", h.ShowAddStudentForm).Name = string(common.ShowAddStudentForm)
-	common.StudentsGroup.POST("/students", h.CreateStudent).Name = string(common.CreateStudent)
 	common.StudentIDGroup.GET("/edit", h.ShowEditStudentForm).Name = string(common.ShowEditStudentForm)
 	common.StudentIDGroup.POST("", h.EditStudent).Name = string(common.EditStudent)
 	common.StudentIDGroup.DELETE("", h.DeleteStudent).Name = string(common.DeleteStudent)
@@ -72,7 +75,7 @@ func (h handler) Students(c echo.Context) error {
 		return c.String(500, "Failed to list students. See server logs for details.")
 	}
 	class.Students = students
-	return util.RenderTempl(components.StudentTableComponent(class.Students), c, 200)
+	return util.RenderTempl(views.StudentTableComponent(class.Students, classID, router), c, 200)
 }
 
 func (h handler) CreateStudent(c echo.Context) error {
@@ -96,7 +99,7 @@ func (h handler) CreateStudent(c echo.Context) error {
 			return c.String(500, "Failed to add student. See server logs for details.")
 		}
 	}
-	return util.RenderTempl(components.StudentRowComponent(student), c, 201)
+	return util.RenderTempl(views.StudentRowComponent(student, classID, router), c, 201)
 }
 
 func (h handler) ShowEditStudentForm(c echo.Context) error {
@@ -112,7 +115,7 @@ func (h handler) ShowEditStudentForm(c echo.Context) error {
 	}
 	switch util.IsHTMX(c) {
 	case true:
-		return util.RenderTempl(components.AddStudentForm(true, student.Class.ID, student), c, 200)
+		return util.RenderTempl(views.AddStudentForm(true, student.Class.ID, student), c, 200)
 	default:
 		return c.Redirect(303, "/")
 	}
@@ -132,7 +135,7 @@ func (h handler) EditStudent(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to update student. See server logs for details.")
 	}
-	return util.RenderTempl(components.StudentRowComponent(student), c, 200)
+	return util.RenderTempl(views.StudentRowComponent(student, student.Class.ID, router), c, 200)
 }
 
 func (h handler) ShowAddStudentForm(c echo.Context) error {
@@ -144,7 +147,7 @@ func (h handler) ShowAddStudentForm(c echo.Context) error {
 	log.Println("Handler: Showing add student form")
 	switch util.IsHTMX(c) {
 	case true:
-		return util.RenderTempl(components.AddStudentForm(false, classID, &models.Student{}), c, 200)
+		return util.RenderTempl(views.AddStudentForm(false, classID, &models.Student{}), c, 200)
 	default:
 		return c.Redirect(303, "/")
 	}

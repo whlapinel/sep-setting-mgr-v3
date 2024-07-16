@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"sep_setting_mgr/internal/database"
 	"sep_setting_mgr/internal/domain/services"
 	"sep_setting_mgr/internal/handlers/about"
 	"sep_setting_mgr/internal/handlers/admin"
@@ -19,6 +18,7 @@ import (
 	testevents "sep_setting_mgr/internal/handlers/test_events"
 	"sep_setting_mgr/internal/handlers/unauthorized"
 	"sep_setting_mgr/internal/handlers/users"
+	"sep_setting_mgr/internal/repositories"
 	adminService "sep_setting_mgr/internal/services/admin"
 	"sep_setting_mgr/internal/services/assignments"
 	classesService "sep_setting_mgr/internal/services/classes"
@@ -34,12 +34,12 @@ import (
 
 func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	// initialize repositories
-	usersRepo := database.NewUsersRepo(db)
-	classesRepo := database.NewClassesRepo(db)
-	studentsRepo := database.NewStudentsRepo(db)
-	testEventsRepo := database.NewTestEventsRepo(db)
-	roomsRepo := database.NewRoomsRepo(db)
-	assignmentsRepo := database.NewAssignmentsRepo(db)
+	usersRepo := repositories.NewUsersRepo(db)
+	classesRepo := repositories.NewClassesRepo(db)
+	studentsRepo := repositories.NewStudentsRepo(db)
+	testEventsRepo := repositories.NewTestEventsRepo(db)
+	roomsRepo := repositories.NewRoomsRepo(db)
+	assignmentsRepo := repositories.NewAssignmentsRepo(db)
 
 	// initialize domain services
 	assignmentsDomainService := services.NewAssignmentsService(assignmentsRepo, roomsRepo, testEventsRepo, classesRepo, studentsRepo)
@@ -57,7 +57,6 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 
 	// define routes
 	common.CreateGroups(e, usersRepo)
-	common.PassRouter(e)
 
 	// initialize handlers
 	usersHandler := users.NewHandler(usersService)
@@ -69,18 +68,18 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 
 	// mount handlers
 	users.Mount(e, usersHandler)
+	dashboard.Mount(e, dashboard.NewHandler(classesService, assignmentAppService))
+	admin.Mount(e, admin.NewHandler(adminService))
+	signup.Mount(e, signup.NewHandler(signupService))
+	signin.Mount(e, signin.NewHandler(signinService))
+	signout.Mount(e, signout.NewHandler())
 	classes.Mount(e, classesHandler)
 	testevents.Mount(e, testEventsHandler)
 	students.Mount(e, studentsHandler)
 	rooms.Mount(e, roomsHandler)
-	about.Mount(e, about.NewHandler())
 	calendar.Mount(e, calendarHandler)
+	about.Mount(e, about.NewHandler())
 	home.Mount(e, home.NewHandler())
-	signout.Mount(e, signout.NewHandler())
 	unauthorized.Mount(e, unauthorized.NewHandler())
-	signup.Mount(e, signup.NewHandler(signupService))
-	signin.Mount(e, signin.NewHandler(signinService))
-	admin.Mount(e, admin.NewHandler(adminService))
-	dashboard.Mount(e, dashboard.NewHandler(classesService, assignmentAppService))
 	return nil
 }

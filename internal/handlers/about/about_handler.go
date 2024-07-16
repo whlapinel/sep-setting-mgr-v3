@@ -2,9 +2,9 @@ package about
 
 import (
 	"net/http"
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/util"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,7 +28,7 @@ func Mount(e *echo.Echo, h AboutPageHandler) {
 func (h handler) AboutPage(c echo.Context) error {
 
 	if !util.IsHTMX(c) {
-		return util.RenderTempl(layouts.MainLayout(components.AboutPage()), c, http.StatusOK)
+		return util.RenderTempl(layouts.MainLayout(views.AboutPage()), c, http.StatusOK)
 	}
-	return util.RenderTempl(components.AboutPage(), c, http.StatusOK)
+	return util.RenderTempl(views.AboutPage(), c, http.StatusOK)
 }

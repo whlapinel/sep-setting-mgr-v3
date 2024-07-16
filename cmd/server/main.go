@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"sep_setting_mgr/internal/assets"
-	"sep_setting_mgr/internal/database"
+	"sep_setting_mgr/internal/repositories"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -15,13 +15,13 @@ func main() {
 	LoadEnvironment()
 	e := echo.New()
 	e.Use(logger)
-	db, err := database.InitializeDB(false)
+	db, err := repositories.InitializeDB(false)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 	if clearData {
-		err = database.ClearDatabase(db)
+		err = repositories.ClearDatabase(db)
 		if err != nil {
 			log.Fatal(err)
 		}

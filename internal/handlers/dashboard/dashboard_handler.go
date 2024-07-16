@@ -2,10 +2,12 @@ package dashboard
 
 import (
 	"log"
+	"net/http"
 	"sep_setting_mgr/internal/auth"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
+	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/assignments"
 	"sep_setting_mgr/internal/services/classes"
 	"sep_setting_mgr/internal/util"
@@ -68,9 +70,9 @@ func (h handler) ShowCalendar(c echo.Context) error {
 		assignments = append(assignments, eventAssignments...)
 	}
 	log.Println("len(assignments): ", len(assignments))
-	calendar := util.RenderTempl(components.CalendarComponent(assignments), c, 200)
+	calendar := views.CalendarComponent(assignments)
 	if util.IsHTMX(c) {
-		return calendar
+		return util.RenderTempl(calendar, c, http.StatusOK)
 	}
-	return calendar
+	return util.RenderTempl(layouts.MainLayout(calendar), c, http.StatusOK)
 }

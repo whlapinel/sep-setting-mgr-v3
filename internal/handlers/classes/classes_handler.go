@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/common"
-	"sep_setting_mgr/internal/handlers/components"
-	"sep_setting_mgr/internal/layouts"
+	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/services/classes"
 	"sep_setting_mgr/internal/util"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -78,7 +78,7 @@ func (h handler) HxClasses(c echo.Context) error {
 	if !util.IsHTMX(c) {
 		return c.Redirect(303, router.Reverse(string(common.Classes)))
 	}
-	return util.RenderTempl(components.ClassesTable(classes, router), c, 200)
+	return util.RenderTempl(views.ClassesTable(classes, router), c, 200)
 }
 
 func (h handler) Classes(c echo.Context) error {
@@ -100,9 +100,9 @@ func (h handler) Classes(c echo.Context) error {
 	log.Println("Current URL: ", currentUrl)
 	// return util.RenderTempl(components.ClassesTable(classes, router, common.ShowAddClassForm, common.DeleteClass), c, 200)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(components.DashboardPage(classes, router), c, 200)
+		return util.RenderTempl(views.DashboardPage(classes, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(components.DashboardPage(classes, router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.DashboardPage(classes, router)), c, 200)
 
 }
 
@@ -112,7 +112,7 @@ func (h handler) ShowAddClassForm(c echo.Context) error {
 	switch util.IsHTMX(c) {
 	case true:
 		class := models.Class{}
-		return util.RenderTempl(components.AddClassForm(&components.AddClassFormProperties{
+		return util.RenderTempl(views.AddClassForm(&views.AddClassFormProperties{
 			IsEdit:     false,
 			Class:      &class,
 			AddPostURI: router.Reverse(string(common.CreateClass)),
@@ -135,7 +135,7 @@ func (h handler) ShowEditClassForm(c echo.Context) error {
 	}
 	switch util.IsHTMX(c) {
 	case true:
-		return util.RenderTempl(components.AddClassForm(&components.AddClassFormProperties{
+		return util.RenderTempl(views.AddClassForm(&views.AddClassFormProperties{
 			IsEdit:      true,
 			Class:       class,
 			EditPostURI: router.Reverse("edit-class", class.ID),
@@ -178,7 +178,7 @@ func (h handler) CreateClass(c echo.Context) error {
 	switch util.IsHTMX(c) {
 	case true:
 
-		err := util.RenderTempl(components.ClassRowComponent(class, router), c, 201)
+		err := util.RenderTempl(views.ClassRowComponent(class, router), c, 201)
 		if err != nil {
 			return c.String(500, "Failed to render class row component. See server logs for details.")
 		}
@@ -202,5 +202,5 @@ func (h handler) EditClass(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to edit class. See server logs for details.")
 	}
-	return util.RenderTempl(components.ClassRowComponent(class, router), c, 200)
+	return util.RenderTempl(views.ClassRowComponent(class, router), c, 200)
 }
