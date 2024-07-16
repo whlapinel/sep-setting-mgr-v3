@@ -2,7 +2,6 @@ package rooms
 
 import (
 	"sep_setting_mgr/internal/domain/models"
-	"sep_setting_mgr/internal/domain/services"
 )
 
 type RoomsService interface {
@@ -14,12 +13,11 @@ type RoomsService interface {
 }
 
 type service struct {
-	rooms       models.RoomRepository
-	assignments services.AssignmentsService
+	rooms models.RoomRepository
 }
 
-func NewService(rooms models.RoomRepository, assignments services.AssignmentsService) RoomsService {
-	return &service{rooms, assignments}
+func NewService(rooms models.RoomRepository) RoomsService {
+	return &service{rooms}
 }
 
 func (s service) ListRooms() ([]*models.Room, error) {
@@ -39,11 +37,7 @@ func (s service) AddRoom(room *models.Room) (id int, err error) {
 }
 
 func (s service) DeleteRoom(id int) error {
-	err := s.assignments.DeleteAssignmentsForRoom(id)
-	if err != nil {
-		return err
-	}
-	err = s.rooms.Delete(id)
+	err := s.rooms.Delete(id)
 	if err != nil {
 		return err
 	}

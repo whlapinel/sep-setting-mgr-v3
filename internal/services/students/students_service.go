@@ -3,8 +3,6 @@ package students
 import (
 	"log"
 	"sep_setting_mgr/internal/domain/models"
-	"sep_setting_mgr/internal/domain/services"
-	"sep_setting_mgr/internal/util"
 )
 
 type StudentsService interface {
@@ -16,20 +14,18 @@ type StudentsService interface {
 }
 
 type service struct {
-	students          models.StudentRepository
-	classes           models.ClassRepository
-	assignmentService services.AssignmentsService
+	students models.StudentRepository
+	classes  models.ClassRepository
 }
 
 func NewService(
 	students models.StudentRepository,
 	classes models.ClassRepository,
-	assignmentService services.AssignmentsService) StudentsService {
+) StudentsService {
 
 	return &service{
-		students:          students,
-		classes:           classes,
-		assignmentService: assignmentService,
+		students: students,
+		classes:  classes,
 	}
 }
 
@@ -53,16 +49,7 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 	}
 	log.Println("new student stored")
 	student.ID = id
-	var notAssignedErr error = nil
-	err = s.assignmentService.CreateAssignmentsForStudent(student)
-	if err != nil {
-		if err == util.ErrNotAssigned {
-			notAssignedErr = err
-		} else {
-			return nil, err
-		}
-	}
-	return student, notAssignedErr
+	return student, nil
 }
 
 func (s service) UpdateStudent(firstName string, lastName string, oneOnOne bool, studentID int) (*models.Student, error) {
@@ -71,28 +58,13 @@ func (s service) UpdateStudent(firstName string, lastName string, oneOnOne bool,
 	if err != nil {
 		return nil, err
 	}
-	oneOnOneChanged := student.OneOnOne != oneOnOne
-	// delete all assignments for student
-	student.FirstName = firstName
-	student.LastName = lastName
-	student.OneOnOne = oneOnOne
+	student.FirstName, student.LastName, student.OneOnOne = firstName, lastName, oneOnOne
 	err = s.students.Update(student)
 	if err != nil {
 		log.Println("Failed to update student: ", err)
 		return nil, err
 	}
-	var notAssignedErr error = nil
-	if oneOnOneChanged {
-		err = s.assignmentService.UpdateStudentAssignments(studentID)
-		if err != nil {
-			if err == util.ErrNotAssigned {
-				notAssignedErr = err
-			} else {
-				return nil, err
-			}
-		}
-	}
-	return student, notAssignedErr
+	return student, nil
 }
 
 func (s service) FindStudentByID(studentID int) (*models.Student, error) {
