@@ -20,8 +20,17 @@ type RoomsHandler interface {
 	// GET /admin/rooms/add
 	ShowAddRoomForm(c echo.Context) error
 
+	// GET /admin/rooms/:room-id/edit
+	ShowEditRoomForm(c echo.Context) error
+
 	// POST /admin/rooms
 	CreateRoom(c echo.Context) error
+
+	// DELETE /admin/rooms/:room-id
+	DeleteRoom(c echo.Context) error
+
+	// POST /admin/rooms/:room-id
+	EditRoom(c echo.Context) error
 }
 
 type handler struct {
@@ -34,10 +43,15 @@ func NewHandler(service rooms.RoomsService) RoomsHandler {
 	}
 }
 
+var router *echo.Echo
+
 func Mount(e *echo.Echo, h RoomsHandler) {
 	common.RoomsGroup.GET("", h.Rooms).Name = string(common.Rooms)
 	common.RoomsGroup.GET("/add", h.ShowAddRoomForm).Name = string(common.ShowAddRoomForm)
 	common.RoomsGroup.POST("", h.CreateRoom).Name = string(common.CreateRoom)
+	common.RoomsIDGroup.GET("/edit", h.ShowEditRoomForm).Name = string(common.ShowEditRoomForm)
+	common.RoomsIDGroup.POST("", h.EditRoom).Name = string(common.EditRoom)
+	common.RoomsIDGroup.DELETE("", h.DeleteRoom).Name = string(common.DeleteRoom)
 }
 
 func (h handler) Rooms(c echo.Context) error {
@@ -48,7 +62,7 @@ func (h handler) Rooms(c echo.Context) error {
 		return c.String(500, "Error retrieving rooms")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.RoomsTableComponent(rooms), c, 200)
+		return util.RenderTempl(views.RoomsTableComponent(rooms, router), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
 }
@@ -72,7 +86,46 @@ func (h handler) CreateRoom(c echo.Context) error {
 		return c.String(500, "Error adding room")
 	}
 	room.ID = id
-	return util.RenderTempl(views.RoomsRowComponent(&room), c, 201)
+	return util.RenderTempl(views.RoomsRowComponent(&room, router), c, 201)
+}
+
+func (h handler) EditRoom(c echo.Context) error {
+	log.SetPrefix("AdminHandler: EditRoom()")
+	roomID, err := strconv.Atoi(c.Param("room-id"))
+	if err != nil {
+		return c.String(400, "Invalid room ID")
+	}
+	var room models.Room
+	room.Name = c.FormValue("room-name")
+	room.Number = c.FormValue("room-number")
+	priority, err := strconv.Atoi(c.FormValue("priority"))
+	if err != nil {
+		return c.String(400, "Error getting priority value")
+	}
+	room.MaxCapacity, err = strconv.Atoi(c.FormValue("capacity"))
+	if err != nil {
+		return c.String(400, "Error getting capacity value")
+	}
+	room.Priority = priority
+	room.ID = roomID
+	err = h.service.UpdateRoom(&room)
+	if err != nil {
+		return c.String(500, "Error updating room")
+	}
+	return util.RenderTempl(views.RoomsRowComponent(&room, router), c, 200)
+}
+
+func (h handler) DeleteRoom(c echo.Context) error {
+	log.SetPrefix("AdminHandler: DeleteRoom()")
+	roomID, err := strconv.Atoi(c.Param("room-id"))
+	if err != nil {
+		return c.String(400, "Invalid room ID")
+	}
+	err = h.service.DeleteRoom(roomID)
+	if err != nil {
+		return c.String(500, "Failed to delete room")
+	}
+	return c.NoContent(204)
 }
 
 func (h handler) ShowAddRoomForm(c echo.Context) error {

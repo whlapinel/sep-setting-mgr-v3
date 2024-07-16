@@ -33,9 +33,16 @@ func (ar *assignmentRepo) Delete(assignmentID int) error {
 	return nil
 }
 
+func (ar *assignmentRepo) DeleteByRoomID(id int) error {
+	_, err := ar.db.Exec(`DELETE FROM assignments WHERE room_id = ?`, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ar *assignmentRepo) All() (models.Assignments, error) {
 	var assignments models.Assignments
-
 	rows, err := ar.db.Query(`
 	SELECT a.*, te.*, s.* 
 	FROM assignments a

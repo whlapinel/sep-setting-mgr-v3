@@ -104,6 +104,11 @@ func (s *AssignmentsService) CreateAssignmentsForStudent(student *models.Student
 	return notAssignedErr
 }
 
+func (s *AssignmentsService) DeleteAssignmentsForRoom(roomID int) error {
+	return s.assignments.DeleteByRoomID(roomID)
+}
+
+
 func (s *AssignmentsService) UpdateStudentAssignments(studentID int) error {
 	student, err := s.students.FindByID(studentID)
 	if err != nil {

@@ -50,7 +50,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	classesService := classesService.NewService(classesRepo, studentsRepo)
 	testEventsService := testEventsService.NewService(testEventsRepo, studentsRepo, classesRepo, assignmentsRepo, roomsRepo, *assignmentsDomainService)
 	studentsService := studentsService.NewService(studentsRepo, classesRepo, *assignmentsDomainService)
-	roomsService := roomsService.NewService(roomsRepo)
+	roomsService := roomsService.NewService(roomsRepo, *assignmentsDomainService)
 	signupService := signupService.NewService(usersRepo)
 	signinService := signinService.NewService(usersRepo)
 	adminService := adminService.NewService(usersRepo)

@@ -1,5 +1,10 @@
 # PROGRESS LOG
 
+## 7/16
+
+- I've been spending a lot of time reorganizing the project to match more closely with Go project structure conventions. I may still be deviating a bit but I feel this is closer. It also feels more sensible.
+- It suddenly dawned on me today that I've got myself into a real pickle trying to auto-assign students to rooms. It adds a ton of complexity and I could put that feature in later. It would also be a lot safer to have auto-assign as a button-triggered, on-demand feature available per-date only in the admin dashboard, rather than triggering it every time a student, test event, or room change happens. It would also be better to allow the admin to confirm or modify auto-assignments before they're saved. The whole thing has suddenly become a nightmare, so I think I'm going to remove all current auto-assignment methods. That will be its own small nightmare but not nearly as bad. And then later I will implement auto-assign in the admin panel.
+
 ## 7/12
 
 - Finally took the time to research echo capabilities and lo and behold, I found the solution to the thing that's been bugging me since I started this project. It would have saved me a lot of trouble if I did that sooner, but better late than never!  I can pass into my templates the echo instance and generate URIs using handlers or named routes. I can also just pass in paths for those without dynamic parameters. The parameters for my templates will get a bit lengthy so I think I may want to define them in a struct.

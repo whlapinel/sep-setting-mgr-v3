@@ -16,7 +16,7 @@ type (
 		Delete(roomID int) error
 		All() ([]*Room, error)
 		FindByID(roomID int) (*Room, error)
-		Update(*Room) error
+		Update(room *Room) error
 		FindByPriority(priority int) (*Room, error)
 		GetRoomAssignments(room *Room, block int, date time.Time) (Assignments, error)
 	}

@@ -1,9 +1,10 @@
 package views
 
 import (
-	"sep_setting_mgr/internal/handlers/views/components"
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/handlers/views/components"
 	"strconv"
+	"time"
 )
 
 func eventsBaseUrl(classID int) string {
@@ -58,6 +59,20 @@ func getEventFormSubmitBtnTitle(isEdit bool) string {
 	return "Add"
 }
 
+func getEventNameValue(isEdit bool, name string) string {
+	if isEdit {
+		return name
+	}
+	return ""
+}
+
+func getEventDateValue(isEdit bool, date *time.Time) string {
+	if isEdit {
+		return date.Format("2006-01-02")
+	}
+	return ""
+}
+
 templ AddTestEventForm(isEdit bool, classID int, event *models.TestEvent) {
 	@components.FormComponent(components.Form{
 		ID:       getEventFormID(isEdit, event.ID),
@@ -74,6 +89,7 @@ templ AddTestEventForm(isEdit bool, classID int, event *models.TestEvent) {
 	}) {
 		@components.InputComponent(components.Input{
 			Label:       "Test Name",
+			Value:       getEventNameValue(isEdit, event.TestName),
 			Placeholder: "e.g. Unit 1 Test",
 			ID:          "test-name",
 			Type:        "text",
@@ -82,6 +98,7 @@ templ AddTestEventForm(isEdit bool, classID int, event *models.TestEvent) {
 		})
 		@components.InputComponent(components.Input{
 			Label:    "Test Date",
+			Value:    getEventDateValue(isEdit, event.TestDate),
 			ID:       "test-date",
 			Type:     "date",
 			Name:     "test-date",

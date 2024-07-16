@@ -10,34 +10,38 @@ import (
 type RouteName string
 
 const (
-	Rooms                RouteName = "rooms"
-	ShowAddClassForm     RouteName = "show-add-class-form"
-	DeleteClass          RouteName = "delete-class"
-	ShowEditClassForm    RouteName = "show-edit-class-form"
-	EditClass            RouteName = "edit-class"
-	Classes              RouteName = "classes"
-	HxClasses            RouteName = "hx-classes"
-	CreateClass          RouteName = "create-class"
-	Students             RouteName = "students"
-	ShowAddStudentForm   RouteName = "show-add-student-form"
-	ShowEditStudentForm  RouteName = "show-edit-student-form"
-	DeleteStudent        RouteName = "delete-student"
-	EditStudent          RouteName = "edit-student"
-	DeleteTestEvent      RouteName = "delete-test-event"
-	ShowAddTestEventForm RouteName = "show-add-test-event-form"
-	TestEvents           RouteName = "test-events"
-	CreateTestEvent      RouteName = "create-test-event"
-	CreateStudent        RouteName = "create-student"
-	SignupPage           RouteName = "signup-page"
-	Signup               RouteName = "signup-post"
-	Signout              RouteName = "signout"
-	Calendar             RouteName = "calendar"
-	ShowAddRoomForm      RouteName = "show-add-room-form"
-	CreateRoom           RouteName = "create-room"
-	SigninPostRoute      RouteName = "signin-post"
-	SigninPage           RouteName = "signin-page"
-	Unauthorized         RouteName = "unauthorized"
-	Users                RouteName = "users"
+	Rooms                 RouteName = "rooms"
+	DeleteRoom            RouteName = "delete-room"
+	ShowEditRoomForm      RouteName = "show-edit-room-form"
+	EditRoom              RouteName = "edit-room"
+	ShowAddClassForm      RouteName = "show-add-class-form"
+	DeleteClass           RouteName = "delete-class"
+	ShowEditClassForm     RouteName = "show-edit-class-form"
+	EditClass             RouteName = "edit-class"
+	Classes               RouteName = "classes"
+	HxClasses             RouteName = "hx-classes"
+	CreateClass           RouteName = "create-class"
+	Students              RouteName = "students"
+	ShowAddStudentForm    RouteName = "show-add-student-form"
+	ShowEditStudentForm   RouteName = "show-edit-student-form"
+	DeleteStudent         RouteName = "delete-student"
+	EditStudent           RouteName = "edit-student"
+	DeleteTestEvent       RouteName = "delete-test-event"
+	ShowAddTestEventForm  RouteName = "show-add-test-event-form"
+	ShowEditTestEventForm RouteName = "show-edit-test-event-form"
+	TestEvents            RouteName = "test-events"
+	CreateTestEvent       RouteName = "create-test-event"
+	CreateStudent         RouteName = "create-student"
+	SignupPage            RouteName = "signup-page"
+	Signup                RouteName = "signup-post"
+	Signout               RouteName = "signout"
+	Calendar              RouteName = "calendar"
+	ShowAddRoomForm       RouteName = "show-add-room-form"
+	CreateRoom            RouteName = "create-room"
+	SigninPostRoute       RouteName = "signin-post"
+	SigninPage            RouteName = "signin-page"
+	Unauthorized          RouteName = "unauthorized"
+	Users                 RouteName = "users"
 )
 
 var (
@@ -49,6 +53,9 @@ var (
 
 	// /admin/rooms
 	RoomsGroup *echo.Group
+
+	// /admin/rooms/:room-id
+	RoomsIDGroup *echo.Group
 
 	// /dashboard
 	DashboardGroup *echo.Group
@@ -75,6 +82,7 @@ var (
 func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	AdminGroup = e.Group("/admin", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo))
 	RoomsGroup = AdminGroup.Group("/rooms")
+	RoomsIDGroup = RoomsGroup.Group("/:room-id")
 	CalendarGroup = AdminGroup.Group("/calendar")
 
 	DashboardGroup = e.Group("/dashboard", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)

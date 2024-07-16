@@ -40,11 +40,15 @@ func NewHandler(testEvents testevents.TestEventsService, assignments assignments
 	return &handler{testEvents, assignments}
 }
 
+var router *echo.Echo
+
 func Mount(e *echo.Echo, h TestEventsHandler) {
+	router = e
 	common.TestEventsGroup.GET("", h.TestEvents).Name = string(common.TestEvents)
 	common.TestEventsGroup.POST("", h.CreateTestEvent).Name = string(common.CreateTestEvent)
 	common.TestEventsGroup.GET("/add", h.ShowAddTestEventForm).Name = string(common.ShowAddTestEventForm)
 	common.TestEventsIDGroup.DELETE("", h.DeleteTestEvent).Name = string(common.DeleteTestEvent)
+	common.TestEventsIDGroup.GET("/edit", h.ShowEditTestEventForm).Name = string(common.ShowEditTestEventForm)
 }
 
 func (h handler) TestEvents(c echo.Context) error {
@@ -61,7 +65,7 @@ func (h handler) TestEvents(c echo.Context) error {
 		log.Println("Failed to list test events: ", err)
 		return c.String(500, "Failed to list test events. See server logs for details.")
 	}
-	return util.RenderTempl(views.TestEventsTableComponent(testEvents, classID), c, 200)
+	return util.RenderTempl(views.TestEventsTableComponent(testEvents, classID, router), c, 200)
 }
 
 func (h handler) ShowAddTestEventForm(c echo.Context) error {
@@ -110,7 +114,7 @@ func (h handler) CreateTestEvent(c echo.Context) error {
 			return c.String(500, "Failed to create test event. See server logs for details.")
 		}
 	}
-	return util.RenderTempl(views.TestEventRowComponent(testEvent), c, 201)
+	return util.RenderTempl(views.TestEventRowComponent(testEvent, classID, router), c, 201)
 }
 
 func (h handler) DeleteTestEvent(c echo.Context) error {
