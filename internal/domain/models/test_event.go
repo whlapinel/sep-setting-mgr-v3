@@ -18,9 +18,11 @@ type TestEvents []*TestEvent
 
 // TestEventRepository provides access a test event store
 type TestEventRepository interface {
+	ListAll() (TestEvents, error)
 	Store(testEvent *TestEvent) (id int, err error)
 	Delete(id int) error
 	FindByClass(classID int) (TestEvents, error)
+	FindByTeacherID(teacherID int) (TestEvents, error)
 	FindByID(id int) (*TestEvent, error)
 }
 

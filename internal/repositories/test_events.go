@@ -43,6 +43,35 @@ func (tr *testEventsRepo) Store(testEvent *models.TestEvent) (int, error) {
 	return testEvent.ID, nil
 }
 
+func (tr *testEventsRepo) ListAll() (models.TestEvents, error) {
+	var testEvents models.TestEvents
+	var tableRows []testEventTableRow
+	rows, err := tr.db.Query(`
+	SELECT * FROM test_events`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var testEventTableRow testEventTableRow
+		var tempDate []uint8
+		err := rows.Scan(&testEventTableRow.id, &testEventTableRow.test_name, &tempDate, &testEventTableRow.class_id)
+		if err != nil {
+			return nil, err
+		}
+		testEventTableRow.test_date, err = time.Parse("2006-01-02", string(tempDate))
+		if err != nil {
+			return nil, err
+		}
+		tableRows = append(tableRows, testEventTableRow)
+	}
+	for _, tableRow := range tableRows {
+		testEvent := convertToTestEvent(tableRow)
+		testEvents = append(testEvents, testEvent)
+	}
+	return testEvents, nil
+}
+
 func (tr *testEventsRepo) FindByClass(classID int) (models.TestEvents, error) {
 	var testEvents models.TestEvents
 	var tableRows []testEventTableRow
@@ -88,6 +117,39 @@ func (tr *testEventsRepo) FindByID(eventID int) (*models.TestEvent, error) {
 	}
 	testEvent := convertToTestEvent(testEventTableRow)
 	return testEvent, nil
+}
+
+func (tr *testEventsRepo) FindByTeacherID(teacherID int) (models.TestEvents, error) {
+	var testEvents models.TestEvents
+	var tableRows []testEventTableRow
+	rows, err := tr.db.Query(`
+	SELECT te.*
+	FROM test_events te
+	JOIN classes c ON te.class_id = c.id
+	WHERE c.teacher_id = ?`, teacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var testEventTableRow testEventTableRow
+		var tempDate []uint8
+		err := rows.Scan(&testEventTableRow.id, &testEventTableRow.test_name, &tempDate, &testEventTableRow.class_id)
+		if err != nil {
+			return nil, err
+		}
+		testEventTableRow.test_date, err = time.Parse("2006-01-02", string(tempDate))
+		if err != nil {
+			return nil, err
+		}
+		tableRows = append(tableRows, testEventTableRow)
+	}
+	for _, tableRow := range tableRows {
+		testEvent := convertToTestEvent(tableRow)
+		testEvents = append(testEvents, testEvent)
+	}
+	return testEvents, nil
+
 }
 
 func convertTestEventToTable(testEvent *models.TestEvent) testEventTableRow {

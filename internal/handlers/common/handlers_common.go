@@ -13,6 +13,7 @@ const (
 	Rooms                 RouteName = "rooms"
 	DeleteRoom            RouteName = "delete-room"
 	ShowEditRoomForm      RouteName = "show-edit-room-form"
+	ShowAddRoomForm       RouteName = "show-add-room-form"
 	EditRoom              RouteName = "edit-room"
 	ShowAddClassForm      RouteName = "show-add-class-form"
 	DeleteClass           RouteName = "delete-class"
@@ -35,8 +36,8 @@ const (
 	SignupPage            RouteName = "signup-page"
 	Signup                RouteName = "signup-post"
 	Signout               RouteName = "signout"
-	Calendar              RouteName = "calendar"
-	ShowAddRoomForm       RouteName = "show-add-room-form"
+	DashboardCalendar     RouteName = "dashboard-calendar"
+	AdminCalendar         RouteName = "admin-calendar"
 	CreateRoom            RouteName = "create-room"
 	SigninPostRoute       RouteName = "signin-post"
 	SigninPage            RouteName = "signin-page"
@@ -59,6 +60,9 @@ var (
 
 	// /dashboard
 	DashboardGroup *echo.Group
+
+	// /dashboard/calendar
+	DBCalendarGroup *echo.Group
 
 	// /dashboard/classes
 	ClassesGroup *echo.Group
@@ -86,6 +90,7 @@ func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	CalendarGroup = AdminGroup.Group("/calendar")
 
 	DashboardGroup = e.Group("/dashboard", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)
+	DBCalendarGroup = DashboardGroup.Group("/calendar")
 
 	ClassesGroup = DashboardGroup.Group("/classes")
 	ClassIDGroup = ClassesGroup.Group("/:class-id")

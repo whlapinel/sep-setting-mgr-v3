@@ -46,6 +46,7 @@ func NewHandler(service rooms.RoomsService) RoomsHandler {
 var router *echo.Echo
 
 func Mount(e *echo.Echo, h RoomsHandler) {
+	router = e
 	common.RoomsGroup.GET("", h.Rooms).Name = string(common.Rooms)
 	common.RoomsGroup.GET("/add", h.ShowAddRoomForm).Name = string(common.ShowAddRoomForm)
 	common.RoomsGroup.POST("", h.CreateRoom).Name = string(common.CreateRoom)

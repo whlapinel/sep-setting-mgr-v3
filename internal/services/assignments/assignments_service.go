@@ -7,6 +7,7 @@ import (
 )
 
 type AssignmentsService interface {
+	ListAll() (models.Assignments, error)
 	GetAssignments(teacherID int, start, end time.Time) (models.Assignments, error)
 	CreateAssignment(student *models.Student, testEvent *models.TestEvent) (*models.Assignment, error)
 	DeleteByStudentID(studentID int) error
@@ -30,6 +31,14 @@ func (s service) CreateAssignment(student *models.Student, testEvent *models.Tes
 	var assignment *models.Assignment
 
 	return assignment, nil
+}
+
+func (s service) ListAll() (models.Assignments, error) {
+	assignments, err := s.assignments.All()
+	if err != nil {
+		return nil, err
+	}
+	return assignments, nil
 }
 
 func (s service) GetAssignments(classID int, start, end time.Time) (models.Assignments, error) {

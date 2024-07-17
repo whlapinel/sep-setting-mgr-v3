@@ -10,6 +10,8 @@ import (
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/assignments"
 	"sep_setting_mgr/internal/services/classes"
+	"sep_setting_mgr/internal/services/students"
+	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
 	"time"
 
@@ -21,18 +23,22 @@ type DashboardHandler interface {
 	Redirect(c echo.Context) error
 
 	// GET /dashboard/calendar
-	ShowCalendar(c echo.Context) error
+	DashboardCalendar(c echo.Context) error
 }
 
 type handler struct {
-	classesService     classes.ClassesService
-	assignmentsService assignments.AssignmentsService
+	classesService classes.ClassesService
+	assignments    assignments.AssignmentsService
+	testEvents     testevents.TestEventsService
+	students       students.StudentsService
 }
 
-func NewHandler(classes classes.ClassesService, assignments assignments.AssignmentsService) DashboardHandler {
+func NewHandler(classes classes.ClassesService, assignments assignments.AssignmentsService, testEvents testevents.TestEventsService, students students.StudentsService) DashboardHandler {
 	return &handler{
 		classes,
 		assignments,
+		testEvents,
+		students,
 	}
 }
 
@@ -44,23 +50,36 @@ func Mount(e *echo.Echo, h DashboardHandler) {
 	common.DashboardGroup.Use(auth.JWTMiddleware)
 	common.DashboardGroup.Use(auth.GetClaims)
 	common.DashboardGroup.GET("", h.Redirect)
-	common.DashboardGroup.GET("/calendar", h.ShowCalendar).Name = string(common.Calendar)
+	common.DBCalendarGroup.GET("", h.DashboardCalendar).Name = string(common.DashboardCalendar)
 }
 
 func (h handler) Redirect(c echo.Context) error {
 	return c.Redirect(303, router.Reverse(string(common.Classes)))
 }
 
-func (h handler) ShowCalendar(c echo.Context) error {
+func (h handler) DashboardCalendar(c echo.Context) error {
 	log.SetPrefix("ShowCalendar: ")
 	teacherID := c.Get("id").(int)
 	classes, err := h.classesService.List(teacherID)
 	if err != nil {
 		return err
 	}
+	testEvents, err := h.testEvents.FindByTeacherID(teacherID)
+	if err != nil {
+		return err
+	}
+	for i, event := range testEvents {
+		event.Class.Students, err = h.students.ListStudents(event.Class.ID)
+		if err != nil {
+			log.Println(err)
+			return c.String(500, "Error retrieving students")
+		}
+		testEvents[i] = event
+	}
+
 	var assignments models.Assignments
 	for _, class := range classes {
-		eventAssignments, err := h.assignmentsService.GetAssignments(class.ID, time.Now(), time.Now().AddDate(0, 1, 0))
+		eventAssignments, err := h.assignments.GetAssignments(class.ID, time.Now(), time.Now().AddDate(0, 1, 0))
 		log.Println("eventAssignments: ", eventAssignments)
 		log.Println("len(eventAssignments): ", len(eventAssignments))
 		if err != nil {

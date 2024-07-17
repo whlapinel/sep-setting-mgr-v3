@@ -2,6 +2,7 @@ package views
 
 import (
 	"sep_setting_mgr/internal/domain/models"
+	"strconv"
 	"time"
 )
 
@@ -54,6 +55,13 @@ templ WeekComponent(date time.Time, assignments []*models.Assignment) {
 	</div>
 }
 
+func getRoom(assignment models.Assignment) string {
+	if assignment.Room == nil {
+		return "Unassigned"
+	}
+	return assignment.Room.Number
+}
+
 templ TestEventTable(assignments []*models.Assignment) {
 	<table>
 		<thead>
@@ -61,6 +69,7 @@ templ TestEventTable(assignments []*models.Assignment) {
 				<th>First Name</th>
 				<th>Last Name</th>
 				<th>Test Name</th>
+				<th>Block</th>
 				<th>Room</th>
 			</tr>
 		</thead>
@@ -70,7 +79,8 @@ templ TestEventTable(assignments []*models.Assignment) {
 					<td>{ assignment.Student.FirstName }</td>
 					<td>{ assignment.Student.LastName }</td>
 					<td>{ assignment.TestEvent.TestName }</td>
-					<td>{ assignment.Room.Number }</td>
+					<td>{ strconv.Itoa(assignment.TestEvent.Block) }</td>
+					<td>{ getRoom(*assignment) }</td>
 				</tr>
 			}
 		</tbody>

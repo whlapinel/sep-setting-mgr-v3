@@ -8,11 +8,11 @@ import (
 )
 
 type roomsTableRow struct {
-	id           int
-	name         string
-	number       string
-	max_capacity int
-	priority     int
+	id           sql.NullInt64
+	name         sql.NullString
+	number       sql.NullString
+	max_capacity sql.NullInt64
+	priority     sql.NullInt64
 }
 
 type roomRepo struct {
@@ -156,21 +156,30 @@ func (rr *roomRepo) Delete(id int) error {
 }
 
 func convertToRoomTable(room *models.Room) roomsTableRow {
+	id := sql.NullInt64{Int64: int64(room.ID), Valid: true}
+	name := sql.NullString{String: room.Name, Valid: true}
+	number := sql.NullString{String: room.Number, Valid: true}
+	maxCapacity := sql.NullInt64{Int64: int64(room.MaxCapacity), Valid: true}
+	priority := sql.NullInt64{Int64: int64(room.Priority), Valid: true}
 	return roomsTableRow{
-		id:           room.ID,
-		name:         room.Name,
-		number:       room.Number,
-		max_capacity: room.MaxCapacity,
-		priority:     room.Priority,
+		id:           id,
+		name:         name,
+		number:       number,
+		max_capacity: maxCapacity,
+		priority:     priority,
 	}
 }
 
 func convertToRoom(tableRow roomsTableRow) *models.Room {
+	if !tableRow.id.Valid {
+		return nil
+	}
+	id := int(tableRow.id.Int64)
 	return &models.Room{
-		ID:          tableRow.id,
-		Name:        tableRow.name,
-		Number:      tableRow.number,
-		MaxCapacity: tableRow.max_capacity,
-		Priority:    tableRow.priority,
+		ID:          id,
+		Name:        string(tableRow.name.String),
+		Number:      string(tableRow.number.String),
+		MaxCapacity: int(tableRow.max_capacity.Int64),
+		Priority:    int(tableRow.priority.Int64),
 	}
 }

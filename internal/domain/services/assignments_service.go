@@ -8,22 +8,22 @@ import (
 )
 
 type AssignmentsService struct {
-	assignments models.AssignmentRepository
-	rooms       models.RoomRepository
-	testEvents  models.TestEventRepository
-	classes     models.ClassRepository
-	students    models.StudentRepository
+	asRepo     models.AssignmentRepository
+	rooms      models.RoomRepository
+	testEvents models.TestEventRepository
+	classes    models.ClassRepository
+	students   models.StudentRepository
 }
 
 func NewAssignmentsService(
-	assignments models.AssignmentRepository,
+	asRepo models.AssignmentRepository,
 	rooms models.RoomRepository,
 	testEvents models.TestEventRepository,
 	classes models.ClassRepository,
 	students models.StudentRepository) *AssignmentsService {
 
 	return &AssignmentsService{
-		assignments,
+		asRepo,
 		rooms,
 		testEvents,
 		classes,
@@ -32,65 +32,24 @@ func NewAssignmentsService(
 }
 
 func (s *AssignmentsService) CreateAssignment(student *models.Student, testEvent *models.TestEvent) (*models.Assignment, error) {
-	var assignment *models.Assignment
-	priority := 1
-	foundOpenRoom := false
-	var max int
-	for !foundOpenRoom {
-		room, err := s.rooms.FindByPriority(priority)
-		if err != nil {
-			return nil, err
-		}
-		if room == nil {
-			return nil, nil
-		}
-		max = room.MaxCapacity
-		if student.OneOnOne {
-			max = 1
-		}
-		roomAssignments, err := s.rooms.GetRoomAssignments(room, testEvent.Class.Block, *testEvent.TestDate)
-		if err != nil {
-			return nil, err
-		}
-		if len(roomAssignments) < max {
-			foundOpenRoom = true
-			assignment = models.NewAssignment(student, room, testEvent)
-			err := s.assignments.Store(assignment)
-			if err != nil {
-				return nil, err
-			}
-		}
-		priority++
-	}
+	assignment := models.NewAssignment(student, nil, testEvent)
+	s.asRepo.Store(assignment)
+	log.Println("Assignment created")
 	return assignment, nil
 }
 
 func (s *AssignmentsService) CreateAssignmentsForStudent(student *models.Student) error {
 	// get test events for class and filter for future events
 	log.Println("Service: Creating assignments for student")
-	classID := student.Class.ID
-	class, err := s.classes.FindByID(classID)
+	testEvents, err := s.testEvents.FindByClass(student.Class.ID)
 	if err != nil {
 		return err
 	}
-	testEvents, err := s.testEvents.FindByClass(classID)
-	if err != nil {
-		return err
-	}
-	log.Println("test events retrieved")
-	// TODO: this should be a models.TestEvents method
-	var futureEvents models.TestEvents
-	for _, event := range testEvents {
-		if event.TestDate.After(time.Now()) {
-			futureEvents = append(futureEvents, event)
-		}
-	}
-	log.Println("test events filtered for future events")
 	var notAssignedErr error = nil
-	for _, futureEvent := range futureEvents {
+	for _, event := range testEvents {
 		log.Println("creating assignment for event")
-		futureEvent.Class = class
-		assignment, err := s.CreateAssignment(student, futureEvent)
+		event.Class = &student.Class
+		assignment, err := s.CreateAssignment(student, event)
 		if err != nil {
 			return err
 		}
@@ -105,9 +64,8 @@ func (s *AssignmentsService) CreateAssignmentsForStudent(student *models.Student
 }
 
 func (s *AssignmentsService) DeleteAssignmentsForRoom(roomID int) error {
-	return s.assignments.DeleteByRoomID(roomID)
+	return s.asRepo.DeleteByRoomID(roomID)
 }
-
 
 func (s *AssignmentsService) UpdateStudentAssignments(studentID int) error {
 	student, err := s.students.FindByID(studentID)
@@ -126,7 +84,7 @@ func (s *AssignmentsService) UpdateStudentAssignments(studentID int) error {
 }
 
 func (s *AssignmentsService) DeleteAssignmentsForStudent(studentID int) error {
-	return s.assignments.DeleteByStudentID(studentID)
+	return s.asRepo.DeleteByStudentID(studentID)
 }
 
 func (s *AssignmentsService) CreateAssignmentsForTestEvent(testEventID int) error {
@@ -148,7 +106,7 @@ func (s *AssignmentsService) CreateAssignmentsForTestEvent(testEventID int) erro
 }
 
 func (s *AssignmentsService) GetAllAssignments() (models.Assignments, error) {
-	return s.assignments.All()
+	return s.asRepo.All()
 }
 
 func (s *AssignmentsService) GetAssignments(classID int, start, end time.Time) (models.Assignments, error) {
@@ -160,7 +118,7 @@ func (s *AssignmentsService) GetAssignments(classID int, start, end time.Time) (
 	}
 	for _, event := range testEvents {
 		if event.TestDate.After(start) && event.TestDate.Before(end) {
-			eventAssignments, err := s.assignments.GetByEventID(event.ID)
+			eventAssignments, err := s.asRepo.GetByEventID(event.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -168,4 +126,8 @@ func (s *AssignmentsService) GetAssignments(classID int, start, end time.Time) (
 		}
 	}
 	return assignments, nil
+}
+
+func (s *AssignmentsService) GetAssignmentsByTeacherID(teacherID int) (models.Assignments, error) {
+	return s.asRepo.GetByTeacherID(teacherID)
 }

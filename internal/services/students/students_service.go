@@ -3,6 +3,7 @@ package students
 import (
 	"log"
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/domain/services"
 )
 
 type StudentsService interface {
@@ -14,18 +15,21 @@ type StudentsService interface {
 }
 
 type service struct {
-	students models.StudentRepository
-	classes  models.ClassRepository
+	students          models.StudentRepository
+	classes           models.ClassRepository
+	assignmentService services.AssignmentsService
 }
 
 func NewService(
 	students models.StudentRepository,
 	classes models.ClassRepository,
+	as services.AssignmentsService,
 ) StudentsService {
 
 	return &service{
-		students: students,
-		classes:  classes,
+		students:          students,
+		classes:           classes,
+		assignmentService: as,
 	}
 }
 
@@ -47,6 +51,8 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 	if err != nil {
 		return nil, err
 	}
+	// create assignments for student, room is null
+	s.assignmentService.CreateAssignmentsForStudent(student)
 	log.Println("new student stored")
 	student.ID = id
 	return student, nil

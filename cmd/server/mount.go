@@ -49,7 +49,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	usersService := usersService.NewService(usersRepo, roomsRepo, assignmentsRepo)
 	classesService := classesService.NewService(classesRepo, studentsRepo)
 	testEventsService := testEventsService.NewService(testEventsRepo, classesRepo)
-	studentsService := studentsService.NewService(studentsRepo, classesRepo)
+	studentsService := studentsService.NewService(studentsRepo, classesRepo, *assignmentsDomainService)
 	roomsService := roomsService.NewService(roomsRepo)
 	signupService := signupService.NewService(usersRepo)
 	signinService := signinService.NewService(usersRepo)
@@ -64,11 +64,11 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	testEventsHandler := testevents.NewHandler(testEventsService, assignmentAppService)
 	studentsHandler := students.NewHandler(studentsService, classesService)
 	roomsHandler := rooms.NewHandler(roomsService)
-	calendarHandler := calendar.NewHandler(*assignmentsDomainService)
+	calendarHandler := calendar.NewHandler(assignmentAppService, testEventsService, studentsService)
 
 	// mount handlers
 	users.Mount(e, usersHandler)
-	dashboard.Mount(e, dashboard.NewHandler(classesService, assignmentAppService))
+	dashboard.Mount(e, dashboard.NewHandler(classesService, assignmentAppService, testEventsService, studentsService))
 	admin.Mount(e, admin.NewHandler(adminService))
 	signup.Mount(e, signup.NewHandler(signupService))
 	signin.Mount(e, signin.NewHandler(signinService))

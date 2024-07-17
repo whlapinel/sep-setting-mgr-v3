@@ -7,10 +7,12 @@ import (
 )
 
 type TestEventsService interface {
-	ListAllTestEvents(classID int) (models.TestEvents, error)
+	FindByClassID(classID int) (models.TestEvents, error)
 	CreateTestEvent(classID int, testName string, testDate string) (*models.TestEvent, error)
 	DeleteTestEvent(testEventID int) error
 	FindTestEventByID(testEventID int) (*models.TestEvent, error)
+	FindByTeacherID(teacherID int) (models.TestEvents, error)
+	ListAll() (models.TestEvents, error)
 }
 
 type service struct {
@@ -63,7 +65,7 @@ func (s service) DeleteTestEvent(testEventID int) error {
 	return nil
 }
 
-func (s service) ListAllTestEvents(classID int) (models.TestEvents, error) {
+func (s service) FindByClassID(classID int) (models.TestEvents, error) {
 	testEvents, err := s.testEvents.FindByClass(classID)
 	if err != nil {
 		return nil, err
@@ -77,4 +79,20 @@ func (s service) FindTestEventByID(testEventID int) (*models.TestEvent, error) {
 		return nil, err
 	}
 	return testEvent, nil
+}
+
+func (s service) FindByTeacherID(teacherID int) (models.TestEvents, error) {
+	testEvents, err := s.testEvents.FindByTeacherID(teacherID)
+	if err != nil {
+		return nil, err
+	}
+	return testEvents, nil
+}
+
+func (s service) ListAll() (models.TestEvents, error) {
+	testEvents, err := s.testEvents.ListAll()
+	if err != nil {
+		return nil, err
+	}
+	return testEvents, nil
 }

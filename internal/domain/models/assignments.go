@@ -20,6 +20,7 @@ type AssignmentRepository interface {
 	All() (Assignments, error)
 	DeleteByStudentID(studentID int) error
 	DeleteByRoomID(roomID int) error
+	GetByTeacherID(teacherID int) (Assignments, error)
 }
 
 type Assignments []*Assignment

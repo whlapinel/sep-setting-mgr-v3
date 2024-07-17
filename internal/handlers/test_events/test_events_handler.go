@@ -60,7 +60,7 @@ func (h handler) TestEvents(c echo.Context) error {
 	if err != nil {
 		return c.String(400, "Invalid class ID")
 	}
-	testEvents, err := h.testEvents.ListAllTestEvents(classID)
+	testEvents, err := h.testEvents.FindByClassID(classID)
 	if err != nil {
 		log.Println("Failed to list test events: ", err)
 		return c.String(500, "Failed to list test events. See server logs for details.")

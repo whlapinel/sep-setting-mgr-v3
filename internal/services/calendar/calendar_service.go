@@ -7,6 +7,7 @@ import (
 
 type CalendarService interface {
 	GetAllAssignments() (models.Assignments, error)
+	GetAssignmentsByTeacherID(teacherID int) (models.Assignments, error)
 }
 
 type service struct {
@@ -21,4 +22,8 @@ func NewService(assignmentsService services.AssignmentsService) CalendarService 
 
 func (s service) GetAllAssignments() (models.Assignments, error) {
 	return s.assignmentsService.GetAllAssignments()
+}
+
+func (s service) GetAssignmentsByTeacherID(teacherID int) (models.Assignments, error) {
+	return s.assignmentsService.GetAssignmentsByTeacherID(teacherID)
 }
