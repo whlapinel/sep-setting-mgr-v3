@@ -1,5 +1,12 @@
 # PROGRESS LOG
 
+## 7/17
+
+- Struggled a little bit with how to display assignments properly, all morning was spent reworking things to make it simpler and more performant. Now calendars are only passed assignments instead of both test events and assignments.
+- Major change in how calendar data is retrieved: when students are created, an assignment is created for every test event in the student's class, with the room id set to null. This meant learning about sql.NullInt64 and sql.NullString and how to use them.
+- Still need to do the same for test events (new assignment should be created for every student in the test event's class).
+- This means I'll also need to implement auto-delete and auto-update accordingly, but I would need to do that anyway, and it will be way simpler than when I was trying to auto-assign to rooms *shudder*.
+
 ## 7/16
 
 - I've been spending a lot of time reorganizing the project to match more closely with Go project structure conventions. I may still be deviating a bit but I feel this is closer. It also feels more sensible.

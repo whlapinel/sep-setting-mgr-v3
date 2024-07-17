@@ -2,6 +2,13 @@
 
 ## PENDING
 
+- make dashboard calendar work like the admin calendar (for some reason it's not showing the assignments where room is nil, these call different repo methods which leads me to the next item)
+- consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
+- creating event should create assignments for every student in the event's class
+- deleting event should delete all assignments for the event
+- deleting student should delete all assignments for the student
+- deleting room should delete all assignments for the room
+- display warning when room is overbooked (for each day, need counter for assignment.Event.Block, show warning for each block where the count is greater than the assignment.Room.MaxCapacity). Also need to account for student.OneOnOne; if student.OneOnOne for any assignments on that date and block, then max should be 1 instead of assignment.Room.MaxCapacity.
 - complete edit students functionality (including room assignments, the biggest pain in the butt!!)
 - edit test events functionality
 - test rooms functionality
