@@ -2,8 +2,11 @@ package views
 
 import (
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/handlers/views/components"
 	"strconv"
 	"time"
+	"sep_setting_mgr/internal/handlers/common"
+	"github.com/labstack/echo/v4"
 )
 
 const format string = "2006-01-02"
@@ -17,10 +20,10 @@ func getThisMonday() time.Time {
 	return today.AddDate(0, 0, -int(today.Weekday())+1)
 }
 
-templ CalendarComponent(assignments []*models.Assignment) {
+templ CalendarComponent(assignments []*models.Assignment, r *echo.Echo) {
 	<h1>Calendar</h1>
-	@WeekComponent(getThisMonday(), assignments)
-	@WeekComponent(getThisMonday().AddDate(0, 0, 7), assignments)
+	@WeekComponent(getThisMonday(), assignments, r)
+	@WeekComponent(getThisMonday().AddDate(0, 0, 7), assignments, r)
 }
 
 func filterAssignmentsForDay(date time.Time, assignments []*models.Assignment) []*models.Assignment {
@@ -33,16 +36,16 @@ func filterAssignmentsForDay(date time.Time, assignments []*models.Assignment) [
 	return filtered
 }
 
-templ DayComponent(date time.Time, assignments []*models.Assignment) {
+templ DayComponent(date time.Time, assignments []*models.Assignment, r *echo.Echo) {
 	<h3>{ date.Format(format) }</h3>
-	@TestEventTable(groupAssignmentsByBlock(assignments))
+	@TestEventTable(groupAssignmentsByBlock(assignments), r)
 }
 
 func getFriday(date time.Time) time.Time {
 	return date.AddDate(0, 0, 4)
 }
 
-templ WeekComponent(date time.Time, assignments []*models.Assignment) {
+templ WeekComponent(date time.Time, assignments []*models.Assignment, r *echo.Echo) {
 	if date.Weekday() != time.Monday {
 		return
 	}
@@ -50,7 +53,7 @@ templ WeekComponent(date time.Time, assignments []*models.Assignment) {
 	// filter assignments for this day
 	<div class="flex gap-2">
 		for i := 0; i < 5; i++ {
-			@DayComponent(date.AddDate(0, 0, i), filterAssignmentsForDay(date.AddDate(0, 0, i), assignments))
+			@DayComponent(date.AddDate(0, 0, i), filterAssignmentsForDay(date.AddDate(0, 0, i), assignments), r)
 		}
 	</div>
 }
@@ -70,7 +73,12 @@ func groupAssignmentsByBlock(assignments []*models.Assignment) map[int][]*models
 	return assignmentsByBlock
 }
 
-templ TestEventTable(assignmentsByBlock map[int][]*models.Assignment) {
+func getRoomNameCellID(assignmentID int) string {
+	prefix := "room-name-cell-"
+	return prefix + strconv.Itoa(assignmentID)
+}
+
+templ TestEventTable(assignmentsByBlock map[int][]*models.Assignment, r *echo.Echo) {
 	<table>
 		<thead>
 			<tr>
@@ -90,10 +98,25 @@ templ TestEventTable(assignmentsByBlock map[int][]*models.Assignment) {
 						<td>{ assignment.Student.LastName }</td>
 						<td>{ assignment.TestEvent.TestName }</td>
 						<td>{ strconv.Itoa(assignment.Block) }</td>
-						<td>{ getRoom(*assignment) }</td>
+						<td id={ getRoomNameCellID(assignment.ID) }>{ getRoom(*assignment) }</td>
+						<td>
+							@components.ButtonComponent(components.Button{
+								Attr: templ.Attributes{
+									"hx-get":      r.Reverse(string(common.ShowAssignRoomForm), assignment.ID),
+									"hx-target":   "#modal",
+									"hx-push-url": "true",
+								},
+							}) {
+								Assign Room
+							}
+						</td>
 					</tr>
 				}
 			}
 		</tbody>
 	</table>
+}
+
+templ AssignRoomSuccess(assignmentID int, roomNumber string) {
+	<td id={ getRoomNameCellID(assignmentID) }>{ roomNumber }</td>
 }

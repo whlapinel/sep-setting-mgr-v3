@@ -25,6 +25,67 @@ func NewAssignmentsRepo(db *sql.DB) models.AssignmentRepository {
 	return &assignmentRepo{db: db}
 }
 
+func (ar *assignmentRepo) UpdateRoom(assignmentID, roomID int) error {
+	_, err := ar.db.Exec(`UPDATE assignments SET room_id = ? WHERE id = ?`, roomID, assignmentID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ar *assignmentRepo) GetByAssignmentID(id int) (*models.Assignment, error) {
+	var classRow classTableRow
+	var userRow userTable
+	var studentRow studentTableRow
+	var eventRow testEventTableRow
+	var roomRow roomsTableRow
+	var tempDate []uint8
+
+	row := ar.db.QueryRow(
+		`SELECT c.block, c.name, u.email, s.first_name, s.last_name, s.one_on_one, e.test_name, e.test_date, r.name, r.number, r.max_capacity
+		FROM assignments a
+		JOIN test_events e ON e.id = a.event_id
+		JOIN students s ON a.student_id = s.id
+		JOIN classes c ON c.id = s.class_id
+		JOIN users u ON u.id = c.teacher_id
+		LEFT JOIN rooms r ON r.id = a.room_id
+		WHERE a.id = ?
+		`, id)
+	err := row.Scan(
+		&classRow.block,
+		&classRow.name,
+		&userRow.email,
+		&studentRow.first_name,
+		&studentRow.last_name,
+		&studentRow.one_on_one,
+		&eventRow.test_name,
+		&tempDate,
+		&roomRow.name,
+		&roomRow.number,
+		&roomRow.max_capacity,
+	)
+	if err != nil {
+		return nil, err
+	}
+	eventRow.test_date, err = time.Parse("2006-01-02", string(tempDate))
+	if err != nil {
+		return nil, err
+	}
+	class := convertToClass(classRow)
+	user := convertFromTable(userRow)
+	student := convertToStudent(studentRow)
+	event := convertToTestEvent(eventRow)
+	room := convertToRoom(roomRow)
+
+	student.Class = *class
+	student.Teacher = *user
+
+	assignment := models.NewAssignment(student, room, event)
+	assignment.ID = id
+
+	return assignment, nil
+}
+
 func (ar *assignmentRepo) Delete(assignmentID int) error {
 	_, err := ar.db.Exec(`DELETE FROM assignments WHERE id = ?`, assignmentID)
 	if err != nil {

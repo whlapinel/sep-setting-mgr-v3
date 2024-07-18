@@ -89,7 +89,7 @@ func (h handler) DashboardCalendar(c echo.Context) error {
 		assignments = append(assignments, eventAssignments...)
 	}
 	log.Println("len(assignments): ", len(assignments))
-	calendar := views.CalendarComponent(assignments)
+	calendar := views.CalendarComponent(assignments, router)
 	if util.IsHTMX(c) {
 		return util.RenderTempl(calendar, c, http.StatusOK)
 	}

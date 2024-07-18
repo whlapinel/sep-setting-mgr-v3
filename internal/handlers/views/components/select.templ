@@ -1,0 +1,32 @@
+package components
+
+type Select struct {
+	Label   string
+	Name    string
+	ID      string
+	Options []*Option
+}
+
+type Option struct {
+	Value    string
+	Text     string
+	Selected bool
+}
+
+templ SelectComponent(s Select) {
+	<div>
+		<label for={ s.ID } class="block text-sm font-medium leading-6 text-gray-900">{ s.Label }</label>
+		<select id={ s.ID } name={ s.Name } class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+			for _, o := range s.Options {
+				<option
+					value={ o.Value }
+					if o.Selected {
+						selected
+					}
+				>
+					{ o.Text }
+				</option>
+			}
+		</select>
+	</div>
+}

@@ -15,6 +15,8 @@ type Assignment struct {
 }
 
 type AssignmentRepository interface {
+	GetByAssignmentID(id int) (*Assignment, error)
+	UpdateRoom(assignmentID, roomID int) (error)
 	Store(*Assignment) error
 	GetByEventID(eventID int) (Assignments, error)
 	All() (Assignments, error)

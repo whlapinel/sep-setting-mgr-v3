@@ -64,7 +64,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	testEventsHandler := testevents.NewHandler(testEventsService, assignmentAppService)
 	studentsHandler := students.NewHandler(studentsService, classesService)
 	roomsHandler := rooms.NewHandler(roomsService)
-	calendarHandler := calendar.NewHandler(assignmentAppService, testEventsService, studentsService)
+	calendarHandler := calendar.NewHandler(assignmentAppService, roomsService, testEventsService, studentsService)
 
 	// mount handlers
 	users.Mount(e, usersHandler)

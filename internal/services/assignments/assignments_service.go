@@ -11,6 +11,8 @@ type AssignmentsService interface {
 	GetAssignments(teacherID int, start, end time.Time) (models.Assignments, error)
 	CreateAssignment(student *models.Student, testEvent *models.TestEvent) (*models.Assignment, error)
 	DeleteByStudentID(studentID int) error
+	GetByAssignmentID(id int) (*models.Assignment, error)
+	UpdateRoom(assignmentID, roomID int) (*models.Room, error)
 }
 
 type service struct {
@@ -60,6 +62,23 @@ func (s service) GetAssignments(classID int, start, end time.Time) (models.Assig
 	return assignments, nil
 }
 
+func (s service) GetByAssignmentID(id int) (*models.Assignment, error) {
+	return s.assignments.GetByAssignmentID(id)
+}
+
 func (s service) DeleteByStudentID(studentID int) error {
 	return s.assignments.DeleteByStudentID(studentID)
+}
+
+func (s service) UpdateRoom(assignmentID, roomID int) (*models.Room, error) {
+	var room *models.Room
+	err := s.assignments.UpdateRoom(assignmentID, roomID)
+	if err != nil {
+		return nil, err
+	}
+	room, err = s.rooms.FindByID(roomID)
+	if err != nil {
+		return nil, err
+	}
+	return room, nil
 }

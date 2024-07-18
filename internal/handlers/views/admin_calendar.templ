@@ -1,7 +1,10 @@
 package views
 
-import "sep_setting_mgr/internal/domain/models"
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/domain/models"
+)
 
-templ AdminCalendarComponent(assignments models.Assignments) {
-	@CalendarComponent(assignments)
+templ AdminCalendarComponent(assignments models.Assignments, r *echo.Echo) {
+	@CalendarComponent(assignments, r)
 }
