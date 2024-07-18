@@ -35,7 +35,7 @@ func filterAssignmentsForDay(date time.Time, assignments []*models.Assignment) [
 
 templ DayComponent(date time.Time, assignments []*models.Assignment) {
 	<h3>{ date.Format(format) }</h3>
-	@TestEventTable(filterAssignmentsForDay(date, assignments))
+	@TestEventTable(groupAssignmentsByBlock(assignments))
 }
 
 func getFriday(date time.Time) time.Time {
@@ -50,7 +50,7 @@ templ WeekComponent(date time.Time, assignments []*models.Assignment) {
 	// filter assignments for this day
 	<div class="flex gap-2">
 		for i := 0; i < 5; i++ {
-			@DayComponent(date.AddDate(0, 0, i), assignments)
+			@DayComponent(date.AddDate(0, 0, i), filterAssignmentsForDay(date.AddDate(0, 0, i), assignments))
 		}
 	</div>
 }
@@ -62,7 +62,15 @@ func getRoom(assignment models.Assignment) string {
 	return assignment.Room.Number
 }
 
-templ TestEventTable(assignments []*models.Assignment) {
+func groupAssignmentsByBlock(assignments []*models.Assignment) map[int][]*models.Assignment {
+	var assignmentsByBlock = make(map[int][]*models.Assignment)
+	for _, assignment := range assignments {
+		assignmentsByBlock[assignment.Block] = append(assignmentsByBlock[assignment.Block], assignment)
+	}
+	return assignmentsByBlock
+}
+
+templ TestEventTable(assignmentsByBlock map[int][]*models.Assignment) {
 	<table>
 		<thead>
 			<tr>
@@ -74,14 +82,17 @@ templ TestEventTable(assignments []*models.Assignment) {
 			</tr>
 		</thead>
 		<tbody>
-			for _, assignment := range assignments {
-				<tr>
-					<td>{ assignment.Student.FirstName }</td>
-					<td>{ assignment.Student.LastName }</td>
-					<td>{ assignment.TestEvent.TestName }</td>
-					<td>{ strconv.Itoa(assignment.TestEvent.Block) }</td>
-					<td>{ getRoom(*assignment) }</td>
-				</tr>
+			for key, val := range assignmentsByBlock {
+				<tr><td colspan="5">Block { strconv.Itoa(key) }</td></tr>
+				for _, assignment := range val {
+					<tr>
+						<td>{ assignment.Student.FirstName }</td>
+						<td>{ assignment.Student.LastName }</td>
+						<td>{ assignment.TestEvent.TestName }</td>
+						<td>{ strconv.Itoa(assignment.Block) }</td>
+						<td>{ getRoom(*assignment) }</td>
+					</tr>
+				}
 			}
 		</tbody>
 	</table>
