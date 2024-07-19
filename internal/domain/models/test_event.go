@@ -20,6 +20,7 @@ type TestEvents []*TestEvent
 type TestEventRepository interface {
 	ListAll() (TestEvents, error)
 	Store(testEvent *TestEvent) (id int, err error)
+	Update(testEvent *TestEvent) error
 	Delete(id int) error
 	FindByClass(classID int) (TestEvents, error)
 	FindByTeacherID(teacherID int) (TestEvents, error)

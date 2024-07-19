@@ -1,6 +1,7 @@
 package assignments
 
 import (
+	"log"
 	"sep_setting_mgr/internal/domain/models"
 )
 
@@ -39,6 +40,14 @@ func (s service) GetByAssignmentID(id int) (*models.Assignment, error) {
 
 func (s service) UpdateRoom(assignmentID, roomID int) (*models.Room, error) {
 	var room *models.Room
+	if roomID < 0 {
+		log.Printf("Nullifying room for assignment %d", assignmentID)
+		err := s.assignments.NullifyRoomIDByAssignmentID(assignmentID)
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
 	err := s.assignments.UpdateRoom(assignmentID, roomID)
 	if err != nil {
 		return nil, err

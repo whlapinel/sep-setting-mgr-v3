@@ -2,6 +2,7 @@ package views
 
 import (
 	"github.com/labstack/echo/v4"
+	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/handlers/common"
 	"sep_setting_mgr/internal/handlers/views/components"
@@ -78,7 +79,44 @@ func getRoomNameCellID(assignmentID int) string {
 	return prefix + strconv.Itoa(assignmentID)
 }
 
-templ TestEventTable2(assignmentsByBlock map[int][]*models.Assignment, admin bool, r *echo.Echo) {
+func roomCount(assignments []*models.Assignment) map[int]int {
+	roomCounter := make(map[int]int)
+	for _, assignment := range assignments {
+		if assignment.Room != nil {
+			roomCounter[assignment.Room.ID]++
+		}
+	}
+	return roomCounter
+}
+
+func isOverBooked(room *models.Room, assignments []*models.Assignment) bool {
+	var maxCapacity int
+	// if any students in this room and block have one on one, max capacity is 1
+	for _, assignment := range assignments {
+		if assignment.Room == nil {
+			continue
+		}
+		if assignment.Room.ID != room.ID {
+			continue
+		}
+		if assignment.Student.OneOnOne {
+			log.Printf("Rooom %s has a one on one accommodation", room.Number)
+			maxCapacity = 1
+			break
+		} else {
+			maxCapacity = room.MaxCapacity
+		}
+	}
+	roomCounter := roomCount(assignments)
+	if roomCounter[room.ID] > maxCapacity {
+		log.Printf("Room %s is overbooked", room.Number)
+		return true
+	}
+	log.Printf("Room %s is not overbooked", room.Number)
+	log.Printf("Room count: %s ", strconv.Itoa(roomCounter[room.ID]))
+	log.Printf("Max capacity: %s ", strconv.Itoa(maxCapacity))
+
+	return false
 }
 
 templ TestEventTable(assignmentsByBlock map[int][]*models.Assignment, admin bool, r *echo.Echo) {
@@ -88,40 +126,49 @@ templ TestEventTable(assignmentsByBlock map[int][]*models.Assignment, admin bool
 				<th>First Name</th>
 				<th>Last Name</th>
 				<th>Test Name</th>
+				<th>One on One</th>
 				<th>Block</th>
 				<th>Room</th>
 			</tr>
 		</thead>
 		<tbody>
-			for key, val := range assignmentsByBlock {
-				<tr><td colspan="5">Block { strconv.Itoa(key) }</td></tr>
-				for _, assignment := range val {
-					<tr>
-						<td>{ assignment.Student.FirstName }</td>
-						<td>{ assignment.Student.LastName }</td>
-						<td>{ assignment.TestEvent.TestName }</td>
-						<td>{ strconv.Itoa(assignment.Block) }</td>
-						<td id={ getRoomNameCellID(assignment.ID) }>{ getRoom(*assignment) }</td>
-						if admin {
-							<td>
-								@components.ButtonComponent(components.Button{
-									Attr: templ.Attributes{
-										"hx-get":      r.Reverse(string(common.ShowAssignRoomForm), assignment.ID),
-										"hx-target":   "#modal",
-										"hx-push-url": "true",
-									},
-								}) {
-									Assign Room
-								}
-							</td>
-						}
-					</tr>
-				}
+			for block, assignments := range assignmentsByBlock {
+				@BlockTable(block, assignments, admin, r)
 			}
 		</tbody>
 	</table>
 }
 
-templ AssignRoomSuccess(assignmentID int, roomNumber string) {
-	<td id={ getRoomNameCellID(assignmentID) }>{ roomNumber }</td>
+const overBookedWarningClass = "text-red-500"
+
+templ BlockTable(block int, assignments []*models.Assignment, admin bool, r *echo.Echo) {
+	<tr><td colspan="5">Block { strconv.Itoa(block) }</td></tr>
+	for _, assignment := range assignments {
+		<tr>
+			<td>{ assignment.Student.FirstName }</td>
+			<td>{ assignment.Student.LastName }</td>
+			<td>{ assignment.TestEvent.TestName }</td>
+			<td>{ strconv.FormatBool(assignment.Student.OneOnOne) }</td>
+			<td>{ strconv.Itoa(assignment.Block) }</td>
+			<td
+				id={ getRoomNameCellID(assignment.ID) }
+				if admin && assignment.Room != nil && isOverBooked(assignment.Room, assignments) {
+					class={ overBookedWarningClass }
+				}
+			>{ getRoom(*assignment) }</td>
+			if admin {
+				<td>
+					@components.ButtonComponent(components.Button{
+						Attr: templ.Attributes{
+							"hx-get":      r.Reverse(string(common.ShowAssignRoomForm), assignment.ID),
+							"hx-target":   "#modal",
+							"hx-push-url": "true",
+						},
+					}) {
+						Assign Room
+					}
+				</td>
+			}
+		</tr>
+	}
 }

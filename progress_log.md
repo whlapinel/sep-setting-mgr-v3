@@ -1,5 +1,10 @@
 # PROGRESS LOG
 
+## 7/19
+
+- Removed assign buttons from dashboard calendar (at this point I want assign rooms to be admin privilege, in keeping with current practices)
+- Fixed edit rooms form
+
 ## 7/18
 
 - Spent most of this morning working on assign rooms functionality from the /admin/calendar page.

@@ -30,6 +30,7 @@ const (
 	DeleteTestEvent       RouteName = "delete-test-event"
 	ShowAddTestEventForm  RouteName = "show-add-test-event-form"
 	ShowEditTestEventForm RouteName = "show-edit-test-event-form"
+	EditTestEvent         RouteName = "edit-test-event"
 	TestEvents            RouteName = "test-events"
 	CreateTestEvent       RouteName = "create-test-event"
 	CreateStudent         RouteName = "create-student"

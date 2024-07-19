@@ -10,6 +10,7 @@ import (
 type TestEventsService interface {
 	FindByClassID(classID int) (models.TestEvents, error)
 	CreateTestEvent(classID int, testName string, testDate string) (*models.TestEvent, error)
+	UpdateTestEvent(event *models.TestEvent) error
 	DeleteTestEvent(testEventID int) error
 	FindTestEventByID(testEventID int) (*models.TestEvent, error)
 	FindByTeacherID(teacherID int) (models.TestEvents, error)
@@ -64,6 +65,15 @@ func (s service) CreateTestEvent(classID int, testName string, testDate string) 
 	}
 	return testEvent, nil
 }
+
+func (s service) UpdateTestEvent(event *models.TestEvent) error {
+	err := s.testEvents.Update(event)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func (s service) DeleteTestEvent(testEventID int) error {
 	err := s.asService.DeleteAssignmentsForTestEvent(testEventID)

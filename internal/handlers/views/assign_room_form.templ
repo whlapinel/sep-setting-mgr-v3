@@ -15,6 +15,11 @@ func getAssignFormID(id int) string {
 
 const roomSelectID = "room-select"
 
+var unassignOption = &components.Option{
+	Value: "-1",
+	Text:  "Unassign",
+}
+
 func roomOptions(rooms []*models.Room) []*components.Option {
 	var options []*components.Option
 	for _, room := range rooms {
@@ -23,6 +28,7 @@ func roomOptions(rooms []*models.Room) []*components.Option {
 			Text:  room.Name,
 		})
 	}
+	options = append(options, unassignOption)
 	return options
 }
 
@@ -32,9 +38,9 @@ templ AssignRoomForm(a *models.Assignment, rooms []*models.Room, r *echo.Echo) {
 		Title:    "Assign Room",
 		SubTitle: "Assign Student to Room",
 		HxAttr: templ.Attributes{
-			"hx-post":   r.Reverse(string(common.AssignRoom), a.ID),
-			"hx-target": "#" + getRoomNameCellID(a.ID),
-			"hx-swap":   "outerHTML",
+			"hx-post": r.Reverse(string(common.AssignRoom), a.ID),
+			// "hx-target": "#" + getRoomNameCellID(a.ID),
+			"hx-target": "#details",
 		},
 		SubmitBtnTitle: "Submit",
 		Cancelable:     true,

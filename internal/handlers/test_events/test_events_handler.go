@@ -10,6 +10,7 @@ import (
 	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,6 +24,9 @@ type TestEventsHandler interface {
 
 	// GET /dashboard/classes/:class-id/test-events/:test-event-id/edit
 	ShowEditTestEventForm(c echo.Context) error
+
+	// POST /dashboard/classes/:class-id/test-events/:test-event-id
+	EditTestEvent(c echo.Context) error
 
 	// POST /dashboard/classes/:class-id/test-events
 	CreateTestEvent(c echo.Context) error
@@ -49,6 +53,7 @@ func Mount(e *echo.Echo, h TestEventsHandler) {
 	common.TestEventsGroup.GET("/add", h.ShowAddTestEventForm).Name = string(common.ShowAddTestEventForm)
 	common.TestEventsIDGroup.DELETE("", h.DeleteTestEvent).Name = string(common.DeleteTestEvent)
 	common.TestEventsIDGroup.GET("/edit", h.ShowEditTestEventForm).Name = string(common.ShowEditTestEventForm)
+	common.TestEventsIDGroup.POST("", h.EditTestEvent).Name = string(common.EditTestEvent)
 }
 
 func (h handler) TestEvents(c echo.Context) error {
@@ -92,6 +97,36 @@ func (h handler) ShowEditTestEventForm(c echo.Context) error {
 		return c.String(400, "Invalid request")
 	}
 	return util.RenderTempl(views.AddTestEventForm(true, testEvent.Class.ID, testEvent), c, 200)
+}
+
+func (h handler) EditTestEvent(c echo.Context) error {
+	log.SetPrefix("Handler: ")
+	log.Println("Editing test event")
+	log.Println("Test Event ID: ", c.Param("test-event-id"))
+	testEventID, err := strconv.Atoi(c.Param("test-event-id"))
+	if err != nil {
+		return c.String(400, "Invalid test event ID")
+	}
+	testName := c.FormValue("test-name")
+	testDate := c.FormValue("test-date")
+	testEvent, err := h.testEvents.FindTestEventByID(testEventID)
+	if err != nil {
+		log.Println("Failed to find test event:", err)
+		return c.String(500, "Failed to find test event. See server logs for details.")
+	}
+	testEvent.TestName = testName
+	*testEvent.TestDate, err = time.Parse("2006-01-02", testDate)
+	if err != nil {
+		log.Println("Failed to parse test date:", err)
+		return c.String(500, "Failed to parse test date. See server logs for details.")
+	}
+	err = h.testEvents.UpdateTestEvent(testEvent)
+	if err != nil {
+		log.Println("Failed to update test event:", err)
+		return c.String(500, "Failed to update test event. See server logs for details.")
+	}
+	return util.RenderTempl(views.TestEventRowComponent(testEvent, testEvent.Class.ID, router), c, 200)
+
 }
 
 func (h handler) CreateTestEvent(c echo.Context) error {

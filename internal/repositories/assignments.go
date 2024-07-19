@@ -94,8 +94,17 @@ func (ar *assignmentRepo) Delete(assignmentID int) error {
 	return nil
 }
 
-func (ar *assignmentRepo) NullifyRoomID(id int) error {
-	_, err := ar.db.Exec(`UPDATE assignments SET room_id = NULL WHERE room_id = ?`, id)
+// NullifyRoomID sets the room_id of all assignments with the given roomID to NULL
+func (ar *assignmentRepo) NullifyRoomID(roomID int) error {
+	_, err := ar.db.Exec(`UPDATE assignments SET room_id = NULL WHERE room_id = ?`, roomID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ar *assignmentRepo) NullifyRoomIDByAssignmentID(assignmentID int) error {
+	_, err := ar.db.Exec(`UPDATE assignments SET room_id = NULL WHERE id = ?`, assignmentID)
 	if err != nil {
 		return err
 	}
@@ -173,7 +182,6 @@ func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, err
 		event := convertToTestEvent(eventTable)
 		student := convertToStudent(studentTable)
 		room := convertToRoom(roomsTable)
-		log.Println("event.Block: ", event.Block)
 
 		assignment.TestEvent = event
 		assignment.Student = student
@@ -251,7 +259,6 @@ func (ar *assignmentRepo) All() (models.Assignments, error) {
 		event := convertToTestEvent(eventTable)
 		student := convertToStudent(studentTable)
 		room := convertToRoom(roomsTable)
-		log.Println("event.Block: ", event.Block)
 
 		assignment.TestEvent = event
 		assignment.Student = student

@@ -43,6 +43,21 @@ func (tr *testEventsRepo) Store(testEvent *models.TestEvent) (int, error) {
 	return testEvent.ID, nil
 }
 
+func (tr *testEventsRepo) Update(testEvent *models.TestEvent) error {
+	log.SetPrefix("Repository: ")
+	log.Println("Updating test event in database")
+	log.Println("Class ID: ", testEvent.Class.ID)
+	dbTestEvent := convertTestEventToTable(testEvent)
+	_, err := tr.db.Exec(`
+	UPDATE test_events
+	SET test_name = ?, test_date = ?
+	WHERE id = ?`, dbTestEvent.test_name, dbTestEvent.test_date, dbTestEvent.id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (tr *testEventsRepo) ListAll() (models.TestEvents, error) {
 	var testEvents models.TestEvents
 	var tableRows []testEventTableRow

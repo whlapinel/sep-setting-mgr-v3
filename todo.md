@@ -2,17 +2,18 @@
 
 ## PENDING
 
-- consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
-- display warning when room is overbooked (for each day, need counter for assignment.Event.Block, show warning for each block where the count is greater than the assignment.Room.MaxCapacity). Also need to account for student.OneOnOne; if student.OneOnOne for any assignments on that date and block, then max should be 1 instead of assignment.Room.MaxCapacity.
-- complete edit students functionality (including room assignments, the biggest pain in the butt!!)
-- edit test events functionality
-- admin functionality (rooms, users)
+- admin functionality (users)
 - refresh token before expiration if user is active
 - implement Google Sign In
+- consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
 - (low priority) should keep classes section at the top and create a new section for students and test events, so that the classes table can be viewed and selected while students or test events tables are displayed
 
 ## COMPLETE
 
+- complete edit students functionality (including room assignments, the biggest pain in the butt!!)
+- display warning when room is overbooked (for each day, need counter for assignment.Event.Block, show warning for each block where the count is greater than the assignment.Room.MaxCapacity). Also need to account for student.OneOnOne; if student.OneOnOne for any assignments on that date and block, then max should be 1 instead of assignment.Room.MaxCapacity.
+- admin functionality (rooms)
+- edit test events functionality
 - test rooms functionality
 - deleting room should nullify roomID for all assignments for the room
 - deleting student should delete all assignments for the student

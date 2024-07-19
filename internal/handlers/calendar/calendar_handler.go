@@ -88,15 +88,25 @@ func (h handler) AssignRoom(c echo.Context) error {
 		return err
 	}
 	roomID, err := strconv.Atoi(c.FormValue("room-id"))
+	log.Println("room-id: ", c.FormValue("room-id"))
 	if err != nil {
 		log.Println("Error converting room ID to int")
 		return err
 	}
-	room, err := h.assignments.UpdateRoom(assignmentID, roomID)
+	_, err = h.assignments.UpdateRoom(assignmentID, roomID)
 	if err != nil {
 		log.Println("Error updating room")
 		return err
 	}
-	return util.RenderTempl(views.AssignRoomSuccess(assignmentID, room.Number), c, 201)
-
+	assignments, err := h.assignments.ListAll()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving assignments")
+	}
+	if util.IsHTMX(c) {
+		return util.RenderTempl(views.AdminCalendarComponent(assignments, router), c, 201)
+	}
+	return c.Redirect(303, router.Reverse(string(common.AdminCalendar)))
+	// return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
+	// return util.RenderTempl(views.AssignRoomSuccess(assignmentID, room.Number), c, 201)
 }

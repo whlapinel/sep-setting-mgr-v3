@@ -23,6 +23,7 @@ type AssignmentRepository interface {
 	DeleteByStudentID(studentID int) error
 	DeleteByEventID(eventID int) error
 	NullifyRoomID(roomID int) error
+	NullifyRoomIDByAssignmentID(assignmentID int) error
 	GetByTeacherID(teacherID int) (Assignments, error)
 }
 
