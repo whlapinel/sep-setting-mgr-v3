@@ -3,6 +3,7 @@ package testevents
 import (
 	"log"
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/domain/services"
 	"sep_setting_mgr/internal/util"
 )
 
@@ -18,15 +19,18 @@ type TestEventsService interface {
 type service struct {
 	testEvents models.TestEventRepository
 	classes    models.ClassRepository
+	asService  services.AssignmentsService
 }
 
 func NewService(testEvents models.TestEventRepository,
 	classes models.ClassRepository,
+	asService services.AssignmentsService,
 ) TestEventsService {
 
 	return &service{
 		testEvents,
 		classes,
+		asService,
 	}
 }
 
@@ -54,11 +58,20 @@ func (s service) CreateTestEvent(classID int, testName string, testDate string) 
 	}
 	testEvent.ID = event_id
 	log.Println("Test event stored")
+	err = s.asService.CreateAssignmentsForTestEvent(testEvent.ID)
+	if err != nil {
+		return nil, err
+	}
 	return testEvent, nil
 }
 
 func (s service) DeleteTestEvent(testEventID int) error {
-	err := s.testEvents.Delete(testEventID)
+	err := s.asService.DeleteAssignmentsForTestEvent(testEventID)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	err = s.testEvents.Delete(testEventID)
 	if err != nil {
 		return err
 	}

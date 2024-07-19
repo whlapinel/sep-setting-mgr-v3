@@ -94,8 +94,16 @@ func (ar *assignmentRepo) Delete(assignmentID int) error {
 	return nil
 }
 
-func (ar *assignmentRepo) DeleteByRoomID(id int) error {
-	_, err := ar.db.Exec(`DELETE FROM assignments WHERE room_id = ?`, id)
+func (ar *assignmentRepo) NullifyRoomID(id int) error {
+	_, err := ar.db.Exec(`UPDATE assignments SET room_id = NULL WHERE room_id = ?`, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ar *assignmentRepo) DeleteByEventID(eventID int) error {
+	_, err := ar.db.Exec(`DELETE FROM assignments WHERE event_id = ?`, eventID)
 	if err != nil {
 		return err
 	}
@@ -103,13 +111,16 @@ func (ar *assignmentRepo) DeleteByRoomID(id int) error {
 }
 
 func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, error) {
+	log.SetPrefix("Assignments Repo: All()")
 	var assignments models.Assignments
 	rows, err := ar.db.Query(`
-	SELECT a.*, te.*, s.* 
+	SELECT a.*, te.*, s.*, c.block, r.*
 	FROM assignments a
 	JOIN test_events te ON a.event_id = te.id
 	JOIN students s ON a.student_id = s.id
-	WHERE te.teacher_id = ?
+	JOIN classes c ON te.class_id = c.id
+	LEFT JOIN rooms r ON a.room_id = r.id
+	WHERE c.teacher_id = ?
 	`, teacherID)
 	if err != nil {
 		return nil, err
@@ -120,23 +131,36 @@ func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, err
 		var assignmentTable assignmentTableRow
 		var eventTable testEventTableRow
 		var studentTable studentTableRow
+		var classTable classTableRow
+		var roomsTable roomsTableRow
 
 		var temp []uint8
 
 		err := rows.Scan(
+			// assignment
 			&assignmentTable.id,
 			&assignmentTable.event_id,
 			&assignmentTable.student_id,
 			&assignmentTable.room_id,
+			// event
 			&eventTable.id,
 			&eventTable.test_name,
 			&temp,
 			&eventTable.class_id,
+			// student
 			&studentTable.id,
 			&studentTable.first_name,
 			&studentTable.last_name,
 			&studentTable.class_id,
 			&studentTable.one_on_one,
+			// classes
+			&classTable.block,
+			// room
+			&roomsTable.id,
+			&roomsTable.name,
+			&roomsTable.number,
+			&roomsTable.max_capacity,
+			&roomsTable.priority,
 		)
 		if err != nil {
 			return nil, err
@@ -148,9 +172,13 @@ func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, err
 		assignment := convertToAssignment(assignmentTable)
 		event := convertToTestEvent(eventTable)
 		student := convertToStudent(studentTable)
+		room := convertToRoom(roomsTable)
+		log.Println("event.Block: ", event.Block)
 
 		assignment.TestEvent = event
 		assignment.Student = student
+		assignment.Room = room
+		assignment.Block = classTable.block
 
 		assignments = append(assignments, assignment)
 	}
@@ -158,9 +186,7 @@ func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, err
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return assignments, nil
-
 }
 
 func (ar *assignmentRepo) All() (models.Assignments, error) {

@@ -22,6 +22,10 @@ type TableData struct {
 	Rows    []Row
 }
 
+func GetCellID(tableID string, rowID int) string {
+	return tableID + "-form-cell-" + strconv.Itoa(rowID)
+}
+
 templ TableComponent(t TableData) {
 	<table>
 		<caption>
@@ -59,7 +63,7 @@ templ TableRowComponent(row Row) {
 			</td>
 		}
 		if row.Editable {
-			<td id={ row.TableID + "-form-cell-" + strconv.Itoa(row.ID) }></td>
+			<td id={ GetCellID(row.TableID, row.ID) }></td>
 		}
 	</tr>
 }

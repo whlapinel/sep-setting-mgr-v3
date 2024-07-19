@@ -23,7 +23,7 @@ templ DashboardPage(classes []*models.Class, router *echo.Echo) {
 		Attr: templ.Attributes{
 			"hx-get":      router.Reverse(string(common.HxClasses)),
 			"hx-target":   "#details",
-			"hx-push-url": "true",
+			"hx-push-url": router.Reverse(string(common.Classes)),
 		},
 	}) {
 		Classes

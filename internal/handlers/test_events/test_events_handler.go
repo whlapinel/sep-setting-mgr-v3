@@ -127,6 +127,7 @@ func (h handler) DeleteTestEvent(c echo.Context) error {
 	}
 	err = h.testEvents.DeleteTestEvent(testEventID)
 	if err != nil {
+		log.Println("Failed to delete test event:", err)
 		return c.String(500, "Failed to delete test event. See server logs for details.")
 	}
 	return c.NoContent(200)

@@ -63,8 +63,8 @@ func (s *AssignmentsService) CreateAssignmentsForStudent(student *models.Student
 	return notAssignedErr
 }
 
-func (s *AssignmentsService) DeleteAssignmentsForRoom(roomID int) error {
-	return s.asRepo.DeleteByRoomID(roomID)
+func (s *AssignmentsService) NullifyRoomID(roomID int) error {
+	return s.asRepo.NullifyRoomID(roomID)
 }
 
 func (s *AssignmentsService) UpdateStudentAssignments(studentID int) error {
@@ -85,6 +85,10 @@ func (s *AssignmentsService) UpdateStudentAssignments(studentID int) error {
 
 func (s *AssignmentsService) DeleteAssignmentsForStudent(studentID int) error {
 	return s.asRepo.DeleteByStudentID(studentID)
+}
+
+func (s *AssignmentsService) DeleteAssignmentsForTestEvent(testEventID int) error {
+	return s.asRepo.DeleteByEventID(testEventID)
 }
 
 func (s *AssignmentsService) CreateAssignmentsForTestEvent(testEventID int) error {

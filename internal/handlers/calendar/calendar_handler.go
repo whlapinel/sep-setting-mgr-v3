@@ -97,6 +97,6 @@ func (h handler) AssignRoom(c echo.Context) error {
 		log.Println("Error updating room")
 		return err
 	}
-	return util.RenderTempl(views.AssignRoomSuccess(assignmentID, room.Number), c, 200)
+	return util.RenderTempl(views.AssignRoomSuccess(assignmentID, room.Number), c, 201)
 
 }

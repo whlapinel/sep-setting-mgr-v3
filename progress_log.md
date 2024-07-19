@@ -1,5 +1,9 @@
 # PROGRESS LOG
 
+## 7/18
+
+- Spent most of this morning working on assign rooms functionality from the /admin/calendar page.
+
 ## 7/17
 
 - Struggled a little bit with how to display assignments properly, all morning was spent reworking things to make it simpler and more performant. Now calendars are only passed assignments instead of both test events and assignments.

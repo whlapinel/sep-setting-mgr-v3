@@ -6,5 +6,5 @@ import (
 )
 
 templ AdminCalendarComponent(assignments models.Assignments, r *echo.Echo) {
-	@CalendarComponent(assignments, r)
+	@CalendarComponent(assignments, true, r)
 }

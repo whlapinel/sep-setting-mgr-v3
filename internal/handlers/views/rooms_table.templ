@@ -26,14 +26,16 @@ func prepareRoomsForTable(rooms []*models.Room, router *echo.Echo) components.Ta
 
 func roomToRow(room *models.Room, router *echo.Echo) components.Row {
 	return components.Row{
-		Data: []string{room.Name, room.Number, strconv.Itoa(room.Priority), strconv.Itoa(room.MaxCapacity)},
-		ID:   room.ID,
+		TableID:  roomsTableID,
+		Editable: true,
+		Data:     []string{room.Name, room.Number, strconv.Itoa(room.Priority), strconv.Itoa(room.MaxCapacity)},
+		ID:       room.ID,
 		Buttons: []components.TableButton{
 			{
 				Text: "Edit",
 				Attr: templ.Attributes{
 					"hx-get":      router.Reverse(string(common.ShowEditRoomForm), room.ID),
-					"hx-target":   "next",
+					"hx-target":   "#" + components.GetCellID(roomsTableID, room.ID),
 					"hx-swap":     "beforebegin",
 					"hx-push-url": "true",
 				},

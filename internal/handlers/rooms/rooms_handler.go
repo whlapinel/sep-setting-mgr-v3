@@ -126,7 +126,7 @@ func (h handler) DeleteRoom(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to delete room")
 	}
-	return c.NoContent(204)
+	return c.NoContent(200)
 }
 
 func (h handler) ShowAddRoomForm(c echo.Context) error {

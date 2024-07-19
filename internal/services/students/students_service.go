@@ -83,7 +83,11 @@ func (s service) FindStudentByID(studentID int) (*models.Student, error) {
 
 func (s service) DeleteStudent(studentID int) error {
 	log.Println("Service: Deleting student from database")
-	err := s.students.Delete(studentID)
+	err := s.assignmentService.DeleteAssignmentsForStudent(studentID)
+	if err != nil {
+		return err
+	}
+	err = s.students.Delete(studentID)
 	if err != nil {
 		return err
 	}
