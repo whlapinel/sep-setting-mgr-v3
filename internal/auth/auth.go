@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const sessionLifeSpan = time.Minute * 5
+const sessionLifeSpan = time.Minute * 60
 
 type jwtCustomClaims struct {
 	Email string `json:"email"`

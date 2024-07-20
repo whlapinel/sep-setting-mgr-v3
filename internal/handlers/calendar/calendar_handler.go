@@ -55,8 +55,9 @@ func (h handler) Calendar(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
 	}
+	assignmentsMap := assignments.MapForCalendar()
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.AdminCalendarComponent(assignments, router), c, 200)
+		return util.RenderTempl(views.CalendarComponent(assignmentsMap, true, router), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
 }
@@ -103,8 +104,9 @@ func (h handler) AssignRoom(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
 	}
+	assignmentsMap := assignments.MapForCalendar()
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.AdminCalendarComponent(assignments, router), c, 201)
+		return util.RenderTempl(views.CalendarComponent(assignmentsMap, true, router), c, 201)
 	}
 	return c.Redirect(303, router.Reverse(string(common.AdminCalendar)))
 	// return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)

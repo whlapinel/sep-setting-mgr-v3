@@ -64,7 +64,8 @@ func (h handler) DashboardCalendar(c echo.Context) error {
 		return c.String(500, "Error retrieving assignments")
 	}
 	log.Println("len(assignments): ", len(assignments))
-	calendar := views.CalendarComponent(assignments, false, router)
+	assignmentsMap := assignments.MapForCalendar()
+	calendar := views.CalendarComponent(assignmentsMap, false, router)
 	if util.IsHTMX(c) {
 		return util.RenderTempl(calendar, c, http.StatusOK)
 	}

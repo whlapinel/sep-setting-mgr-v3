@@ -1,5 +1,9 @@
 # PROGRESS LOG
 
+## 7/20
+
+- Spent all morning re-working calendar. Using a nested map, which seemed overwhelmingly complex at first and took me a long time to get comfortable working with it. But this is a lot more efficient than what I had before.
+
 ## 7/19
 
 - Removed assign buttons from dashboard calendar (at this point I want assign rooms to be admin privilege, in keeping with current practices)

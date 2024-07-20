@@ -2,6 +2,9 @@
 
 ## PENDING
 
+- Unassigned currently show up as overbooked (overbooked tracker is tracking assignments with room id of -1)
+- Nullify should set roomid to -1 (maybe?) for sake of consistency
+- AssignRoom handler should return more precise data instead of re-rendering entire calendar. Should render component that holds assignments for a given block and room. (need to make this component first!)
 - admin functionality (users)
 - refresh token before expiration if user is active
 - implement Google Sign In
@@ -10,6 +13,7 @@
 
 ## COMPLETE
 
+- optimize code for checking overbooked in admin calendar (currently checks every room for every assignment, should only do the check once and then consult a map or slice that holds roomid and boolean)
 - complete edit students functionality (including room assignments, the biggest pain in the butt!!)
 - display warning when room is overbooked (for each day, need counter for assignment.Event.Block, show warning for each block where the count is greater than the assignment.Room.MaxCapacity). Also need to account for student.OneOnOne; if student.OneOnOne for any assignments on that date and block, then max should be 1 instead of assignment.Room.MaxCapacity.
 - admin functionality (rooms)
