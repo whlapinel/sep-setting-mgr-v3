@@ -1,0 +1,49 @@
+package views
+
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/handlers/views/components"
+)
+
+templ UserFormComponent(adminID int, user *models.User, r *echo.Echo) {
+	@components.FormComponent(components.Form{
+		ID:       "user-form",
+		Title:    "User",
+		SubTitle: "User Information",
+		HxAttr: templ.Attributes{
+			"hx-post":   r.Reverse(string(common.EditUser), user.ID),
+			"hx-target": "closest tr",
+		},
+		SubmitBtnTitle: "Submit",
+		Cancelable:     true,
+	}) {
+		@components.InputComponent(components.Input{
+			Label: "Email",
+			Name:  "email",
+			Type:  "email",
+			Value: user.Email,
+		})
+		@components.RadioComponent(components.RadioGroup{
+			Title: "Admin",
+			Name:  "admin",
+			Options: []*components.RadioOption{
+				{
+					ID:       "yes",
+					Value:    "yes",
+					Label:    "Yes",
+					Checked:  user.Admin == true,
+					Disabled: user.ID == adminID,
+				},
+				{
+					ID:       "no",
+					Value:    "no",
+					Label:    "No",
+					Checked:  user.Admin == false,
+					Disabled: user.ID == adminID,
+				},
+			},
+		})
+	}
+}

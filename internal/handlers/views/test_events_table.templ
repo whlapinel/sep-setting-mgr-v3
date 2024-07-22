@@ -16,20 +16,22 @@ func prepareTestEventsForTable(testEvents models.TestEvents, classID int, router
 	for _, testEvent := range testEvents {
 		rows = append(rows, testEventToRow(testEvent, classID, router))
 	}
-	return components.TableData{ID: testEventsTableID, Title: "Test Events", Headers: headers, Rows: rows}
+	return components.TableData{ID: testEventsTableID, Title: "Test Events",
+		Description: "A list of all test events.",
+		AddRow:      true,
+		AddRowButton: components.Button{
+			Attr: templ.Attributes{
+				"hx-get":      router.Reverse(string(common.ShowAddTestEventForm), classID),
+				"hx-target":   "#" + testEventsTableID,
+				"hx-swap":     "afterbegin",
+				"hx-push-url": "true",
+			},
+		},
+
+		Headers: headers, Rows: rows}
 }
 
 templ TestEventsTableComponent(testEvents models.TestEvents, classID int, router *echo.Echo) {
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":      router.Reverse(string(common.ShowAddTestEventForm), classID),
-			"hx-target":   "next",
-			"hx-swap":     "beforebegin",
-			"hx-push-url": "true",
-		},
-	}) {
-		Add Test Event
-	}
 	@components.TableComponent(prepareTestEventsForTable(testEvents, classID, router))
 }
 

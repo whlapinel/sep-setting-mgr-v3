@@ -28,7 +28,9 @@ templ DashboardPage(classes []*models.Class, router *echo.Echo) {
 	}) {
 		Classes
 	}
-	<div id="details">
+	<div id="details" class="flex justify-center">
 		@ClassesTable(classes, router)
+	</div>
+	<div id="modal">
 	</div>
 }

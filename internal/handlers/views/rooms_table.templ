@@ -20,7 +20,19 @@ func prepareRoomsForTable(rooms []*models.Room, router *echo.Echo) components.Ta
 			rows = append(rows, roomToRow(room, router))
 		}
 	}
-	return components.TableData{ID: roomsTableID, Title: "Rooms", Headers: headers, Rows: rows}
+	return components.TableData{ID: roomsTableID, Title: "Rooms",
+		Description: "A list of all rooms.",
+		AddRow:      true,
+		AddRowButton: components.Button{
+			Attr: templ.Attributes{
+				"hx-get":      router.Reverse(string(common.ShowAddRoomForm)),
+				"hx-target":   "#" + roomsTableID,
+				"hx-swap":     "afterbegin",
+				"hx-push-url": "true",
+			},
+		},
+
+		Headers: headers, Rows: rows}
 
 }
 
@@ -53,16 +65,6 @@ func roomToRow(room *models.Room, router *echo.Echo) components.Row {
 }
 
 templ RoomsTableComponent(rooms []*models.Room, router *echo.Echo) {
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":      router.Reverse(string(common.ShowAddRoomForm)),
-			"hx-target":   "next",
-			"hx-swap":     "beforebegin",
-			"hx-push-url": "true",
-		},
-	}) {
-		Add Room
-	}
 	@components.TableComponent(prepareRoomsForTable(rooms, router))
 }
 

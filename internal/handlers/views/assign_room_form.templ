@@ -38,8 +38,7 @@ templ AssignRoomForm(a *models.Assignment, rooms []*models.Room, r *echo.Echo) {
 		Title:    "Assign Room",
 		SubTitle: "Assign Student to Room",
 		HxAttr: templ.Attributes{
-			"hx-post": r.Reverse(string(common.AssignRoom), a.ID),
-			// "hx-target": "#" + getRoomNameCellID(a.ID),
+			"hx-post":   r.Reverse(string(common.AssignRoom), a.ID),
 			"hx-target": "#details",
 		},
 		SubmitBtnTitle: "Submit",
@@ -50,6 +49,11 @@ templ AssignRoomForm(a *models.Assignment, rooms []*models.Room, r *echo.Echo) {
 			Label:   "Room",
 			Name:    "room-id",
 			Options: roomOptions(rooms),
+		})
+		@components.InputComponent(components.Input{
+			Name:  "date",
+			Type:  "hidden",
+			Value: a.TestEvent.TestDate.Format("2006-01-02"),
 		})
 	}
 }

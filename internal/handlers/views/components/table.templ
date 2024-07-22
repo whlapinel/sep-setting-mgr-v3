@@ -16,10 +16,13 @@ type Row struct {
 }
 
 type TableData struct {
-	ID      string
-	Title   string
-	Headers []string
-	Rows    []Row
+	ID           string
+	Title        string
+	AddRow       bool
+	AddRowButton Button
+	Description  string
+	Headers      []string
+	Rows         []Row
 }
 
 func GetCellID(tableID string, rowID int) string {
@@ -27,23 +30,10 @@ func GetCellID(tableID string, rowID int) string {
 }
 
 templ TableComponent(t TableData) {
-	<table>
-		<caption>
-			{ t.Title }
-		</caption>
-		<thead>
-			<tr>
-				for _, header := range t.Headers {
-					<th>{ header }</th>
-				}
-			</tr>
-		</thead>
-		<tbody id={ t.ID }>
-			for _, row := range t.Rows {
-				@TableRowComponent(row)
-			}
-		</tbody>
-	</table>
+	@TableWrapperComponent(t) {
+		@TableHeaderComponent(t.Headers)
+		@TableBodyComponent(t)
+	}
 }
 
 templ TableRowComponent(row Row) {
@@ -51,7 +41,7 @@ templ TableRowComponent(row Row) {
 		data-id={ strconv.Itoa(row.ID) }
 	>
 		for _, cell := range row.Data {
-			<td>{ cell }</td>
+			@TableCell(cell, false)
 		}
 		for _, button := range row.Buttons {
 			<td>
@@ -66,4 +56,81 @@ templ TableRowComponent(row Row) {
 			<td id={ GetCellID(row.TableID, row.ID) }></td>
 		}
 	</tr>
+}
+
+templ TableCell(data string, warning bool) {
+	if !warning {
+		<td
+			class={ "whitespace-nowrap px-3 py-4 size-7 text-gray-500" }
+		>{ data }</td>
+	} else {
+		<td
+			class={ "whitespace-nowrap px-3 py-4 size-7 text-slate-100 bg-red-700" }
+		>{ data }</td>
+	}
+}
+
+templ SubHeader(data string, colspan int, warning bool) {
+	if !warning {
+		<tr>
+			<td
+				colspan={ strconv.Itoa(colspan) }
+				class={ "text-center text-lg" }
+			>{ data }</td>
+		</tr>
+	} else {
+		<tr>
+			<td
+				colspan={ strconv.Itoa(colspan) }
+				class={ "text-center text-lg text-slate-100 bg-red-700" }
+			>{ data }</td>
+		</tr>
+	}
+}
+
+templ TableHeaderComponent(headers []string) {
+	<thead>
+		<tr>
+			for _, header := range headers {
+				<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-1/4">{ header }</th>
+			}
+		</tr>
+	</thead>
+}
+
+templ TableWrapperComponent(t TableData) {
+	<div class="px-4 sm:px-6 lg:px-8 ">
+		<div class="sm:flex sm:items-center">
+			if t.AddRow {
+				<div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+					@ButtonComponent(t.AddRowButton) {
+						Add { t.Title }
+					}
+				</div>
+			}
+		</div>
+		<div class="mt-8 flow-root">
+			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+				<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+					<table class="min-w-full divide-y divide-gray-300 w-full">
+						<caption>{ t.Title }</caption>
+						{ children... }
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+const TableBodyClass = "divide-y divide-gray-200"
+
+templ TableBodyComponent(t TableData) {
+	<tbody
+		id={ t.ID }
+		class={ TableBodyClass }
+	>
+		for _, row := range t.Rows {
+			@TableRowComponent(row)
+		}
+	</tbody>
 }

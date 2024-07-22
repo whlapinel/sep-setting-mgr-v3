@@ -82,6 +82,22 @@ func NormalizeDate(t time.Time) string {
 	return t.Format("2006-01-02")
 }
 
+func (a AssignmentsByRoom) GetRoomList() []*Room {
+	rooms := make([]*Room, 0)
+	for roomID := range a {
+		rooms = append(rooms, a[roomID][0].Room)
+	}
+	// sort rooms by room.Priority
+	for i := 0; i < len(rooms); i++ {
+		for j := i + 1; j < len(rooms); j++ {
+			if rooms[i].Priority > rooms[j].Priority {
+				rooms[i], rooms[j] = rooms[j], rooms[i]
+			}
+		}
+	}
+	return rooms
+}
+
 func ParseDate(date string) time.Time {
 	t, _ := time.Parse("2006-01-02", date)
 	return t

@@ -3,8 +3,8 @@ let activityTimeout;
 let timeOutWarning;
 let isSignedIn;
 
-const warningTimer = 10 * 60000;
-const signoutTimer = 15 * 60000;
+const warningTimer = 30 * 60000;
+const signoutTimer = 60 * 60000;
 
 function setIsSignedIn(signedIn) {
     isSignedIn = signedIn;

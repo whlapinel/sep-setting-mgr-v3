@@ -46,7 +46,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 
 	// initialize application services
 	assignmentAppService := assignments.NewService(assignmentsRepo, roomsRepo, testEventsRepo)
-	usersService := usersService.NewService(usersRepo, roomsRepo, assignmentsRepo)
+	usersService := usersService.NewService(usersRepo)
 	classesService := classesService.NewService(classesRepo, studentsRepo)
 	testEventsService := testEventsService.NewService(testEventsRepo, classesRepo, *assignmentsDomainService)
 	studentsService := studentsService.NewService(studentsRepo, classesRepo, *assignmentsDomainService)

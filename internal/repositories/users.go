@@ -34,6 +34,16 @@ func (ur *userRepo) Store(user *models.User) error {
 	return nil
 }
 
+func (ur *userRepo) Update(user *models.User) error {
+	dbUser := convertToTable(user)
+	log.Println("Updating user in database")
+	_, err := ur.db.Exec(`UPDATE users SET email = ?, password = ?, admin = ? WHERE id = ?`, dbUser.email, dbUser.password, dbUser.admin, user.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ur *userRepo) All() ([]*models.User, error) {
 	var users []*models.User
 	rows, err := ur.db.Query(`SELECT * FROM users`)

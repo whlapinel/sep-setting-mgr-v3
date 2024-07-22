@@ -20,6 +20,7 @@ type (
 
 	UserRepository interface {
 		Store(*User) error
+		Update(*User) error
 		Find(email string) (*User, error)
 		FindByID(id int) (*User, error)
 		GetClasses(user *User) ([]*Class, error)

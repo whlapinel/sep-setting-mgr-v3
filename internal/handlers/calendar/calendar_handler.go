@@ -11,6 +11,7 @@ import (
 	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,6 +19,12 @@ import (
 type CalendarHandler interface {
 	// GET /admin/calendar
 	Calendar(c echo.Context) error
+
+	// GET /admin/calendar/:date/details
+	AdminCalendarDetails(c echo.Context) error
+
+	// GET /dashboard/calendar/:date/details
+	DBCalendarDetails(c echo.Context) error
 
 	// GET /admin/calendar/assign-room/:assignment-id
 	ShowAssignRoomForm(c echo.Context) error
@@ -43,7 +50,9 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h CalendarHandler) {
 	router = e
-	common.CalendarGroup.GET("", h.Calendar).Name = string(common.AdminCalendar)
+	common.CalendarGroup.GET("/:date", h.Calendar).Name = string(common.AdminCalendar)
+	common.DayDetailsGroup.GET("", h.AdminCalendarDetails).Name = string(common.AdminCalendarDetails)
+	common.DBDayDetailsGroup.GET("", h.DBCalendarDetails).Name = string(common.DBCalendarDetails)
 	common.AssignRoomGroup.GET("", h.ShowAssignRoomForm).Name = string(common.ShowAssignRoomForm)
 	common.AssignRoomGroup.POST("", h.AssignRoom).Name = string(common.AssignRoom)
 }
@@ -56,10 +65,54 @@ func (h handler) Calendar(c echo.Context) error {
 		return c.String(500, "Error retrieving assignments")
 	}
 	assignmentsMap := assignments.MapForCalendar()
-	if util.IsHTMX(c) {
-		return util.RenderTempl(views.CalendarComponent(assignmentsMap, true, router), c, 200)
+	dateString := c.Param("date")
+	date, err := time.Parse("2006-01-02", dateString)
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error parsing date")
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
+	if util.IsHTMX(c) {
+		return util.RenderTempl(views.CalendarComponent(date, assignmentsMap, true, router), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+}
+
+func (h handler) AdminCalendarDetails(c echo.Context) error {
+	dateParam := c.Param("date")
+	date, err := time.Parse("2006-01-02", dateParam)
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error parsing date param")
+	}
+	assignments, err := h.assignments.ListAll()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving assignments")
+	}
+	assignmentsMap := assignments.MapForCalendar()
+	if util.IsHTMX(c) {
+		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], true, router), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+}
+
+func (h handler) DBCalendarDetails(c echo.Context) error {
+	dateParam := c.Param("date")
+	date, err := time.Parse("2006-01-02", dateParam)
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error parsing date param")
+	}
+	assignments, err := h.assignments.ListAll()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving assignments")
+	}
+	assignmentsMap := assignments.MapForCalendar()
+	if util.IsHTMX(c) {
+		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], false, router), c, 200)
+	}
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
 }
 
 func (h handler) ShowAssignRoomForm(c echo.Context) error {
@@ -94,6 +147,12 @@ func (h handler) AssignRoom(c echo.Context) error {
 		log.Println("Error converting room ID to int")
 		return err
 	}
+	dateParam := c.FormValue("date")
+	date, err := time.Parse("2006-01-02", dateParam)
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error parsing date")
+	}
 	_, err = h.assignments.UpdateRoom(assignmentID, roomID)
 	if err != nil {
 		log.Println("Error updating room")
@@ -106,9 +165,7 @@ func (h handler) AssignRoom(c echo.Context) error {
 	}
 	assignmentsMap := assignments.MapForCalendar()
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.CalendarComponent(assignmentsMap, true, router), c, 201)
+		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], true, router), c, 201)
 	}
-	return c.Redirect(303, router.Reverse(string(common.AdminCalendar)))
-	// return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
-	// return util.RenderTempl(views.AssignRoomSuccess(assignmentID, room.Number), c, 201)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 201)
 }

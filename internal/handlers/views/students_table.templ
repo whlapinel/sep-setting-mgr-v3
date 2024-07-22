@@ -2,9 +2,9 @@ package views
 
 import (
 	"github.com/labstack/echo/v4"
-	"sep_setting_mgr/internal/handlers/views/components"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/handlers/views/components"
 	"strconv"
 )
 
@@ -16,20 +16,23 @@ func prepareStudentsForTable(students []*models.Student, classID int, router *ec
 	for _, student := range students {
 		rows = append(rows, studentToRow(student, classID, router))
 	}
-	return components.TableData{ID: studentTableID, Title: "Students", Headers: headers, Rows: rows}
+	return components.TableData{ID: studentTableID,
+		Title:       "Students",
+		Description: "A list of all students.",
+		AddRow:      true,
+		AddRowButton: components.Button{
+			Attr: templ.Attributes{
+				"hx-get":      router.Reverse(string(common.ShowAddStudentForm), classID),
+				"hx-target":   "#" + studentTableID,
+				"hx-swap":     "afterbegin",
+				"hx-push-url": "true",
+			},
+		},
+		Headers: headers,
+		Rows:    rows}
 }
 
 templ StudentTableComponent(students []*models.Student, classID int, router *echo.Echo) {
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":      router.Reverse(string(common.ShowAddStudentForm), classID),
-			"hx-target":   "next",
-			"hx-swap":     "beforebegin",
-			"hx-push-url": "true",
-		},
-	}) {
-		Add Student
-	}
 	@components.TableComponent(prepareStudentsForTable(students, classID, router))
 }
 

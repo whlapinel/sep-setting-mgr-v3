@@ -23,14 +23,17 @@ func NewHandler(adminService admin.AdminService) AdminHandler {
 	return &handler{adminService}
 }
 
+var router *echo.Echo
+
 func Mount(e *echo.Echo, h AdminHandler) {
+	router = e
 	common.AdminGroup.GET("", h.AdminHandler)
 }
 
 func (h handler) AdminHandler(c echo.Context) error {
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.AdminPage(), c, 200)
+		return util.RenderTempl(views.AdminPage(router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
 
 }

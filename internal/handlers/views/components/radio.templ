@@ -8,11 +8,12 @@ type RadioGroup struct {
 }
 
 type RadioOption struct {
-	ID      string
-	Value   string
-	Label   string
-	Checked bool
-	Attr    templ.Attributes
+	ID       string
+	Value    string
+	Label    string
+	Checked  bool
+	Disabled bool
+	Attr     templ.Attributes
 }
 
 func boolToString(b bool) string {
@@ -33,11 +34,15 @@ templ RadioComponent(r RadioGroup) {
 						required
 					}
 					id={ option.ID }
+					if option.Disabled {
+						disabled
+					}
 					name={ r.Name }
 					value={ option.Value }
 					if option.Checked {
 						checked
 					}
+					class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 disabled:text-slate-500"
 					{ option.Attr... }
 				/>
 				<label

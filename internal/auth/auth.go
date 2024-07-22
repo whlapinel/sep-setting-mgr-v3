@@ -52,7 +52,7 @@ func WriteToken(c echo.Context, t string) {
 	cookie.Value = t
 	cookie.HttpOnly = true
 	cookie.Path = "/"
-	cookie.Expires = time.Now().Add(time.Minute * 5)
+	cookie.Expires = time.Now().Add(sessionLifeSpan)
 	log.Println("Setting cookie: ", cookie)
 	c.SetCookie(cookie)
 	c.Response().Header().Set("Authorization", "Bearer "+t)

@@ -1,0 +1,11 @@
+package components
+
+type LinkData struct {
+	Attr templ.Attributes
+}
+
+templ Link(l LinkData) {
+	<button { l.Attr... }>
+		{ children... }
+	</button>
+}

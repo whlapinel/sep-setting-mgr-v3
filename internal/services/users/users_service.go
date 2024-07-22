@@ -6,18 +6,17 @@ import (
 
 type UsersService interface {
 	ListUsers() ([]*models.User, error)
-	ListRooms() ([]*models.Room, error)
+	FindUserByID(id int) (*models.User, error)
+	UpdateUser(user *models.User) error
 	IsAdmin(userID int) bool
 }
 
 type service struct {
-	users       models.UserRepository
-	rooms       models.RoomRepository
-	assignments models.AssignmentRepository
+	users models.UserRepository
 }
 
-func NewService(users models.UserRepository, rooms models.RoomRepository, assignments models.AssignmentRepository) UsersService {
-	return &service{users, rooms, assignments}
+func NewService(users models.UserRepository) UsersService {
+	return &service{users}
 }
 
 func (s service) IsAdmin(userID int) bool {
@@ -36,34 +35,18 @@ func (s service) ListUsers() ([]*models.User, error) {
 	return users, nil
 }
 
-func (s service) ListRooms() ([]*models.Room, error) {
-	rooms, err := s.rooms.All()
+func (s service) FindUserByID(id int) (*models.User, error) {
+	user, err := s.users.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return rooms, nil
+	return user, nil
 }
 
-func (s service) AddRoom(room *models.Room) (id int, err error) {
-	id, err = s.rooms.Store(room)
+func (s service) UpdateUser(user *models.User) error {
+	err := s.users.Update(user)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return id, nil
-}
-
-func (s service) FindRoomByID(id int) (*models.Room, error) {
-	room, err := s.rooms.FindByID(id)
-	if err != nil {
-		return nil, err
-	}
-	return room, nil
-}
-
-func (s service) GetAllAssignments() (models.Assignments, error) {
-	assignments, err := s.assignments.All()
-	if err != nil {
-		return nil, err
-	}
-	return assignments, nil
+	return nil
 }

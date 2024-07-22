@@ -1,8 +1,13 @@
 package views
 
-import "sep_setting_mgr/internal/handlers/views/components"
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/handlers/views/components"
+	"time"
+)
 
-templ AdminPage() {
+templ AdminPage(r *echo.Echo) {
 	<h1>Admin</h1>
 	<p>What is HAPPENING</p>
 	<button>What the hell is going on here</button>
@@ -16,20 +21,22 @@ templ AdminPage() {
 	}
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":    "/admin/calendar",
-			"hx-target": "#details",
+			"hx-get":      r.Reverse(string(common.AdminCalendar), time.Now().Format("2006-01-02")),
+			"hx-target":   "#details",
+			"hx-push-url": "true",
 		},
 	}) {
 		Calendar
 	}
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":    "/admin/users",
-			"hx-target": "#details",
+			"hx-get":      r.Reverse(string(common.Users)),
+			"hx-target":   "#details",
+			"hx-push-url": "true",
 		},
 	}) {
 		Users
 	}
-	<div id="details"></div>
+	<div id="details" class="flex justify-center"></div>
 	<div id="modal"></div>
 }

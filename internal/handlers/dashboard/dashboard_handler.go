@@ -12,6 +12,7 @@ import (
 	"sep_setting_mgr/internal/services/students"
 	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -65,7 +66,8 @@ func (h handler) DashboardCalendar(c echo.Context) error {
 	}
 	log.Println("len(assignments): ", len(assignments))
 	assignmentsMap := assignments.MapForCalendar()
-	calendar := views.CalendarComponent(assignmentsMap, false, router)
+	date := time.Now()
+	calendar := views.CalendarComponent(date, assignmentsMap, false, router)
 	if util.IsHTMX(c) {
 		return util.RenderTempl(calendar, c, http.StatusOK)
 	}
