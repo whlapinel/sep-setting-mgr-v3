@@ -1,5 +1,12 @@
 # PROGRESS LOG
 
+## 7/22
+
+- Continue styling and componentizing calendar tables
+- Show warning on overbooked rooms or unassigned students
+- Simplify week view with more detailed day view
+- Create separate handler for dashboard calendar details
+
 ## 7/21
 
 - Edit Users functionality today. Also began styling tables.
