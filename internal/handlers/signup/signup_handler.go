@@ -106,7 +106,7 @@ func (h handler) GoogleSignup(c echo.Context) error {
 
 	fmt.Println("User ID: ", tokenInfo.UserId)
 	fmt.Println("Email: ", tokenInfo.Email)
-	fmt.Println("Name: ", tokenInfo.ExpiresIn)
+	fmt.Println("Expires in: ", tokenInfo.ExpiresIn)
 	fmt.Println("Audience: ", tokenInfo.Audience)
 	fmt.Println("StatusCode: ", tokenInfo.HTTPStatusCode)
 	fmt.Println("Header:", tokenInfo.Header)
@@ -115,8 +115,28 @@ func (h handler) GoogleSignup(c echo.Context) error {
 	fmt.Println("Scope:", tokenInfo.Scope)
 	fmt.Println("ServerResponse:", tokenInfo.ServerResponse)
 	fmt.Println("VerifiedEmail:", tokenInfo.VerifiedEmail)
-	// ... Use the user data as needed ...
 
-	// ... Create a session, set cookies, or respond with success ...
-	return c.String(200, "GoogleSignup()")
+	if !isValidEmail(tokenInfo.Email) {
+		return c.String(401, "Invalid email")
+	}
+	ok, err := h.service.CreateUser(tokenInfo.Email, "")
+	if err != nil {
+		log.Println("error: ", err)
+		return c.String(500, "Failed to create user")
+	}
+	if !ok {
+		log.Println("error nil, but user not created")
+		return c.String(500, "Failed to create user")
+	}
+	return c.Redirect(200, string(common.Classes))
+}
+
+func isValidEmail(email string) bool {
+	return verifyCMSDomain(email) || email == "whlapinel@gmail.com"
+}
+
+func verifyCMSDomain(email string) bool {
+	// Check if the email is from a CMS domain
+	cmsDomain := "cms.k12.nc.us"
+	return email[len(email)-len(cmsDomain):] == cmsDomain
 }

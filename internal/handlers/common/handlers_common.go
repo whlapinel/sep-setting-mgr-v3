@@ -11,6 +11,7 @@ type RouteName string
 
 const (
 	GoogleSignup          RouteName = "google-signup"
+	GoogleSignin          RouteName = "google-signin"
 	Rooms                 RouteName = "rooms"
 	DeleteRoom            RouteName = "delete-room"
 	ShowEditRoomForm      RouteName = "show-edit-room-form"
@@ -55,8 +56,6 @@ const (
 )
 
 var (
-	// /auth/callback/google
-	GoogleAuthGroup *echo.Group
 
 	// /admin
 	AdminGroup *echo.Group
@@ -111,7 +110,6 @@ var (
 )
 
 func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
-	GoogleAuthGroup = e.Group("/auth/callback/google")
 
 	AdminGroup = e.Group("/admin", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo))
 
