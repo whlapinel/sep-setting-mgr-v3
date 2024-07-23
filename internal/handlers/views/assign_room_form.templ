@@ -32,7 +32,7 @@ func roomOptions(rooms []*models.Room) []*components.Option {
 	return options
 }
 
-templ AssignRoomForm(a *models.Assignment, rooms []*models.Room, r *echo.Echo) {
+templ AssignRoomForm(a *models.Assignment, rooms models.Rooms, r *echo.Echo) {
 	@components.FormComponent(components.Form{
 		ID:       getAssignFormID(a.ID),
 		Title:    "Assign Room",

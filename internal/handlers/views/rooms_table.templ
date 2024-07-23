@@ -10,14 +10,16 @@ import (
 
 const roomsTableID = "rooms-table"
 
-func prepareRoomsForTable(rooms []*models.Room, router *echo.Echo) components.TableData {
+func prepareRoomsForTable(rooms models.Rooms, router *echo.Echo) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Number", "Priority", "Capacity"}
 	if len(rooms) == 0 {
 		rows = []components.Row{}
 	} else {
 		for _, room := range rooms {
-			rows = append(rows, roomToRow(room, router))
+			if room.ID != -1 {
+				rows = append(rows, roomToRow(room, router))
+			}
 		}
 	}
 	return components.TableData{ID: roomsTableID, Title: "Rooms",
@@ -64,7 +66,7 @@ func roomToRow(room *models.Room, router *echo.Echo) components.Row {
 	}
 }
 
-templ RoomsTableComponent(rooms []*models.Room, router *echo.Echo) {
+templ RoomsTableComponent(rooms models.Rooms, router *echo.Echo) {
 	@components.TableComponent(prepareRoomsForTable(rooms, router))
 }
 

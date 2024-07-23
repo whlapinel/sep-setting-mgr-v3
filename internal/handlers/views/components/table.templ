@@ -61,28 +61,37 @@ templ TableRowComponent(row Row) {
 templ TableCell(data string, warning bool) {
 	if !warning {
 		<td
-			class={ "whitespace-nowrap px-3 py-4 size-7 text-gray-500" }
+			class={ "whitespace-nowrap px-3 py-4 size-7 rounded text-gray-500" }
 		>{ data }</td>
 	} else {
 		<td
-			class={ "whitespace-nowrap px-3 py-4 size-7 text-slate-100 bg-red-700" }
+			class={ "whitespace-nowrap px-3 py-4 size-7 rounded text-slate-100 bg-red-700" }
 		>{ data }</td>
 	}
 }
 
-templ SubHeader(data string, colspan int, warning bool) {
+func getSizeClass(size string) string {
+	if size == "small" {
+		return "text-lg"
+	} else {
+		return "text-lg font-bold"
+	}
+}
+
+// size: small or large
+templ SubHeader(data string, size string, colspan int, warning bool) {
 	if !warning {
 		<tr>
 			<td
 				colspan={ strconv.Itoa(colspan) }
-				class={ "text-center text-lg" }
+				class={ "text-center " + getSizeClass(size) + " rounded" }
 			>{ data }</td>
 		</tr>
 	} else {
 		<tr>
 			<td
 				colspan={ strconv.Itoa(colspan) }
-				class={ "text-center text-lg text-slate-100 bg-red-700" }
+				class={ "text-center " + getSizeClass(size) + " rounded text-slate-100 bg-red-700" }
 			>{ data }</td>
 		</tr>
 	}
@@ -92,7 +101,7 @@ templ TableHeaderComponent(headers []string) {
 	<thead>
 		<tr>
 			for _, header := range headers {
-				<th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-1/4">{ header }</th>
+				<th scope="col" class="px-3 py-3.5 text-left text-lg font-semibold text-gray-900 w-1/4">{ header }</th>
 			}
 		</tr>
 	</thead>

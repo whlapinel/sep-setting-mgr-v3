@@ -9,6 +9,7 @@ import (
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/assignments"
 	"sep_setting_mgr/internal/services/classes"
+	"sep_setting_mgr/internal/services/rooms"
 	"sep_setting_mgr/internal/services/students"
 	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
@@ -30,14 +31,16 @@ type handler struct {
 	assignments    assignments.AssignmentsService
 	testEvents     testevents.TestEventsService
 	students       students.StudentsService
+	rooms          rooms.RoomsService
 }
 
-func NewHandler(classes classes.ClassesService, assignments assignments.AssignmentsService, testEvents testevents.TestEventsService, students students.StudentsService) DashboardHandler {
+func NewHandler(classes classes.ClassesService, assignments assignments.AssignmentsService, testEvents testevents.TestEventsService, students students.StudentsService, rooms rooms.RoomsService) DashboardHandler {
 	return &handler{
 		classes,
 		assignments,
 		testEvents,
 		students,
+		rooms,
 	}
 }
 
@@ -66,8 +69,12 @@ func (h handler) DashboardCalendar(c echo.Context) error {
 	}
 	log.Println("len(assignments): ", len(assignments))
 	assignmentsMap := assignments.MapForCalendar()
+	rooms, err := h.rooms.ListRooms()
+	if err != nil {
+		return err
+	}
 	date := time.Now()
-	calendar := views.CalendarComponent(date, assignmentsMap, false, router)
+	calendar := views.CalendarComponent(date, assignmentsMap, rooms, false, router)
 	if util.IsHTMX(c) {
 		return util.RenderTempl(calendar, c, http.StatusOK)
 	}

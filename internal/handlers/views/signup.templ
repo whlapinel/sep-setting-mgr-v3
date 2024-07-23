@@ -6,7 +6,7 @@ import (
 	"sep_setting_mgr/internal/handlers/views/components"
 )
 
-templ SignUpPage(router *echo.Echo) {
+templ SignUpPage(router *echo.Echo, clientID string) {
 	@components.FormComponent(components.Form{
 		Title:    "Sign Up",
 		SubTitle: "Enter Username and Password and Click Submit",
@@ -30,5 +30,23 @@ templ SignUpPage(router *echo.Echo) {
 			ID:       "password",
 			Required: true,
 		})
+		<div
+			id="g_id_onload"
+			data-client_id={ clientID }
+			data-context="signup"
+			data-ux_mode="popup"
+			data-login_uri="http://localhost:1323/signup"
+			data-nonce=""
+			data-auto_prompt="false"
+		></div>
+		<div
+			class="g_id_signin"
+			data-type="standard"
+			data-shape="rectangular"
+			data-theme="outline"
+			data-text="signup_with"
+			data-size="large"
+			data-logo_alignment="left"
+		></div>
 	}
 }

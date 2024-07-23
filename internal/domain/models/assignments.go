@@ -41,13 +41,6 @@ func (a Assignments) MapForCalendar() AssignmentsByDate {
 		if assignment.TestEvent == nil || assignment.TestEvent.TestDate == nil {
 			continue
 		}
-		if assignment.Room == nil {
-			assignment.Room = &Room{
-				ID:     -1,
-				Number: "Unassigned",
-				Name:   "Unassigned",
-			}
-		}
 		normalizedDate := NormalizeDate(*assignment.TestEvent.TestDate)
 		if _, ok := assignmentsMap[normalizedDate]; !ok {
 			assignmentsMap[normalizedDate] = make(AssignmentsByBlock)
@@ -60,21 +53,6 @@ func (a Assignments) MapForCalendar() AssignmentsByDate {
 		}
 		assignmentsMap[normalizedDate][assignment.Block][assignment.Room.ID] = append(assignmentsMap[normalizedDate][assignment.Block][assignment.Room.ID], assignment)
 	}
-	for i := 1; i <= 8; i++ {
-		date := NormalizeDate(time.Now().AddDate(0, 0, i))
-		log.Printf("Date: %v", date)
-		for block, roomIDs := range assignmentsMap[date] {
-			log.Printf("Block: %v", block)
-			for roomID, assignmentsList := range roomIDs {
-				for _, assignment := range assignmentsList {
-					log.Printf("Date: %v, Block: %v, Room: %v", date, block, roomID)
-					log.Printf("Assignment: %v", assignment)
-					log.Printf("Assignment.ID: %v", assignment.ID)
-				}
-			}
-		}
-	}
-
 	return assignmentsMap
 }
 

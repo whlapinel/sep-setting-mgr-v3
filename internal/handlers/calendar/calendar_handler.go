@@ -64,6 +64,10 @@ func (h handler) Calendar(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
 	}
+	rooms, err := h.rooms.ListRooms()
+	if err != nil {
+		return err
+	}
 	assignmentsMap := assignments.MapForCalendar()
 	dateString := c.Param("date")
 	date, err := time.Parse("2006-01-02", dateString)
@@ -72,7 +76,7 @@ func (h handler) Calendar(c echo.Context) error {
 		return c.String(500, "Error parsing date")
 	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.CalendarComponent(date, assignmentsMap, true, router), c, 200)
+		return util.RenderTempl(views.CalendarComponent(date, assignmentsMap, rooms, true, router), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
 }
@@ -90,8 +94,13 @@ func (h handler) AdminCalendarDetails(c echo.Context) error {
 		return c.String(500, "Error retrieving assignments")
 	}
 	assignmentsMap := assignments.MapForCalendar()
+	rooms, err := h.rooms.ListRooms()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving rooms")
+	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], true, router), c, 200)
+		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, true, router), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
 }
@@ -109,8 +118,13 @@ func (h handler) DBCalendarDetails(c echo.Context) error {
 		return c.String(500, "Error retrieving assignments")
 	}
 	assignmentsMap := assignments.MapForCalendar()
+	rooms, err := h.rooms.ListRooms()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving rooms")
+	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], false, router), c, 200)
+		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, false, router), c, 200)
 	}
 	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
 }
@@ -164,8 +178,13 @@ func (h handler) AssignRoom(c echo.Context) error {
 		return c.String(500, "Error retrieving assignments")
 	}
 	assignmentsMap := assignments.MapForCalendar()
+	rooms, err := h.rooms.ListRooms()
+	if err != nil {
+		log.Println(err)
+		return c.String(500, "Error retrieving rooms")
+	}
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], true, router), c, 201)
+		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, true, router), c, 201)
 	}
 	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 201)
 }

@@ -9,7 +9,7 @@ type RoomsService interface {
 	AddRoom(*models.Room) (id int, err error)
 	DeleteRoom(id int) error
 	UpdateRoom(room *models.Room) error
-	ListRooms() ([]*models.Room, error)
+	ListRooms() (models.Rooms, error)
 	FindRoomByID(id int) (*models.Room, error)
 }
 
@@ -22,7 +22,7 @@ func NewService(rooms models.RoomRepository, asService services.AssignmentsServi
 	return &service{rooms, asService}
 }
 
-func (s service) ListRooms() ([]*models.Room, error) {
+func (s service) ListRooms() (models.Rooms, error) {
 	rooms, err := s.rooms.All()
 	if err != nil {
 		return nil, err

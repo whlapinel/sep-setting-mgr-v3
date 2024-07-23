@@ -1,5 +1,9 @@
 # PROGRESS LOG
 
+## 7/23
+
+- Continue styling and formatting calendar tables
+
 ## 7/22
 
 - Continue styling and componentizing calendar tables

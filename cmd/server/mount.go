@@ -68,7 +68,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 
 	// mount handlers
 	users.Mount(e, usersHandler)
-	dashboard.Mount(e, dashboard.NewHandler(classesService, assignmentAppService, testEventsService, studentsService))
+	dashboard.Mount(e, dashboard.NewHandler(classesService, assignmentAppService, testEventsService, studentsService, roomsService))
 	admin.Mount(e, admin.NewHandler(adminService))
 	signup.Mount(e, signup.NewHandler(signupService))
 	signin.Mount(e, signin.NewHandler(signinService))

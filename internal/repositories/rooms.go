@@ -39,7 +39,7 @@ func (rr *roomRepo) Store(room *models.Room) (int, error) {
 	return room.ID, nil
 }
 
-func (rr *roomRepo) All() ([]*models.Room, error) {
+func (rr *roomRepo) All() (models.Rooms, error) {
 	log.SetPrefix("Rooms Repo: All()")
 	var rooms []*models.Room
 	var tableRows []roomsTableRow
@@ -61,6 +61,7 @@ func (rr *roomRepo) All() ([]*models.Room, error) {
 		room := convertToRoom(tableRow)
 		rooms = append(rooms, room)
 	}
+	rooms = append(rooms, &models.Unassigned)
 	return rooms, nil
 }
 
@@ -172,7 +173,7 @@ func convertToRoomTable(room *models.Room) roomsTableRow {
 
 func convertToRoom(tableRow roomsTableRow) *models.Room {
 	if !tableRow.id.Valid {
-		return nil
+		return &models.Unassigned
 	}
 	id := int(tableRow.id.Int64)
 	return &models.Room{

@@ -2,17 +2,15 @@
 
 ## PENDING
 
-- Calendar table heights should be consistent with each other within the week view. Maybe list every room each day instead of only listing those for which there are tests.
 - Put dashboard and admin top menu buttons in a sidebar.
 - Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
-- Nullify should set roomid to -1 (maybe?) for sake of consistency
 - refresh token before expiration if user is active
 - implement Google Sign In
 - consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
-- (low priority) should keep classes section at the top and create a new section for students and test events, so that the classes table can be viewed and selected while students or test events tables are displayed
 
 ## COMPLETE
 
+- Calendar table heights should be consistent with each other within the week view. Maybe list every room each day instead of only listing those for which there are tests.
 - admin functionality (users)
 - AssignRoom handler should return more precise data instead of re-rendering entire calendar. Should render component that holds assignments for a given block and room. (need to make this component first!)
 - Unassigned currently show up as overbooked (overbooked tracker is tracking assignments with room id of -1)
@@ -38,4 +36,5 @@
 
 ## CANCELED
 
+- Nullify should set roomid to -1 (maybe?) for sake of consistency (due to foreign constraint room_id would also need to create a room)
 - dashboard: URL params should be changed to query params e.g. dashboard/classes/:class-id?students=true&test-events=true so that display state can be reflected accurately in the URL (this seemed tricky to implement so I'm putting it on the backburner for now, hopefully revisiting later)
