@@ -72,8 +72,9 @@ func (sr *studentRepo) All(classID int) ([]*models.Student, error) {
 	var students []*models.Student
 	var tableRows []studentTableRow
 	rows, err := sr.db.Query(`
-	SELECT * FROM students 
-	where class_id = ?`, classID)
+	SELECT s.* 
+	FROM students s
+	where s.class_id = ?`, classID)
 	if err != nil {
 		return nil, err
 	}

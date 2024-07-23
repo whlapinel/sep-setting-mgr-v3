@@ -2,6 +2,9 @@
 
 ## PENDING
 
+- Calendar table heights should be consistent with each other within the week view. Maybe list every room each day instead of only listing those for which there are tests.
+- Put dashboard and admin top menu buttons in a sidebar.
+- Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
 - Nullify should set roomid to -1 (maybe?) for sake of consistency
 - refresh token before expiration if user is active
 - implement Google Sign In

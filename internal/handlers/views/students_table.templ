@@ -10,19 +10,19 @@ import (
 
 const studentTableID = "students-table"
 
-func prepareStudentsForTable(students []*models.Student, classID int, router *echo.Echo) components.TableData {
+func prepareStudentsForTable(students []*models.Student, class *models.Class, router *echo.Echo) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Block"}
 	for _, student := range students {
-		rows = append(rows, studentToRow(student, classID, router))
+		rows = append(rows, studentToRow(student, class, router))
 	}
 	return components.TableData{ID: studentTableID,
-		Title:       "Students",
+		Title:       "Students in " + class.Name,
 		Description: "A list of all students.",
 		AddRow:      true,
 		AddRowButton: components.Button{
 			Attr: templ.Attributes{
-				"hx-get":      router.Reverse(string(common.ShowAddStudentForm), classID),
+				"hx-get":      router.Reverse(string(common.ShowAddStudentForm), class.ID),
 				"hx-target":   "#" + studentTableID,
 				"hx-swap":     "afterbegin",
 				"hx-push-url": "true",
@@ -32,11 +32,11 @@ func prepareStudentsForTable(students []*models.Student, classID int, router *ec
 		Rows:    rows}
 }
 
-templ StudentTableComponent(students []*models.Student, classID int, router *echo.Echo) {
-	@components.TableComponent(prepareStudentsForTable(students, classID, router))
+templ StudentTableComponent(students []*models.Student, class *models.Class, router *echo.Echo) {
+	@components.TableComponent(prepareStudentsForTable(students, class, router))
 }
 
-func studentToRow(student *models.Student, classID int, router *echo.Echo) components.Row {
+func studentToRow(student *models.Student, class *models.Class, router *echo.Echo) components.Row {
 	return components.Row{
 		TableID:  studentTableID,
 		Editable: true,
@@ -46,7 +46,7 @@ func studentToRow(student *models.Student, classID int, router *echo.Echo) compo
 			{
 				Text: "Delete",
 				Attr: templ.Attributes{
-					"hx-delete":  router.Reverse(string(common.DeleteStudent), classID, student.ID),
+					"hx-delete":  router.Reverse(string(common.DeleteStudent), class.ID, student.ID),
 					"hx-target":  "closest tr",
 					"hx-confirm": "Are you sure you want to delete this student?",
 				},
@@ -54,7 +54,7 @@ func studentToRow(student *models.Student, classID int, router *echo.Echo) compo
 			{
 				Text: "Edit",
 				Attr: templ.Attributes{
-					"hx-get":      router.Reverse(string(common.ShowEditStudentForm), classID, student.ID),
+					"hx-get":      router.Reverse(string(common.ShowEditStudentForm), class.ID, student.ID),
 					"hx-target":   "#" + studentTableID + "-form-cell-" + strconv.Itoa(student.ID),
 					"hx-push-url": "true",
 				},
@@ -63,6 +63,6 @@ func studentToRow(student *models.Student, classID int, router *echo.Echo) compo
 	}
 }
 
-templ StudentRowComponent(student *models.Student, classID int, router *echo.Echo) {
-	@components.TableRowComponent(studentToRow(student, classID, router))
+templ StudentRowComponent(student *models.Student, class *models.Class, router *echo.Echo) {
+	@components.TableRowComponent(studentToRow(student, class, router))
 }

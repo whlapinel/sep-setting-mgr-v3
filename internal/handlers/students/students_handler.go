@@ -75,7 +75,7 @@ func (h handler) Students(c echo.Context) error {
 		return c.String(500, "Failed to list students. See server logs for details.")
 	}
 	class.Students = students
-	return util.RenderTempl(views.StudentTableComponent(class.Students, classID, router), c, 200)
+	return util.RenderTempl(views.StudentTableComponent(class.Students, class, router), c, 200)
 }
 
 func (h handler) CreateStudent(c echo.Context) error {
@@ -99,7 +99,7 @@ func (h handler) CreateStudent(c echo.Context) error {
 			return c.String(500, "Failed to add student. See server logs for details.")
 		}
 	}
-	return util.RenderTempl(views.StudentRowComponent(student, classID, router), c, 201)
+	return util.RenderTempl(views.StudentRowComponent(student, &student.Class, router), c, 201)
 }
 
 func (h handler) ShowEditStudentForm(c echo.Context) error {
@@ -135,7 +135,7 @@ func (h handler) EditStudent(c echo.Context) error {
 	if err != nil {
 		return c.String(500, "Failed to update student. See server logs for details.")
 	}
-	return util.RenderTempl(views.StudentRowComponent(student, student.Class.ID, router), c, 200)
+	return util.RenderTempl(views.StudentRowComponent(student, &student.Class, router), c, 200)
 }
 
 func (h handler) ShowAddStudentForm(c echo.Context) error {
