@@ -3,7 +3,8 @@ package signup
 import "sep_setting_mgr/internal/domain/models"
 
 type SignupService interface {
-	CreateUser(username string, password string) (bool, error)
+	IsDuplicate(email string) (bool, error)
+	CreateUser(first, last, email string) (bool, error)
 }
 
 type service struct {
@@ -14,8 +15,8 @@ func NewService(users models.UserRepository) SignupService {
 	return &service{users: users}
 }
 
-func (s service) CreateUser(email string, password string) (bool, error) {
-	user, err := models.NewUser(email, password)
+func (s service) CreateUser(first, last, email string) (bool, error) {
+	user, err := models.NewUser(first, last, email)
 	if err != nil {
 		return false, err
 	}
@@ -24,4 +25,15 @@ func (s service) CreateUser(email string, password string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (s service) IsDuplicate(email string) (bool, error) {
+	user, err := s.users.Find(email)
+	if err != nil {
+		return false, err
+	}
+	if user.Email == email {
+		return true, nil
+	}
+	return false, nil
 }

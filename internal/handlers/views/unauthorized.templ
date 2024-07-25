@@ -1,5 +1,30 @@
 package views
 
-templ UnauthorizedPage() {
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/handlers/common"
+)
+
+type UnauthorizedProps struct {
+	Page   string
+	Reason string
+	R      *echo.Echo
+	UserID int
+}
+
+templ UnauthorizedPage(p UnauthorizedProps) {
 	<h1>Unauthorized</h1>
+	if p.Page != "" {
+		<p>You are not authorized to access the { p.Page } page.</p>
+		if p.Reason != "" {
+			<p>Reason: { p.Reason }</p>
+		}
+		if p.Page == "admin" && p.Reason == "not admin" {
+			<p>Only administrators can access this page.</p>
+			<p>Please click here to apply for admin access.</p>
+			<p hx-post={ p.R.Reverse(string(common.ApplyForRole), p.UserID) }>Apply For Admin Role</p>
+		}
+	} else {
+		<p>You are not authorized to access this page.</p>
+	}
 }

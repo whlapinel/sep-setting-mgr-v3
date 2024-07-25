@@ -8,11 +8,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type userTable struct {
-	id       int
-	email    string
-	password string
-	admin    bool
+type userTableRow struct {
+	id         int
+	first_name string
+	last_name  string
+	email      string
+	admin      bool
 }
 
 type userRepo struct {
@@ -27,7 +28,7 @@ func NewUsersRepo(db *sql.DB) models.UserRepository {
 func (ur *userRepo) Store(user *models.User) error {
 	dbUser := convertToTable(user)
 	log.Println("Adding user to database")
-	_, err := ur.db.Exec(`INSERT INTO users (email, password, admin) VALUES (?, ?, ?)`, dbUser.email, dbUser.password, dbUser.admin)
+	_, err := ur.db.Exec(`INSERT INTO users (email, first_name, last_name, admin) VALUES (?, ?, ?, ?)`, dbUser.email, dbUser.first_name, dbUser.last_name, dbUser.admin)
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,10 @@ func (ur *userRepo) Store(user *models.User) error {
 func (ur *userRepo) Update(user *models.User) error {
 	dbUser := convertToTable(user)
 	log.Println("Updating user in database")
-	_, err := ur.db.Exec(`UPDATE users SET email = ?, password = ?, admin = ? WHERE id = ?`, dbUser.email, dbUser.password, dbUser.admin, user.ID)
+	_, err := ur.db.Exec(`
+	UPDATE users 
+	SET first_name = ?, last_name = ?, email = ?, admin = ? 
+	WHERE id = ?`, dbUser.first_name, dbUser.last_name, dbUser.email, dbUser.admin, user.ID)
 	if err != nil {
 		return err
 	}
@@ -52,8 +56,8 @@ func (ur *userRepo) All() ([]*models.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var dbUser userTable
-		err := rows.Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
+		var dbUser userTableRow
+		err := rows.Scan(&dbUser.id, &dbUser.email, &dbUser.admin)
 		if err != nil {
 			return nil, err
 		}
@@ -64,17 +68,17 @@ func (ur *userRepo) All() ([]*models.User, error) {
 }
 
 func (ur *userRepo) Find(email string) (*models.User, error) {
-	var dbUser userTable
+	var dbUser userTableRow
 	ur.db.QueryRow(`SELECT * FROM users WHERE email = ?`, email).
-		Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
+		Scan(&dbUser.id, &dbUser.first_name, &dbUser.last_name, &dbUser.email, &dbUser.admin)
 	user := convertFromTable(dbUser)
 	return user, nil
 }
 
 func (ur *userRepo) FindByID(id int) (*models.User, error) {
-	var dbUser userTable
+	var dbUser userTableRow
 	ur.db.QueryRow(`SELECT * FROM users WHERE id = ?`, id).
-		Scan(&dbUser.id, &dbUser.email, &dbUser.password, &dbUser.admin)
+		Scan(&dbUser.id, &dbUser.email, &dbUser.admin)
 	user := convertFromTable(dbUser)
 	return user, nil
 }
@@ -97,8 +101,9 @@ func createUsersTable(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS 
 	users (
 		id int AUTO_INCREMENT PRIMARY KEY, 
+		first_name VARCHAR(255) NOT NULL,
+		last_name VARCHAR(255) NOT NULL,
 		email VARCHAR(255) UNIQUE NOT NULL,
-		password VARCHAR(255) NOT NULL,
 		admin BOOLEAN NOT NULL
 		)`)
 	if err != nil {
@@ -109,19 +114,21 @@ func createUsersTable(db *sql.DB) error {
 	return nil
 }
 
-func convertFromTable(dbUser userTable) *models.User {
+func convertFromTable(dbUser userTableRow) *models.User {
 	return &models.User{
-		ID:       dbUser.id,
-		Email:    dbUser.email,
-		Password: dbUser.password,
-		Admin:    dbUser.admin,
+		ID:        dbUser.id,
+		FirstName: dbUser.first_name,
+		LastName:  dbUser.last_name,
+		Email:     dbUser.email,
+		Admin:     dbUser.admin,
 	}
 }
 
-func convertToTable(user *models.User) userTable {
-	return userTable{
-		email:    user.Email,
-		password: user.Password,
-		admin:    user.Admin,
+func convertToTable(user *models.User) userTableRow {
+	return userTableRow{
+		first_name: user.FirstName,
+		last_name:  user.LastName,
+		email:      user.Email,
+		admin:      user.Admin,
 	}
 }

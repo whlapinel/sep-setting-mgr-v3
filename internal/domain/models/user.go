@@ -2,20 +2,17 @@ package models
 
 type (
 	User struct {
-		ID       int
-		Email    string
-		Admin    bool
-		Password string
+		ID        int
+		FirstName string
+		LastName  string
+		Email     string
+		Admin     bool
 	}
 
 	Teacher struct {
 		User
 		Classes  []*Class
 		Students []*Student
-	}
-
-	UserService interface {
-		NewUser(username string, email string, password string, admin bool) (*User, error)
 	}
 
 	UserRepository interface {
@@ -29,10 +26,10 @@ type (
 	}
 )
 
-func NewUser(email string, password string) (*User, error) {
+func NewUser(firstName, lastName, email string) (*User, error) {
 	return &User{
-		Email:    email,
-		Password: password,
-		Admin:    false,
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
 	}, nil
 }

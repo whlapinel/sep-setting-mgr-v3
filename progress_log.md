@@ -1,5 +1,10 @@
 # PROGRESS LOG
 
+## 7/24
+
+- Finally implemented Sign In With Google, removed password fields and added first and last name.
+- The docs for Sign In with Google were surprisingly sparse and confusing. Could have done this a lot faster with better docs.
+
 ## 7/23
 
 - Continue styling and formatting calendar tables

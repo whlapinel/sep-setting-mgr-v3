@@ -1,12 +1,12 @@
 package signin
 
 import (
+	"errors"
 	domain "sep_setting_mgr/internal/domain/models"
 )
 
 type SigninService interface {
-	VerifyCredentials(email string, password string) (bool, error)
-	GetUserID(email string) int
+	GetUserID(email string) (int, error)
 }
 
 type service struct {
@@ -17,15 +17,13 @@ func NewService(users domain.UserRepository) SigninService {
 	return &service{users: users}
 }
 
-func (s service) VerifyCredentials(email string, password string) (bool, error) {
+func (s service) GetUserID(email string) (int, error) {
 	user, err := s.users.Find(email)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	return user.Password == password, nil
-}
-
-func (s service) GetUserID(email string) int {
-	user, _ := s.users.Find(email)
-	return user.ID
+	if user.Email == "" {
+		return 0, errors.New("user not found")
+	}
+	return user.ID, nil
 }

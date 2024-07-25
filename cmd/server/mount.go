@@ -40,6 +40,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	testEventsRepo := repositories.NewTestEventsRepo(db)
 	roomsRepo := repositories.NewRoomsRepo(db)
 	assignmentsRepo := repositories.NewAssignmentsRepo(db)
+	applicationsRepo := repositories.NewApplicationRepo(db)
 
 	// initialize domain services
 	assignmentsDomainService := services.NewAssignmentsService(assignmentsRepo, roomsRepo, testEventsRepo, classesRepo, studentsRepo)
@@ -53,7 +54,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	roomsService := roomsService.NewService(roomsRepo, *assignmentsDomainService)
 	signupService := signupService.NewService(usersRepo)
 	signinService := signinService.NewService(usersRepo)
-	adminService := adminService.NewService(usersRepo)
+	adminService := adminService.NewService(usersRepo, applicationsRepo)
 
 	// define routes
 	common.CreateGroups(e, usersRepo)

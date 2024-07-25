@@ -35,7 +35,7 @@ func (ar *assignmentRepo) UpdateRoom(assignmentID, roomID int) error {
 
 func (ar *assignmentRepo) GetByAssignmentID(id int) (*models.Assignment, error) {
 	var classRow classTableRow
-	var userRow userTable
+	var userRow userTableRow
 	var studentRow studentTableRow
 	var eventRow testEventTableRow
 	var roomRow roomsTableRow

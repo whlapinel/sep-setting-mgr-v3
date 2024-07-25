@@ -10,55 +10,63 @@ import (
 type RouteName string
 
 const (
-	GoogleSignup          RouteName = "google-signup"
-	GoogleSignin          RouteName = "google-signin"
-	Rooms                 RouteName = "rooms"
-	DeleteRoom            RouteName = "delete-room"
-	ShowEditRoomForm      RouteName = "show-edit-room-form"
-	ShowAddRoomForm       RouteName = "show-add-room-form"
-	EditRoom              RouteName = "edit-room"
-	ShowEditUserForm      RouteName = "show-edit-user-form"
-	EditUser              RouteName = "edit-user"
-	Users                 RouteName = "users"
-	DeleteUser            RouteName = "delete-user"
-	ShowAddClassForm      RouteName = "show-add-class-form"
-	DeleteClass           RouteName = "delete-class"
-	ShowEditClassForm     RouteName = "show-edit-class-form"
-	EditClass             RouteName = "edit-class"
-	Classes               RouteName = "classes"
-	HxClasses             RouteName = "hx-classes"
-	CreateClass           RouteName = "create-class"
-	Students              RouteName = "students"
-	ShowAddStudentForm    RouteName = "show-add-student-form"
-	ShowEditStudentForm   RouteName = "show-edit-student-form"
-	DeleteStudent         RouteName = "delete-student"
-	EditStudent           RouteName = "edit-student"
-	DeleteTestEvent       RouteName = "delete-test-event"
-	ShowAddTestEventForm  RouteName = "show-add-test-event-form"
-	ShowEditTestEventForm RouteName = "show-edit-test-event-form"
-	EditTestEvent         RouteName = "edit-test-event"
-	TestEvents            RouteName = "test-events"
-	CreateTestEvent       RouteName = "create-test-event"
-	CreateStudent         RouteName = "create-student"
-	SignupPage            RouteName = "signup-page"
-	Signup                RouteName = "signup-post"
-	Signout               RouteName = "signout"
-	DashboardCalendar     RouteName = "dashboard-calendar"
-	DBCalendarDetails     RouteName = "dashboard-calendar-details"
-	AdminCalendar         RouteName = "admin-calendar"
-	AdminCalendarDetails  RouteName = "admin-calendar-details"
-	ShowAssignRoomForm    RouteName = "show-assign-room-form"
-	AssignRoom            RouteName = "assign-room"
-	CreateRoom            RouteName = "create-room"
-	SigninPostRoute       RouteName = "signin-post"
-	SigninPage            RouteName = "signin-page"
-	Unauthorized          RouteName = "unauthorized"
+	GoogleSignup                        RouteName = "google-signup"
+	GoogleSignin                        RouteName = "google-signin"
+	Registration                        RouteName = "registration"
+	Rooms                               RouteName = "rooms"
+	DeleteRoom                          RouteName = "delete-room"
+	ShowEditRoomForm                    RouteName = "show-edit-room-form"
+	ShowAddRoomForm                     RouteName = "show-add-room-form"
+	EditRoom                            RouteName = "edit-room"
+	ShowEditUserForm                    RouteName = "show-edit-user-form"
+	EditUser                            RouteName = "edit-user"
+	Users                               RouteName = "users"
+	DeleteUser                          RouteName = "delete-user"
+	ShowAddClassForm                    RouteName = "show-add-class-form"
+	DeleteClass                         RouteName = "delete-class"
+	ShowEditClassForm                   RouteName = "show-edit-class-form"
+	EditClass                           RouteName = "edit-class"
+	Classes                             RouteName = "classes"
+	HxClasses                           RouteName = "hx-classes"
+	CreateClass                         RouteName = "create-class"
+	Students                            RouteName = "students"
+	ShowAddStudentForm                  RouteName = "show-add-student-form"
+	ShowEditStudentForm                 RouteName = "show-edit-student-form"
+	DeleteStudent                       RouteName = "delete-student"
+	EditStudent                         RouteName = "edit-student"
+	DeleteTestEvent                     RouteName = "delete-test-event"
+	ShowAddTestEventForm                RouteName = "show-add-test-event-form"
+	ShowEditTestEventForm               RouteName = "show-edit-test-event-form"
+	EditTestEvent                       RouteName = "edit-test-event"
+	TestEvents                          RouteName = "test-events"
+	CreateTestEvent                     RouteName = "create-test-event"
+	CreateStudent                       RouteName = "create-student"
+	SignupPage                          RouteName = "signup-page"
+	Signup                              RouteName = "signup-post"
+	Signout                             RouteName = "signout"
+	DashboardCalendar                   RouteName = "dashboard-calendar"
+	DBCalendarDetails                   RouteName = "dashboard-calendar-details"
+	AdminCalendar                       RouteName = "admin-calendar"
+	AdminCalendarDetails                RouteName = "admin-calendar-details"
+	ShowAssignRoomForm                  RouteName = "show-assign-room-form"
+	AssignRoom                          RouteName = "assign-room"
+	CreateRoom                          RouteName = "create-room"
+	SigninPostRoute                     RouteName = "signin-post"
+	SigninPage                          RouteName = "signin-page"
+	Unauthorized                        RouteName = "unauthorized"
+	UnauthorizedWithPage                RouteName = "unauthorized-with-page"
+	UnauthorizedWithPageAndReason       RouteName = "unauthorized-with-page-and-reason"
+	UnauthorizedWithPageReasonAndUserID RouteName = "unauthorized-with-page-reason-and-user-id"
+	ApplyForRole                        RouteName = "apply-for-role"
 )
 
 var (
 
 	// /admin
 	AdminGroup *echo.Group
+
+	// /applications
+	ApplicationsGroup *echo.Group
 
 	// /admin/calendar
 	CalendarGroup *echo.Group
@@ -112,6 +120,8 @@ var (
 func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 
 	AdminGroup = e.Group("/admin", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo))
+
+	ApplicationsGroup = e.Group("/applications", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)
 
 	UsersGroup = AdminGroup.Group("/users")
 	UserIDGroup = UsersGroup.Group("/:user-id")

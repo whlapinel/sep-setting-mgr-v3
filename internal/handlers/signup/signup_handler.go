@@ -1,11 +1,9 @@
 package signup
 
 import (
-	"context"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
+	"sep_setting_mgr/internal/auth"
 	"sep_setting_mgr/internal/handlers/common"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
@@ -13,8 +11,6 @@ import (
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
-	"google.golang.org/api/oauth2/v2"
-	"google.golang.org/api/option"
 )
 
 type SignupHandler interface {
@@ -22,7 +18,7 @@ type SignupHandler interface {
 	SignUpPage(c echo.Context) error
 
 	// POST /hx-signup
-	Signup(c echo.Context) error
+	// Signup(c echo.Context) error
 
 	// POST /signup
 	GoogleSignup(c echo.Context) error
@@ -41,25 +37,25 @@ var router *echo.Echo
 func Mount(e *echo.Echo, h SignupHandler) {
 	router = e
 	e.GET("/signup", h.SignUpPage).Name = string(common.SignupPage)
-	e.POST("/hx-signup", h.Signup).Name = string(common.Signup)
+	// e.POST("/hx-signup", h.Signup).Name = string(common.Signup)
 	e.POST("/signup", h.GoogleSignup).Name = string(common.GoogleSignup)
 }
 
-func (h handler) Signup(c echo.Context) error {
-	email := c.FormValue("email")
-	password := c.FormValue("password")
-	created, err := h.service.CreateUser(email, password)
-	if err != nil {
-		log.Println("SignUpHandler(): ", err)
-		c.String(500, "Error creating user.")
-		return err
-	}
-	if !created {
-		fmt.Println("User not created.")
-		return echo.ErrInternalServerError
-	}
-	return c.String(201, "User created.")
-}
+// func (h handler) Signup(c echo.Context) error {
+// 	email := c.FormValue("email")
+// 	name := c.FormValue("name")
+// 	created, err := h.service.CreateUser(first, name)
+// 	if err != nil {
+// 		log.Println("SignUpHandler(): ", err)
+// 		c.String(500, "Error creating user.")
+// 		return err
+// 	}
+// 	if !created {
+// 		fmt.Println("User not created.")
+// 		return echo.ErrInternalServerError
+// 	}
+// 	return c.String(201, "User created.")
+// }
 
 func (h handler) SignUpPage(c echo.Context) error {
 	var clientID string = os.Getenv("GOOGLE_CLIENT_ID")
@@ -70,65 +66,42 @@ func (h handler) SignUpPage(c echo.Context) error {
 }
 
 func (h handler) GoogleSignup(c echo.Context) error {
-	log.Println("GoogleSignup()")
-	log.Println(c.Request().Header)
-	log.Println(c.Request().Body)
-	log.Println(c.Cookie("g_csrf_token"))
-	log.Println(c.Cookie("g_state"))
-	// ... Get the ID token from the request body or query parameters ...
-	idToken := c.FormValue("credential") // Assuming it's sent as "credential" in a form
-	log.Println("idToken: ", idToken)
-
-	// Create an OAuth2 service object
-	oauth2Service, err := oauth2.NewService(context.Background(), option.WithoutAuthentication())
+	payload, err := auth.GoogleAuth(c)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Failed to create OAuth2 service")
-
+		log.Println("Failed to authenticate user: ", err)
+		return c.String(401, "Failed to authenticate user")
 	}
+	email := payload.Claims["email"].(string)
+	first := payload.Claims["given_name"].(string)
+	last := payload.Claims["family_name"].(string)
 
-	// Call the tokeninfo endpoint to verify the token
-	tokenInfoCall := oauth2Service.Tokeninfo()
-	tokenInfoCall.IdToken(idToken)
-	tokenInfo, err := tokenInfoCall.Do()
-	if err != nil {
-		return c.String(500, "Failed to verify ID token")
-	}
-	log.Println(tokenInfo)
-
-	// Extract claims (user information) from the token
-	// Verify the "aud" (audience) claim matches your Google client ID
-	if tokenInfo.Audience != os.Getenv("GOOGLE_CLIENT_ID") {
-		return c.String(401, "Invalid audience")
-	}
-	// if claims.Aud != os.Getenv("GOOGLE_CLIENT_ID") {
-	// 	return c.String(401, "Invalid audience")
-	// }
-
-	fmt.Println("User ID: ", tokenInfo.UserId)
-	fmt.Println("Email: ", tokenInfo.Email)
-	fmt.Println("Expires in: ", tokenInfo.ExpiresIn)
-	fmt.Println("Audience: ", tokenInfo.Audience)
-	fmt.Println("StatusCode: ", tokenInfo.HTTPStatusCode)
-	fmt.Println("Header:", tokenInfo.Header)
-	fmt.Println("IssuedTo:", tokenInfo.IssuedTo)
-	fmt.Println("NullFields", tokenInfo.NullFields)
-	fmt.Println("Scope:", tokenInfo.Scope)
-	fmt.Println("ServerResponse:", tokenInfo.ServerResponse)
-	fmt.Println("VerifiedEmail:", tokenInfo.VerifiedEmail)
-
-	if !isValidEmail(tokenInfo.Email) {
+	if !isValidEmail(email) {
+		log.Println("Invalid email: ", email)
 		return c.String(401, "Invalid email")
 	}
-	ok, err := h.service.CreateUser(tokenInfo.Email, "")
+
+	// Check if the user is already in the database
+	isDuplicate, err := h.service.IsDuplicate(email)
 	if err != nil {
-		log.Println("error: ", err)
+		log.Println("Failed to check for duplicate email: ", err)
+		return c.String(500, "Failed to check for duplicate email")
+	}
+	if isDuplicate {
+		log.Println("Email already exists: ", email)
+		return c.String(409, "Email already exists")
+	}
+
+	// create user
+	created, err := h.service.CreateUser(first, last, email)
+	if err != nil {
+		log.Println("Failed to create user: ", err)
 		return c.String(500, "Failed to create user")
 	}
-	if !ok {
-		log.Println("error nil, but user not created")
+	if !created {
+		log.Println("Failed to create user")
 		return c.String(500, "Failed to create user")
 	}
-	return c.Redirect(200, string(common.Classes))
+	return c.String(200, "Welcome "+first+" "+last+"!")
 }
 
 func isValidEmail(email string) bool {

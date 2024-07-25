@@ -6,14 +6,16 @@ import (
 
 type AdminService interface {
 	IsAdmin(userID int) bool
+	ListAllApplications() (models.Applications, error)
 }
 
 type service struct {
-	users models.UserRepository
+	users        models.UserRepository
+	applications models.ApplicationRepository
 }
 
-func NewService(users models.UserRepository) AdminService {
-	return &service{users}
+func NewService(users models.UserRepository, applications models.ApplicationRepository) AdminService {
+	return &service{users, applications}
 }
 
 func (s service) IsAdmin(userID int) bool {
@@ -22,4 +24,8 @@ func (s service) IsAdmin(userID int) bool {
 		return false
 	}
 	return user.Admin
+}
+
+func (s service) ListAllApplications() (models.Applications, error) {
+	return s.applications.All()
 }
