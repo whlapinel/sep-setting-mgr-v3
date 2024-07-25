@@ -20,9 +20,14 @@ templ UnauthorizedPage(p UnauthorizedProps) {
 			<p>Reason: { p.Reason }</p>
 		}
 		if p.Page == "admin" && p.Reason == "not admin" {
-			<p>Only administrators can access this page.</p>
+			<p>Only approved administrators can access the admin page.</p>
 			<p>Please click here to apply for admin access.</p>
-			<p hx-post={ p.R.Reverse(string(common.ApplyForRole), p.UserID) }>Apply For Admin Role</p>
+			<p hx-post={ p.R.Reverse(common.ApplyForRole, p.UserID, "admin") } class="cursor-pointer">Apply For Admin Role</p>
+		}
+		if p.Page == "dashboard" && p.Reason == "not teacher" {
+			<p>Only teachers who have been approved for access can access the dashboard page.</p>
+			<p>Please click here to apply for teacher access.</p>
+			<p hx-post={ p.R.Reverse(common.ApplyForRole, p.UserID, "teacher") } hx-push-url="true" class="cursor-pointer">Apply For Teacher Role</p>
 		}
 	} else {
 		<p>You are not authorized to access this page.</p>

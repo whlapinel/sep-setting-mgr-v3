@@ -7,22 +7,38 @@ import (
 	"time"
 )
 
-templ AdminPage(r *echo.Echo) {
+type AdminPageProps struct {
+	R *echo.Echo
+}
+
+var details = "details"
+var detailsSelector = "#" + details
+
+var modal = "modal"
+var modalSelector = "#" + modal
+
+templ AdminPage(p AdminPageProps) {
 	<h1>Admin</h1>
-	<p>What is HAPPENING</p>
-	<button>What the hell is going on here</button>
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":    "/admin/rooms",
-			"hx-target": "#details",
+			"hx-get":    p.R.Reverse(common.Applications),
+			"hx-target": detailsSelector,
 		},
 	}) {
-		Show Rooms
+		Pending Applications
 	}
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":      r.Reverse(string(common.AdminCalendar), time.Now().Format("2006-01-02")),
-			"hx-target":   "#details",
+			"hx-get":    common.Rooms,
+			"hx-target": detailsSelector,
+		},
+	}) {
+		Rooms
+	}
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-get":      p.R.Reverse(string(common.AdminCalendar), time.Now().Format("2006-01-02")),
+			"hx-target":   detailsSelector,
 			"hx-push-url": "true",
 		},
 	}) {
@@ -30,13 +46,13 @@ templ AdminPage(r *echo.Echo) {
 	}
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-get":      r.Reverse(string(common.Users)),
-			"hx-target":   "#details",
+			"hx-get":      p.R.Reverse(string(common.Users)),
+			"hx-target":   detailsSelector,
 			"hx-push-url": "true",
 		},
 	}) {
 		Users
 	}
-	<div id="details" class="flex justify-center"></div>
-	<div id="modal"></div>
+	<div id={ details } class="flex justify-center"></div>
+	<div id={ modal }></div>
 }

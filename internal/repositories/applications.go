@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"time"
 
@@ -21,11 +20,14 @@ type applicationRepo struct {
 }
 
 func NewApplicationRepo(db *sql.DB) models.ApplicationRepository {
-	createApplicationsTable(db)
+	err := createApplicationsTable(db)
+	if err != nil {
+		panic(err)
+	}
 	return &applicationRepo{db: db}
 }
 
-func createApplicationsTable(db *sql.DB) {
+func createApplicationsTable(db *sql.DB) error {
 	query := `
 		CREATE TABLE IF NOT EXISTS applications (
 			id INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,8 +38,9 @@ func createApplicationsTable(db *sql.DB) {
 	`
 	_, err := db.Exec(query)
 	if err != nil {
-		log.Fatalf("could not create applications table: %v", err)
+		return err
 	}
+	return nil
 }
 
 func (r *applicationRepo) Store(a *models.Application) error {
@@ -58,11 +61,12 @@ func (r *applicationRepo) Delete(a *models.Application) error {
 	return nil
 }
 
-func (r *applicationRepo) All() ([]*models.Application, error) {
+func (r *applicationRepo) All() (models.Applications, error) {
 	query := `
 	SELECT a.*, u.* 
 	FROM applications a
 	JOIN users u ON u.id = a.user_id
+	ORDER BY a.date ASC
 	;`
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -77,7 +81,42 @@ func (r *applicationRepo) All() ([]*models.Application, error) {
 		if err != nil {
 			return nil, err
 		}
-		role, err := models.GetRole(row.role)
+		app := &models.Application{
+			ID:        row.id,
+			Date:      row.date,
+			UserID:    row.user_id,
+			FirstName: user.first_name,
+			LastName:  user.last_name,
+			Email:     user.email,
+			Role:      row.role,
+		}
+		apps = append(apps, app)
+	}
+	return apps, nil
+}
+
+func (r *applicationRepo) GetApplicationsByUserID(userID int) (models.Applications, error) {
+	query := `
+	SELECT a.*, u.first_name, u.last_name, u.email
+	FROM applications a
+	JOIN users u ON u.id = a.user_id
+	WHERE user_id = ?
+	;`
+	rows, err := r.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var apps []*models.Application
+	for rows.Next() {
+		var row applicationTableRow
+		var user userTableRow
+		var temp []uint8
+		err := rows.Scan(&row.id, &temp, &row.user_id, &row.role, &user.first_name, &user.last_name, &user.email)
+		if err != nil {
+			return nil, err
+		}
+		row.date, err = time.Parse("2006-01-02 15:04:05", string(temp))
 		if err != nil {
 			return nil, err
 		}
@@ -88,9 +127,34 @@ func (r *applicationRepo) All() ([]*models.Application, error) {
 			FirstName: user.first_name,
 			LastName:  user.last_name,
 			Email:     user.email,
-			Role:      role,
+			Role:      row.role,
 		}
 		apps = append(apps, app)
 	}
 	return apps, nil
+}
+
+func (r *applicationRepo) GetApplicationByID(id int) (*models.Application, error) {
+	query := `
+	SELECT a.*, u.first_name, u.last_name, u.email
+	FROM applications a
+	JOIN users u ON u.id = a.user_id
+	WHERE a.id = ?
+	;`
+	row := r.db.QueryRow(query, id)
+	var app models.Application
+	var user userTableRow
+	var temp []uint8
+	err := row.Scan(&app.ID, &temp, &app.UserID, &app.Role, &user.first_name, &user.last_name, &user.email)
+	if err != nil {
+		return nil, err
+	}
+	app.Date, err = time.Parse("2006-01-02 15:04:05", string(temp))
+	if err != nil {
+		return nil, err
+	}
+	app.FirstName = user.first_name
+	app.LastName = user.last_name
+	app.Email = user.email
+	return &app, nil
 }

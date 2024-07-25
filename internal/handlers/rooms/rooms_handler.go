@@ -65,7 +65,7 @@ func (h handler) Rooms(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.RoomsTableComponent(rooms, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }
 
 func (h handler) CreateRoom(c echo.Context) error {
@@ -134,7 +134,7 @@ func (h handler) ShowAddRoomForm(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.AddRoomForm(false, &models.Room{}), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }
 
 func (h handler) ShowEditRoomForm(c echo.Context) error {
@@ -150,5 +150,5 @@ func (h handler) ShowEditRoomForm(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.AddRoomForm(true, room), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }

@@ -21,7 +21,10 @@ type assignmentRepo struct {
 }
 
 func NewAssignmentsRepo(db *sql.DB) models.AssignmentRepository {
-	createAssignmentsTable(db)
+	err := createAssignmentsTable(db)
+	if err != nil {
+		panic(err)
+	}
 	return &assignmentRepo{db: db}
 }
 

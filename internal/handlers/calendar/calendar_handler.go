@@ -78,7 +78,7 @@ func (h handler) Calendar(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.CalendarComponent(date, assignmentsMap, rooms, true, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }
 
 func (h handler) AdminCalendarDetails(c echo.Context) error {
@@ -102,7 +102,7 @@ func (h handler) AdminCalendarDetails(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, true, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }
 
 func (h handler) DBCalendarDetails(c echo.Context) error {
@@ -126,7 +126,7 @@ func (h handler) DBCalendarDetails(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, false, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }
 
 func (h handler) ShowAssignRoomForm(c echo.Context) error {
@@ -186,5 +186,5 @@ func (h handler) AssignRoom(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, true, router), c, 201)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 201)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }

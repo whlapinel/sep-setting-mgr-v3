@@ -14,6 +14,7 @@ type userTableRow struct {
 	last_name  string
 	email      string
 	admin      bool
+	teacher    bool
 }
 
 type userRepo struct {
@@ -21,14 +22,17 @@ type userRepo struct {
 }
 
 func NewUsersRepo(db *sql.DB) models.UserRepository {
-	createUsersTable(db)
+	err := createUsersTable(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return &userRepo{db: db}
 }
 
 func (ur *userRepo) Store(user *models.User) error {
 	dbUser := convertToTable(user)
 	log.Println("Adding user to database")
-	_, err := ur.db.Exec(`INSERT INTO users (email, first_name, last_name, admin) VALUES (?, ?, ?, ?)`, dbUser.email, dbUser.first_name, dbUser.last_name, dbUser.admin)
+	_, err := ur.db.Exec(`INSERT INTO users (email, first_name, last_name, admin, teacher) VALUES (?, ?, ?, ?, ?)`, dbUser.email, dbUser.first_name, dbUser.last_name, dbUser.admin, dbUser.teacher)
 	if err != nil {
 		return err
 	}
@@ -40,8 +44,8 @@ func (ur *userRepo) Update(user *models.User) error {
 	log.Println("Updating user in database")
 	_, err := ur.db.Exec(`
 	UPDATE users 
-	SET first_name = ?, last_name = ?, email = ?, admin = ? 
-	WHERE id = ?`, dbUser.first_name, dbUser.last_name, dbUser.email, dbUser.admin, user.ID)
+	SET first_name = ?, last_name = ?, email = ?, admin = ?, teacher = ? 
+	WHERE id = ?`, dbUser.first_name, dbUser.last_name, dbUser.email, dbUser.admin, dbUser.teacher, user.ID)
 	if err != nil {
 		return err
 	}
@@ -57,7 +61,7 @@ func (ur *userRepo) All() ([]*models.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var dbUser userTableRow
-		err := rows.Scan(&dbUser.id, &dbUser.email, &dbUser.admin)
+		err := rows.Scan(&dbUser.id, &dbUser.email, &dbUser.admin, &dbUser.teacher)
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +74,7 @@ func (ur *userRepo) All() ([]*models.User, error) {
 func (ur *userRepo) Find(email string) (*models.User, error) {
 	var dbUser userTableRow
 	ur.db.QueryRow(`SELECT * FROM users WHERE email = ?`, email).
-		Scan(&dbUser.id, &dbUser.first_name, &dbUser.last_name, &dbUser.email, &dbUser.admin)
+		Scan(&dbUser.id, &dbUser.first_name, &dbUser.last_name, &dbUser.email, &dbUser.admin, &dbUser.teacher)
 	user := convertFromTable(dbUser)
 	return user, nil
 }
@@ -78,21 +82,9 @@ func (ur *userRepo) Find(email string) (*models.User, error) {
 func (ur *userRepo) FindByID(id int) (*models.User, error) {
 	var dbUser userTableRow
 	ur.db.QueryRow(`SELECT * FROM users WHERE id = ?`, id).
-		Scan(&dbUser.id, &dbUser.email, &dbUser.admin)
+		Scan(&dbUser.id, &dbUser.email, &dbUser.admin, &dbUser.teacher)
 	user := convertFromTable(dbUser)
 	return user, nil
-}
-
-func (ur *userRepo) GetClasses(user *models.User) ([]*models.Class, error) {
-	var classes []*models.Class
-
-	return classes, nil
-}
-
-func (ur *userRepo) GetStudents(user *models.User) ([]*models.Student, error) {
-	var classes []*models.Student
-
-	return classes, nil
 }
 
 func createUsersTable(db *sql.DB) error {
@@ -104,7 +96,8 @@ func createUsersTable(db *sql.DB) error {
 		first_name VARCHAR(255) NOT NULL,
 		last_name VARCHAR(255) NOT NULL,
 		email VARCHAR(255) UNIQUE NOT NULL,
-		admin BOOLEAN NOT NULL
+		admin BOOLEAN NOT NULL,
+		teacher BOOLEAN NOT NULL
 		)`)
 	if err != nil {
 		return err
@@ -121,6 +114,7 @@ func convertFromTable(dbUser userTableRow) *models.User {
 		LastName:  dbUser.last_name,
 		Email:     dbUser.email,
 		Admin:     dbUser.admin,
+		Teacher:   dbUser.teacher,
 	}
 }
 
@@ -130,5 +124,6 @@ func convertToTable(user *models.User) userTableRow {
 		last_name:  user.LastName,
 		email:      user.Email,
 		admin:      user.Admin,
+		teacher:    user.Teacher,
 	}
 }

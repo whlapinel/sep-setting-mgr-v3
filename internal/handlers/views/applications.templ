@@ -1,0 +1,74 @@
+package views
+
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/handlers/views/components"
+)
+
+type ApplicationsPageProps struct {
+	R                 *echo.Echo
+	UserID            int
+	AppliedForTeacher bool
+	AppliedForAdmin   bool
+	HasTeacherRole    bool
+	HasAdminRole      bool
+}
+
+templ ApplicationsPage(p ApplicationsPageProps) {
+	<h1>Applications</h1>
+	<h2>Teacher Role</h2>
+	if p.HasTeacherRole {
+		<p>You are already a teacher.</p>
+	} else {
+		if p.AppliedForTeacher {
+			<p>Your application for the teacher role is pending.</p>
+		} else {
+			@ApplyButton(p.R, p.UserID, "teacher")
+		}
+	}
+	<h2>Admin Role</h2>
+	if p.HasAdminRole {
+		<p>You are already an admin.</p>
+	} else {
+		if p.AppliedForAdmin {
+			<p>Your application for the admin role is pending.</p>
+		} else {
+			@ApplyButton(p.R, p.UserID, "admin")
+		}
+	}
+}
+
+templ ApplyButton(r *echo.Echo, userID int, role string) {
+	@components.ButtonComponent(components.Button{
+		Attr: templ.Attributes{
+			"hx-post": r.Reverse(common.ApplyForRole, userID, role),
+			"hx-swap": "outerHTML",
+			"class":   "cursor-pointer",
+		},
+	}) {
+		Apply for the { role } role
+	}
+}
+
+type AppliedSuccessProps struct {
+	Role string
+}
+
+templ AppliedSuccess(p AppliedSuccessProps) {
+	<h1>Success</h1>
+	<p>Your application for { p.Role } has been submitted.</p>
+	<p>You will be notified when your application has been approved.</p>
+}
+
+type AppliedFailureProps struct {
+	Role   string
+	Reason string
+}
+
+templ AppliedFailure(p AppliedFailureProps) {
+	<h1>Failure</h1>
+	<p>Your application for { p.Role } has failed to submit.</p>
+	<p>Reason: { p.Reason }</p>
+	<p>Please try again later.</p>
+}

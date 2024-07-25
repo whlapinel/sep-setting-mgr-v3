@@ -51,7 +51,7 @@ func (h handler) Users(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.UsersTableComponent(users, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 }
 
 // GET /admin/users/:user-id/edit
@@ -70,11 +70,10 @@ func (h handler) ShowEditUserForm(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.UserFormComponent(adminID, user, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
 
 }
 
-// POST /admin/users/:user-id/
 func (h handler) EditUser(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("user-id"))
 	if err != nil {

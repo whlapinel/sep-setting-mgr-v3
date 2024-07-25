@@ -1,0 +1,22 @@
+package views
+
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/handlers/views/components"
+)
+
+type ApplicationsTableProps struct {
+	R    *echo.Echo
+	Apps models.Applications
+}
+
+func appsToTable(apps models.Applications) components.TableData {
+	var tableData components.TableData
+
+	return tableData
+}
+
+templ ApplicationsTable(p ApplicationsTableProps) {
+	@components.TableComponent(appsToTable(p.Apps))
+}

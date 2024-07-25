@@ -53,7 +53,12 @@ func (h handler) Unauthorized(c echo.Context) error {
 	log.Println("Unauthorized reason: ", reasonUnescaped)
 	c.Response().Header().Set("HX-Retarget", "#page")
 	c.Response().Header().Set("HX-Reswap", "innerHTML")
-	unAuthTemplate := views.UnauthorizedPage(views.UnauthorizedProps{Page: page, Reason: reasonUnescaped, R: router, UserID: userID})
+	unAuthTemplate := views.UnauthorizedPage(views.UnauthorizedProps{
+		Page:   page,
+		Reason: reasonUnescaped,
+		R:      router,
+		UserID: userID})
+
 	if util.IsHTMX(c) {
 		return util.RenderTempl(unAuthTemplate, c, http.StatusOK)
 	}

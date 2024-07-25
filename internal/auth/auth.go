@@ -114,7 +114,7 @@ func unauthorizedPath(c echo.Context, reason string, userID int) string {
 	return "/unauthorized" + c.Request().RequestURI + "/" + escapedReason + "/" + strconv.Itoa(userID)
 }
 
-func Authorization(userRepo models.UserRepository) echo.MiddlewareFunc {
+func Authorization(userRepo models.UserRepository, role string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			log.SetPrefix("Authorization Middleware")
@@ -129,14 +129,46 @@ func Authorization(userRepo models.UserRepository) echo.MiddlewareFunc {
 				reason := "user not found"
 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
 			}
-			if !user.Admin {
-				reason := "not admin"
-				return c.Redirect(303, unauthorizedPath(c, reason, userID))
+			if role == "admin" {
+				if !user.Admin {
+					reason := "not admin"
+					return c.Redirect(303, unauthorizedPath(c, reason, userID))
+				}
+			}
+			if role == "teacher" {
+				if !user.Teacher {
+					reason := "not teacher"
+					return c.Redirect(303, unauthorizedPath(c, reason, userID))
+				}
 			}
 			return next(c)
 		}
 	}
 }
+
+// func Authorization(userRepo models.UserRepository) echo.MiddlewareFunc {
+// 	return func(next echo.HandlerFunc) echo.HandlerFunc {
+// 		return func(c echo.Context) error {
+// 			log.SetPrefix("Authorization Middleware")
+// 			userID := c.Get("id").(int)
+// 			log.Println("User ID: ", userID)
+// 			user, err := userRepo.FindByID(userID)
+// 			if err != nil {
+// 				reason := "error retrieving user"
+// 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
+// 			}
+// 			if user == nil {
+// 				reason := "user not found"
+// 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
+// 			}
+// 			if !user.Admin {
+// 				reason := "not admin"
+// 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
+// 			}
+// 			return next(c)
+// 		}
+// 	}
+// }
 
 func GoogleAuth(c echo.Context) (*idtoken.Payload, error) {
 	token, err := c.Cookie("g_csrf_token")

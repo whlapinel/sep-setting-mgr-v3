@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-type role string
-
 type Application struct {
 	ID        int
 	Date      time.Time
@@ -14,12 +12,17 @@ type Application struct {
 	FirstName string
 	LastName  string
 	Email     string
-	Role      role
+	Role      string
 }
 
 const (
-	AdminRole   role = "admin"
-	TeacherRole role = "teacher"
+	AdminRole   string = "admin"
+	TeacherRole string = "teacher"
+)
+
+const (
+	Approve string = "approve"
+	Deny    string = "deny"
 )
 
 type Applications []*Application
@@ -27,24 +30,19 @@ type Applications []*Application
 type ApplicationRepository interface {
 	Store(*Application) error
 	Delete(*Application) error
-	All() ([]*Application, error)
+	All() (Applications, error)
+	GetApplicationByID(id int) (*Application, error)
+	GetApplicationsByUserID(userID int) (Applications, error)
 }
 
 var ErrInvalidRole = errors.New("invalid role")
 
-func GetRole(roleString string) (role, error) {
-	var newRole role = role(roleString)
-	switch newRole {
-	case AdminRole:
-		return AdminRole, nil
-	case TeacherRole:
-		return TeacherRole, nil
-	default:
-		return "", ErrInvalidRole
-	}
-}
+var ErrInvalidAction = errors.New("invalid action")
 
-func NewApplication(userID int, firstName, lastName, email string, role role) (*Application, error) {
+func NewApplication(userID int, firstName, lastName, email string, role string) (*Application, error) {
+	if role != AdminRole && role != TeacherRole {
+		return nil, ErrInvalidRole
+	}
 	return &Application{
 		UserID:    userID,
 		FirstName: firstName,

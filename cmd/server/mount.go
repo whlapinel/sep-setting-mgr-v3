@@ -5,6 +5,7 @@ import (
 	"sep_setting_mgr/internal/domain/services"
 	"sep_setting_mgr/internal/handlers/about"
 	"sep_setting_mgr/internal/handlers/admin"
+	"sep_setting_mgr/internal/handlers/applications"
 	"sep_setting_mgr/internal/handlers/calendar"
 	"sep_setting_mgr/internal/handlers/classes"
 	common "sep_setting_mgr/internal/handlers/common"
@@ -20,6 +21,7 @@ import (
 	"sep_setting_mgr/internal/handlers/users"
 	"sep_setting_mgr/internal/repositories"
 	adminService "sep_setting_mgr/internal/services/admin"
+	applicationService "sep_setting_mgr/internal/services/applications"
 	"sep_setting_mgr/internal/services/assignments"
 	classesService "sep_setting_mgr/internal/services/classes"
 	roomsService "sep_setting_mgr/internal/services/rooms"
@@ -55,6 +57,7 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	signupService := signupService.NewService(usersRepo)
 	signinService := signinService.NewService(usersRepo)
 	adminService := adminService.NewService(usersRepo, applicationsRepo)
+	applicationService := applicationService.NewService(applicationsRepo, usersRepo)
 
 	// define routes
 	common.CreateGroups(e, usersRepo)
@@ -82,5 +85,6 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	about.Mount(e, about.NewHandler())
 	home.Mount(e, home.NewHandler())
 	unauthorized.Mount(e, unauthorized.NewHandler())
+	applications.Mount(e, applications.NewHandler(applicationService))
 	return nil
 }

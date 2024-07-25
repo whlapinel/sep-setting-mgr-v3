@@ -7,63 +7,66 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type RouteName string
-
 const (
-	GoogleSignup                        RouteName = "google-signup"
-	GoogleSignin                        RouteName = "google-signin"
-	Registration                        RouteName = "registration"
-	Rooms                               RouteName = "rooms"
-	DeleteRoom                          RouteName = "delete-room"
-	ShowEditRoomForm                    RouteName = "show-edit-room-form"
-	ShowAddRoomForm                     RouteName = "show-add-room-form"
-	EditRoom                            RouteName = "edit-room"
-	ShowEditUserForm                    RouteName = "show-edit-user-form"
-	EditUser                            RouteName = "edit-user"
-	Users                               RouteName = "users"
-	DeleteUser                          RouteName = "delete-user"
-	ShowAddClassForm                    RouteName = "show-add-class-form"
-	DeleteClass                         RouteName = "delete-class"
-	ShowEditClassForm                   RouteName = "show-edit-class-form"
-	EditClass                           RouteName = "edit-class"
-	Classes                             RouteName = "classes"
-	HxClasses                           RouteName = "hx-classes"
-	CreateClass                         RouteName = "create-class"
-	Students                            RouteName = "students"
-	ShowAddStudentForm                  RouteName = "show-add-student-form"
-	ShowEditStudentForm                 RouteName = "show-edit-student-form"
-	DeleteStudent                       RouteName = "delete-student"
-	EditStudent                         RouteName = "edit-student"
-	DeleteTestEvent                     RouteName = "delete-test-event"
-	ShowAddTestEventForm                RouteName = "show-add-test-event-form"
-	ShowEditTestEventForm               RouteName = "show-edit-test-event-form"
-	EditTestEvent                       RouteName = "edit-test-event"
-	TestEvents                          RouteName = "test-events"
-	CreateTestEvent                     RouteName = "create-test-event"
-	CreateStudent                       RouteName = "create-student"
-	SignupPage                          RouteName = "signup-page"
-	Signup                              RouteName = "signup-post"
-	Signout                             RouteName = "signout"
-	DashboardCalendar                   RouteName = "dashboard-calendar"
-	DBCalendarDetails                   RouteName = "dashboard-calendar-details"
-	AdminCalendar                       RouteName = "admin-calendar"
-	AdminCalendarDetails                RouteName = "admin-calendar-details"
-	ShowAssignRoomForm                  RouteName = "show-assign-room-form"
-	AssignRoom                          RouteName = "assign-room"
-	CreateRoom                          RouteName = "create-room"
-	SigninPostRoute                     RouteName = "signin-post"
-	SigninPage                          RouteName = "signin-page"
-	Unauthorized                        RouteName = "unauthorized"
-	UnauthorizedWithPage                RouteName = "unauthorized-with-page"
-	UnauthorizedWithPageAndReason       RouteName = "unauthorized-with-page-and-reason"
-	UnauthorizedWithPageReasonAndUserID RouteName = "unauthorized-with-page-reason-and-user-id"
-	ApplyForRole                        RouteName = "apply-for-role"
+	GoogleSignup                        string = "google-signup"
+	GoogleSignin                        string = "google-signin"
+	Registration                        string = "registration"
+	Rooms                               string = "rooms"
+	DeleteRoom                          string = "delete-room"
+	ShowEditRoomForm                    string = "show-edit-room-form"
+	ShowAddRoomForm                     string = "show-add-room-form"
+	EditRoom                            string = "edit-room"
+	ShowEditUserForm                    string = "show-edit-user-form"
+	EditUser                            string = "edit-user"
+	Users                               string = "users"
+	DeleteUser                          string = "delete-user"
+	ShowAddClassForm                    string = "show-add-class-form"
+	DeleteClass                         string = "delete-class"
+	ShowEditClassForm                   string = "show-edit-class-form"
+	EditClass                           string = "edit-class"
+	Classes                             string = "classes"
+	HxClasses                           string = "hx-classes"
+	CreateClass                         string = "create-class"
+	Students                            string = "students"
+	ShowAddStudentForm                  string = "show-add-student-form"
+	ShowEditStudentForm                 string = "show-edit-student-form"
+	DeleteStudent                       string = "delete-student"
+	EditStudent                         string = "edit-student"
+	DeleteTestEvent                     string = "delete-test-event"
+	ShowAddTestEventForm                string = "show-add-test-event-form"
+	ShowEditTestEventForm               string = "show-edit-test-event-form"
+	EditTestEvent                       string = "edit-test-event"
+	TestEvents                          string = "test-events"
+	CreateTestEvent                     string = "create-test-event"
+	CreateStudent                       string = "create-student"
+	SignupPage                          string = "signup-page"
+	Signup                              string = "signup-post"
+	Signout                             string = "signout"
+	DashboardCalendar                   string = "dashboard-calendar"
+	DBCalendarDetails                   string = "dashboard-calendar-details"
+	AdminCalendar                       string = "admin-calendar"
+	AdminCalendarDetails                string = "admin-calendar-details"
+	ShowAssignRoomForm                  string = "show-assign-room-form"
+	AssignRoom                          string = "assign-room"
+	CreateRoom                          string = "create-room"
+	SigninPostRoute                     string = "signin-post"
+	SigninPage                          string = "signin-page"
+	Unauthorized                        string = "unauthorized"
+	UnauthorizedWithPage                string = "unauthorized-with-page"
+	UnauthorizedWithPageAndReason       string = "unauthorized-with-page-and-reason"
+	UnauthorizedWithPageReasonAndUserID string = "unauthorized-with-page-reason-and-user-id"
+	ApplicationsPage                    string = "applications-page"
+	ApplyForRole                        string = "apply-for-role"
+	Applications                        string = "admin-applications"     // GET /admin/applications
+	AdjudicateApplication               string = "adjudicate-application" // POST /admin/applications/:app-id/:action
 )
 
 var (
-
 	// /admin
 	AdminGroup *echo.Group
+
+	// /admin/applications
+	AdminApplicationsGroup *echo.Group
 
 	// /applications
 	ApplicationsGroup *echo.Group
@@ -119,9 +122,7 @@ var (
 
 func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 
-	AdminGroup = e.Group("/admin", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo))
-
-	ApplicationsGroup = e.Group("/applications", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)
+	AdminGroup = e.Group("/admin", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo, models.AdminRole))
 
 	UsersGroup = AdminGroup.Group("/users")
 	UserIDGroup = UsersGroup.Group("/:user-id")
@@ -133,8 +134,11 @@ func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	DayDetailsGroup = CalendarGroup.Group("/:date/details")
 
 	AssignRoomGroup = CalendarGroup.Group("/assign-room/:assignment-id")
+	AdminApplicationsGroup = AdminGroup.Group("/applications")
 
-	DashboardGroup = e.Group("/dashboard", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)
+	ApplicationsGroup = e.Group("/applications", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)
+
+	DashboardGroup = e.Group("/dashboard", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo, models.TeacherRole))
 	DBCalendarGroup = DashboardGroup.Group("/calendar")
 	DBDayDetailsGroup = DBCalendarGroup.Group(":date/details")
 

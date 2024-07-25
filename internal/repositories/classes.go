@@ -20,7 +20,10 @@ type classRepo struct {
 }
 
 func NewClassesRepo(db *sql.DB) models.ClassRepository {
-	createClassesTable(db)
+	err := createClassesTable(db)
+	if err != nil {
+		panic(err)
+	}
 	return &classRepo{db: db}
 }
 

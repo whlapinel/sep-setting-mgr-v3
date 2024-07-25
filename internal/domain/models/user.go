@@ -6,7 +6,8 @@ type (
 		FirstName string
 		LastName  string
 		Email     string
-		Admin     bool
+		Admin     bool // must be approved for role
+		Teacher   bool // must be approved for role
 	}
 
 	Teacher struct {
@@ -20,8 +21,6 @@ type (
 		Update(*User) error
 		Find(email string) (*User, error)
 		FindByID(id int) (*User, error)
-		GetClasses(user *User) ([]*Class, error)
-		GetStudents(user *User) ([]*Student, error)
 		All() ([]*User, error)
 	}
 )
