@@ -7,6 +7,10 @@ type TableButton struct {
 	Attr templ.Attributes
 }
 
+type Rower interface {
+	ToRow() Row
+}
+
 type Row struct {
 	TableID  string
 	Data     []string
@@ -25,8 +29,39 @@ type TableData struct {
 	Rows         []Row
 }
 
+type TableOption func(*TableData)
+
 func GetCellID(tableID string, rowID int) string {
 	return tableID + "-form-cell-" + strconv.Itoa(rowID)
+}
+
+func (t TableData) SetDescription(description string) TableData {
+	t.Description = description
+	return t
+}
+
+func (t TableData) SetAddRowButton(button Button) TableData {
+	t.AddRow = true
+	t.AddRowButton = button
+	return t
+}
+
+func Table(id string, title string, headers []string, rowers []Rower) TableData {
+	var rows []Row
+	for _, rower := range rowers {
+		rows = append(rows, rower.ToRow())
+	}
+	t := TableData{
+		ID:      id,
+		Title:   title,
+		Headers: headers,
+		Rows:    rows,
+	}
+	return t
+}
+
+func (t TableData) Templify() templ.Component {
+	return TableComponent(t)
 }
 
 templ TableComponent(t TableData) {

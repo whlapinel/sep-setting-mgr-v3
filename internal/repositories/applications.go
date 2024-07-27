@@ -63,7 +63,7 @@ func (r *applicationRepo) Delete(a *models.Application) error {
 
 func (r *applicationRepo) All() (models.Applications, error) {
 	query := `
-	SELECT a.*, u.* 
+	SELECT a.*, u.first_name, u.last_name, u.email
 	FROM applications a
 	JOIN users u ON u.id = a.user_id
 	ORDER BY a.date ASC
@@ -77,7 +77,12 @@ func (r *applicationRepo) All() (models.Applications, error) {
 	for rows.Next() {
 		var row applicationTableRow
 		var user userTableRow
-		err := rows.Scan(&row.id, &row.date, &row.user_id, &row.role, &user.id, &user.first_name, &user.last_name, &user.email)
+		var temp []uint8
+		err := rows.Scan(&row.id, &temp, &row.user_id, &row.role, &user.first_name, &user.last_name, &user.email)
+		if err != nil {
+			return nil, err
+		}
+		row.date, err = time.Parse("2006-01-02 15:04:05", string(temp))
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +93,7 @@ func (r *applicationRepo) All() (models.Applications, error) {
 			FirstName: user.first_name,
 			LastName:  user.last_name,
 			Email:     user.email,
-			Role:      row.role,
+			Role:      models.Role(row.role),
 		}
 		apps = append(apps, app)
 	}
@@ -127,7 +132,7 @@ func (r *applicationRepo) GetApplicationsByUserID(userID int) (models.Applicatio
 			FirstName: user.first_name,
 			LastName:  user.last_name,
 			Email:     user.email,
-			Role:      row.role,
+			Role:      models.Role(row.role),
 		}
 		apps = append(apps, app)
 	}

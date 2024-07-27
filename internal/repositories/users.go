@@ -61,7 +61,7 @@ func (ur *userRepo) All() ([]*models.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var dbUser userTableRow
-		err := rows.Scan(&dbUser.id, &dbUser.email, &dbUser.admin, &dbUser.teacher)
+		err := rows.Scan(&dbUser.id, &dbUser.first_name, &dbUser.last_name, &dbUser.email, &dbUser.admin, &dbUser.teacher)
 		if err != nil {
 			return nil, err
 		}
@@ -82,8 +82,9 @@ func (ur *userRepo) Find(email string) (*models.User, error) {
 func (ur *userRepo) FindByID(id int) (*models.User, error) {
 	var dbUser userTableRow
 	ur.db.QueryRow(`SELECT * FROM users WHERE id = ?`, id).
-		Scan(&dbUser.id, &dbUser.email, &dbUser.admin, &dbUser.teacher)
+		Scan(&dbUser.id, &dbUser.first_name, &dbUser.last_name, &dbUser.email, &dbUser.admin, &dbUser.teacher)
 	user := convertFromTable(dbUser)
+	log.Println("REPO: User.Admin: ", user.Admin)
 	return user, nil
 }
 

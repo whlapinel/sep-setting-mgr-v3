@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sep_setting_mgr/internal/domain/models"
-	common "sep_setting_mgr/internal/handlers/common"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/services/classes"
 	"sep_setting_mgr/internal/util"

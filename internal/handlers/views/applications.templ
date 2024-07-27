@@ -2,7 +2,8 @@ package views
 
 import (
 	"github.com/labstack/echo/v4"
-	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/domain/models"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
 )
 
@@ -42,7 +43,7 @@ templ ApplicationsPage(p ApplicationsPageProps) {
 templ ApplyButton(r *echo.Echo, userID int, role string) {
 	@components.ButtonComponent(components.Button{
 		Attr: templ.Attributes{
-			"hx-post": r.Reverse(common.ApplyForRole, userID, role),
+			"hx-post": r.Reverse(common.ApplyForRole.String(), userID, role),
 			"hx-swap": "outerHTML",
 			"class":   "cursor-pointer",
 		},
@@ -52,23 +53,23 @@ templ ApplyButton(r *echo.Echo, userID int, role string) {
 }
 
 type AppliedSuccessProps struct {
-	Role string
+	Role models.Role
 }
 
 templ AppliedSuccess(p AppliedSuccessProps) {
 	<h1>Success</h1>
-	<p>Your application for { p.Role } has been submitted.</p>
+	<p>Your application for { p.Role.Str() } has been submitted.</p>
 	<p>You will be notified when your application has been approved.</p>
 }
 
 type AppliedFailureProps struct {
-	Role   string
+	Role   models.Role
 	Reason string
 }
 
 templ AppliedFailure(p AppliedFailureProps) {
 	<h1>Failure</h1>
-	<p>Your application for { p.Role } has failed to submit.</p>
+	<p>Your application for { p.Role.Str() } has failed to submit.</p>
 	<p>Reason: { p.Reason }</p>
 	<p>Please try again later.</p>
 }

@@ -42,8 +42,7 @@ var config = echojwt.Config{
 		// Redirect to login page on error
 		log.Println("Error: ", err)
 		reason := "error validating token"
-		escapedReason := url.QueryEscape(reason)
-		return c.Redirect(303, "/unauthorized"+c.Request().RequestURI+"/"+escapedReason)
+		return c.Redirect(303, unauthorizedPath(c, reason, 0))
 	},
 }
 
@@ -80,9 +79,8 @@ var AddCookieToHeader = func(next echo.HandlerFunc) echo.HandlerFunc {
 		log.Println("running AddCookieToHeader middleware")
 		cookie, err := c.Cookie("token")
 		if err != nil {
-			reason := "cookie not found"
-			urlEncodedReason := url.QueryEscape(reason)
-			return c.Redirect(303, "/unauthorized"+c.Request().RequestURI+"/"+urlEncodedReason)
+			reason := "Not signed in"
+			return c.Redirect(303, unauthorizedPath(c, reason, 0))
 		}
 		c.Request().Header.Set("Authorization", "Bearer "+cookie.Value)
 		return next(c)
@@ -114,61 +112,52 @@ func unauthorizedPath(c echo.Context, reason string, userID int) string {
 	return "/unauthorized" + c.Request().RequestURI + "/" + escapedReason + "/" + strconv.Itoa(userID)
 }
 
-func Authorization(userRepo models.UserRepository, role string) echo.MiddlewareFunc {
+type UnauthReason string
+
+func (r UnauthReason) String() string {
+	return string(r)
+}
+
+const NoAdminRole UnauthReason = "user does not have admin role"
+const NoTeacherRole UnauthReason = "user does not have teacher role"
+const UserNotFound UnauthReason = "user not found"
+const ErrorRetrievingUser UnauthReason = "error retrieving user"
+
+func Authorization(userRepo models.UserRepository, role models.Role) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			log.SetPrefix("Authorization Middleware")
 			userID := c.Get("id").(int)
 			log.Println("User ID: ", userID)
+			log.Println("role: ", role)
 			user, err := userRepo.FindByID(userID)
+			log.Println("user.Admin: ", user.Admin)
+			ok := true
+			var reason UnauthReason
 			if err != nil {
-				reason := "error retrieving user"
-				return c.Redirect(303, unauthorizedPath(c, reason, userID))
-			}
-			if user == nil {
-				reason := "user not found"
-				return c.Redirect(303, unauthorizedPath(c, reason, userID))
-			}
-			if role == "admin" {
+				ok = false
+				reason = ErrorRetrievingUser
+			} else if user == nil {
+				ok = false
+				reason = UserNotFound
+			} else if role == "admin" {
 				if !user.Admin {
-					reason := "not admin"
-					return c.Redirect(303, unauthorizedPath(c, reason, userID))
+					ok = false
+					reason = NoAdminRole
+				}
+			} else if role == "teacher" {
+				if !user.Teacher {
+					ok = false
+					reason = NoTeacherRole
 				}
 			}
-			if role == "teacher" {
-				if !user.Teacher {
-					reason := "not teacher"
-					return c.Redirect(303, unauthorizedPath(c, reason, userID))
-				}
+			if !ok {
+				return c.Redirect(303, unauthorizedPath(c, reason.String(), userID))
 			}
 			return next(c)
 		}
 	}
 }
-
-// func Authorization(userRepo models.UserRepository) echo.MiddlewareFunc {
-// 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-// 		return func(c echo.Context) error {
-// 			log.SetPrefix("Authorization Middleware")
-// 			userID := c.Get("id").(int)
-// 			log.Println("User ID: ", userID)
-// 			user, err := userRepo.FindByID(userID)
-// 			if err != nil {
-// 				reason := "error retrieving user"
-// 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
-// 			}
-// 			if user == nil {
-// 				reason := "user not found"
-// 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
-// 			}
-// 			if !user.Admin {
-// 				reason := "not admin"
-// 				return c.Redirect(303, unauthorizedPath(c, reason, userID))
-// 			}
-// 			return next(c)
-// 		}
-// 	}
-// }
 
 func GoogleAuth(c echo.Context) (*idtoken.Payload, error) {
 	token, err := c.Cookie("g_csrf_token")

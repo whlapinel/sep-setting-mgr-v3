@@ -1,7 +1,9 @@
 package adminapplications
 
 import (
-	"sep_setting_mgr/internal/handlers/common"
+	"log"
+	"sep_setting_mgr/internal/domain/models"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/applications"
@@ -12,10 +14,8 @@ import (
 )
 
 type AdminApplicationsHandler interface {
-	// GET /admin/applications
 	Applications(c echo.Context) error
 
-	// POST /admin/applications/:userID/:role/:action
 	AdjudicateApplication(c echo.Context) error
 }
 
@@ -31,14 +31,15 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h AdminApplicationsHandler) {
 	router = e
-	common.AdminApplicationsGroup.GET("", h.Applications).Name = common.Applications
-	common.AdminApplicationsGroup.POST("/:app-id/:action", h.AdjudicateApplication).Name = common.AdjudicateApplication
+	common.AdminApplicationsGroup.GET("", h.Applications).Name = common.Applications.String()
+	common.AdminApplicationsGroup.POST("/:app-id/:action", h.AdjudicateApplication).Name = common.AdjudicateApplication.String()
 }
 
 func (h handler) Applications(c echo.Context) error {
 
 	apps, err := h.applications.All()
 	if err != nil {
+		log.Println(err)
 		return c.String(500, "Error fetching applications")
 	}
 	template := views.ApplicationsTable(views.ApplicationsTableProps{
@@ -56,7 +57,9 @@ func (h handler) AdjudicateApplication(c echo.Context) error {
 	if err != nil {
 		return c.String(400, "Invalid user ID")
 	}
-	action := c.Param("action")
+	actionString := c.Param("action")
+	action := models.Action(actionString)
+
 	err = h.applications.AdjudicateApplication(appID, action)
 	if err != nil {
 		return c.String(500, "Error adjudicating application")

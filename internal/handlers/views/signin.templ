@@ -1,6 +1,9 @@
 package views
 
-import "sep_setting_mgr/internal/handlers/views/components"
+import (
+	"os"
+	"sep_setting_mgr/internal/handlers/views/components"
+)
 
 templ SignInPage(isSignedIn bool) {
 	if isSignedIn {
@@ -44,9 +47,10 @@ templ SignInPage(isSignedIn bool) {
 				});
 			})();
 			</script>
+			<p>Please Sign In With Your CMS Google Account</p>
 			<div
 				id="g_id_onload"
-				data-client_id="910063803307-20qudb7vttu4tk3sd0q4sti72ql01mff.apps.googleusercontent.com"
+				data-client_id={ os.Getenv("GOOGLE_CLIENT_ID") }
 				data-context="signin"
 				data-ux_mode="popup"
 				data-login_uri="http://localhost:1323/signin"
@@ -61,6 +65,7 @@ templ SignInPage(isSignedIn bool) {
 				data-size="large"
 				data-logo_alignment="left"
 			></div>
+			<script src="https://accounts.google.com/gsi/client" onload="console.log('TODO: add onload function')" async defer></script>
 		}
 	}
 }

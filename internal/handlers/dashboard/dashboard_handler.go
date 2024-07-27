@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/handlers/common"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/assignments"
@@ -20,7 +20,7 @@ import (
 
 type DashboardHandler interface {
 	// GET /dashboard
-	Redirect(c echo.Context) error
+	Dashboard(c echo.Context) error
 
 	// GET /dashboard/calendar
 	DashboardCalendar(c echo.Context) error
@@ -51,12 +51,12 @@ func Mount(e *echo.Echo, h DashboardHandler) {
 	common.DashboardGroup.Use(auth.AddCookieToHeader)
 	common.DashboardGroup.Use(auth.JWTMiddleware)
 	common.DashboardGroup.Use(auth.GetClaims)
-	common.DashboardGroup.GET("", h.Redirect)
-	common.DBCalendarGroup.GET("", h.DashboardCalendar).Name = string(common.DashboardCalendar)
+	common.DashboardGroup.GET("", h.Dashboard).Name = common.Dashboard.String()
+	common.DBCalendarGroup.GET("", h.DashboardCalendar).Name = common.DashboardCalendar.String()
 }
 
-func (h handler) Redirect(c echo.Context) error {
-	return c.Redirect(303, router.Reverse(string(common.Classes)))
+func (h handler) Dashboard(c echo.Context) error {
+	return c.Redirect(303, router.Reverse(common.Classes.String()))
 }
 
 func (h handler) DashboardCalendar(c echo.Context) error {

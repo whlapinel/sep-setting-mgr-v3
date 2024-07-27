@@ -3,7 +3,7 @@ package views
 import (
 	"github.com/labstack/echo/v4"
 	"sep_setting_mgr/internal/domain/models"
-	"sep_setting_mgr/internal/handlers/common"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
 	"strconv"
 )
@@ -26,7 +26,7 @@ func prepareClassesForTable(classes []*models.Class, router *echo.Echo) componen
 		ID:          classesTableID,
 		Title:       "Classes",
 		Description: "A list of all classes.",
-		AddRow: true,
+		AddRow:      true,
 		AddRowButton: components.Button{
 			Attr: templ.Attributes{
 				"hx-get":      router.Reverse(string(common.ShowAddClassForm)),

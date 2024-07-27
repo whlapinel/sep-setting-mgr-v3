@@ -7,10 +7,10 @@ import (
 )
 
 type ApplicationsService interface {
-	ApplyForRole(userID int, role string) error
-	HasRole(userID int, role string) (bool, error)
-	HasApplied(userID int, role string) (bool, error)
-	AdjudicateApplication(appID int, action string) error
+	ApplyForRole(userID int, role models.Role) error
+	HasRole(userID int, role models.Role) (bool, error)
+	HasApplied(userID int, role models.Role) (bool, error)
+	AdjudicateApplication(appID int, action models.Action) error
 	All() (models.Applications, error)
 }
 
@@ -23,7 +23,7 @@ func NewService(applications models.ApplicationRepository, users models.UserRepo
 	return &service{applications, users}
 }
 
-func (s service) ApplyForRole(userId int, role string) error {
+func (s service) ApplyForRole(userId int, role models.Role) error {
 	user, err := s.users.FindByID(userId)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (s service) ApplyForRole(userId int, role string) error {
 	return s.applications.Store(application)
 }
 
-func (s service) HasApplied(userID int, role string) (bool, error) {
+func (s service) HasApplied(userID int, role models.Role) (bool, error) {
 	log.SetPrefix("Application Service: HasApplied() ")
 	log.Println("Role: ", role)
 	applications, err := s.applications.GetApplicationsByUserID(userID)
@@ -53,7 +53,7 @@ func (s service) HasApplied(userID int, role string) (bool, error) {
 	return false, nil
 }
 
-func (s service) HasRole(userID int, role string) (bool, error) {
+func (s service) HasRole(userID int, role models.Role) (bool, error) {
 	user, err := s.users.FindByID(userID)
 	if err != nil {
 		return false, nil
@@ -70,7 +70,7 @@ func (s service) HasRole(userID int, role string) (bool, error) {
 var ErrApplicationNotFound = errors.New("application not found")
 var ErrSearchError = errors.New("error searching for application")
 
-func (s service) AdjudicateApplication(appID int, action string) error {
+func (s service) AdjudicateApplication(appID int, action models.Action) error {
 	if action != models.Approve && action != models.Deny {
 		return models.ErrInvalidAction
 	}

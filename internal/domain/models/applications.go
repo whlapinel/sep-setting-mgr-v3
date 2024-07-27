@@ -12,18 +12,29 @@ type Application struct {
 	FirstName string
 	LastName  string
 	Email     string
-	Role      string
+	Role      Role
 }
 
 const (
-	AdminRole   string = "admin"
-	TeacherRole string = "teacher"
+	AdminRole   Role = "admin"
+	TeacherRole Role = "teacher"
 )
 
 const (
-	Approve string = "approve"
-	Deny    string = "deny"
+	Approve Action = "approve"
+	Deny    Action = "deny"
 )
+
+type Action string
+type Role string
+
+func (a Action) Str() string {
+	return string(a)
+}
+
+func (r Role) Str() string {
+	return string(r)
+}
 
 type Applications []*Application
 
@@ -39,7 +50,7 @@ var ErrInvalidRole = errors.New("invalid role")
 
 var ErrInvalidAction = errors.New("invalid action")
 
-func NewApplication(userID int, firstName, lastName, email string, role string) (*Application, error) {
+func NewApplication(userID int, firstName, lastName, email string, role Role) (*Application, error) {
 	if role != AdminRole && role != TeacherRole {
 		return nil, ErrInvalidRole
 	}

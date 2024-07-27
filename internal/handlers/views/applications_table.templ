@@ -3,6 +3,7 @@ package views
 import (
 	"github.com/labstack/echo/v4"
 	"sep_setting_mgr/internal/domain/models"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
 )
 
@@ -11,12 +12,53 @@ type ApplicationsTableProps struct {
 	Apps models.Applications
 }
 
-func appsToTable(apps models.Applications) components.TableData {
-	var tableData components.TableData
+const applicationsTableID = "applications-table"
 
+func appToRow(app models.Application, router *echo.Echo) components.Row {
+	return components.Row{
+		Editable: true,
+		TableID:  applicationsTableID,
+		Data:     []string{app.FirstName, app.LastName, app.Email, app.Role.Str(), app.Date.Format(format)},
+		ID:       app.ID,
+		Buttons: []components.TableButton{
+			{
+				Text: "Approve",
+				Attr: templ.Attributes{
+					"hx-post":    router.Reverse(common.AdjudicateApplication.String(), app.ID, models.Approve),
+					"hx-target":  "closest tr",
+					"hx-confirm": "Are you sure you want to approve this application?",
+				},
+			},
+			{
+				Text: "Deny",
+				Attr: templ.Attributes{
+					"hx-post":    router.Reverse(common.AdjudicateApplication.String(), app.ID, models.Deny),
+					"hx-target":  "closest tr",
+					"hx-confirm": "Are you sure you want to deny this application?",
+				},
+			},
+		},
+	}
+}
+
+func (p ApplicationsTableProps) appsToTable() components.TableData {
+	var tableData components.TableData
+	var rows []components.Row
+	headers := []string{"First Name", "Last Name", "Email", "Role", "Date"}
+	for _, app := range p.Apps {
+		rows = append(rows, appToRow(*app, p.R))
+	}
+	tableData = components.TableData{
+		ID:          applicationsTableID,
+		Title:       "Applications",
+		Description: "A list of all applications.",
+		AddRow:      false,
+		Headers:     headers,
+		Rows:        rows,
+	}
 	return tableData
 }
 
 templ ApplicationsTable(p ApplicationsTableProps) {
-	@components.TableComponent(appsToTable(p.Apps))
+	@components.TableComponent(p.appsToTable())
 }

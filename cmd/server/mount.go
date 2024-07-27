@@ -5,11 +5,12 @@ import (
 	"sep_setting_mgr/internal/domain/services"
 	"sep_setting_mgr/internal/handlers/about"
 	"sep_setting_mgr/internal/handlers/admin"
+	adminapplications "sep_setting_mgr/internal/handlers/admin_applications"
 	"sep_setting_mgr/internal/handlers/applications"
 	"sep_setting_mgr/internal/handlers/calendar"
 	"sep_setting_mgr/internal/handlers/classes"
-	common "sep_setting_mgr/internal/handlers/common"
 	"sep_setting_mgr/internal/handlers/dashboard"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/home"
 	"sep_setting_mgr/internal/handlers/rooms"
 	"sep_setting_mgr/internal/handlers/signin"
@@ -86,5 +87,6 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	home.Mount(e, home.NewHandler())
 	unauthorized.Mount(e, unauthorized.NewHandler())
 	applications.Mount(e, applications.NewHandler(applicationService))
+	adminapplications.Mount(e, adminapplications.NewHandler(applicationService))
 	return nil
 }

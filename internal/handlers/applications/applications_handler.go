@@ -2,7 +2,8 @@ package applications
 
 import (
 	"log"
-	"sep_setting_mgr/internal/handlers/common"
+	"sep_setting_mgr/internal/domain/models"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/applications"
@@ -32,10 +33,9 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h ApplicationsHandler) {
 	router = e
-	common.ApplicationsGroup.GET("", h.ApplicationsPage).Name = common.ApplicationsPage
-	common.ApplicationsGroup.POST("/:userID/:role", h.ApplyForRole).Name = common.ApplyForRole
+	common.ApplicationsGroup.GET("", h.ApplicationsPage).Name = common.ApplicationsPage.String()
+	common.ApplicationsGroup.POST("/:userID/:role", h.ApplyForRole).Name = common.ApplyForRole.String()
 
-	
 }
 
 func (h handler) ApplyForRole(c echo.Context) error {
@@ -43,7 +43,8 @@ func (h handler) ApplyForRole(c echo.Context) error {
 	if err != nil {
 		return util.RenderTempl(views.AppliedFailure(views.AppliedFailureProps{Role: "unknown", Reason: "error parsing id"}), c, 200)
 	}
-	role := c.Param("role")
+	roleString := c.Param("role")
+	role := models.Role(roleString)
 	err = h.applications.ApplyForRole(userID, role)
 	if err != nil {
 		return util.RenderTempl(views.AppliedFailure(views.AppliedFailureProps{Role: role, Reason: "error creating application"}), c, 200)

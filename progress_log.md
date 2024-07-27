@@ -1,5 +1,10 @@
 # PROGRESS LOG
 
+## 7/26
+
+- Added side nav components to dashboard and admin pages
+- I'm not sure if I'm on the right track now, but I'm experimenting with how I call templ components. I've been uncomfortable with using struct literals for component properties (how do I know what's required and what's optional?) so starting with the new dialog component (so simple that it's probably a bad example for this purpose, but just wanted to see how it would work) I'm creating a constructor for the dialogProps struct e.g. Dialog() and this struct has a method Templify(). So I tried using this in the templ component, but method calls don't seem to enjoy syntax highlighting.  So I created an interface Templifer with the Templify method as its requirement, and a function that accepts a Templifier, and then I call that function and pass in the constructor call. It's quite convoluted, and I'm not sure if I'm gaining much here (other than reinforcing knowledge about these things) and need to think more about whether to apply this pattern elsewhere.
+
 ## 7/24
 
 - Finally implemented Sign In With Google, removed password fields and added first and last name.

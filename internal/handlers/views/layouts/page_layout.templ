@@ -1,0 +1,15 @@
+package layouts
+
+import common "sep_setting_mgr/internal/handlers/views/layouts/layoutscommon"
+
+// intended for admin and dashboard pages, includes sidenav
+templ PageLayout(title string, sideNav templ.Component) {
+	<h1>{ title }</h1>
+	<div class="grid grid-cols-[1fr_4fr]">
+		@sideNav
+		<div id={ common.Details.String() } class="flex justify-center w-[90vw]">
+			{ children... }
+		</div>
+	</div>
+	<div id={ common.Modal.String() }></div>
+}

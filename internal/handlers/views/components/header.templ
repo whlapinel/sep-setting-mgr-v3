@@ -1,12 +1,21 @@
 package components
 
 type NavItem struct {
-	Text string
-	URL  string
+	Text    string
+	URL     string
+	PushURL string
 }
 
 type Header struct {
 	NavItems []NavItem
+}
+
+func (i NavItem) pushURL() string {
+	if i.PushURL != "" {
+		return i.PushURL
+	} else {
+		return "true"
+	}
 }
 
 templ HeaderComponent(h Header) {
@@ -15,7 +24,13 @@ templ HeaderComponent(h Header) {
 			<ul class="flex gap-2">
 				for _, item := range h.NavItems {
 					<li>
-						<button hx-push-url="true" hx-get={ string(templ.URL(item.URL)) } hx-target="#page">{ item.Text }</button>
+						<button
+							hx-get={ string(templ.URL(item.URL)) }
+							hx-target="#page"
+							hx-push-url={ item.pushURL() }
+						>
+							{ item.Text }
+						</button>
 					</li>
 				}
 			</ul>

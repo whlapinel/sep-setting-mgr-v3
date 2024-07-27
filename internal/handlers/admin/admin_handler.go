@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"sep_setting_mgr/internal/handlers/common"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/admin"

@@ -3,7 +3,7 @@ package signin
 import (
 	"log"
 	"sep_setting_mgr/internal/auth"
-	"sep_setting_mgr/internal/handlers/common"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/signin"

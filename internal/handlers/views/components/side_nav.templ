@@ -1,0 +1,35 @@
+package components
+
+templ SideNav(navItems []NavItem, target string) {
+	<nav id="side-nav" class="flex flex-col bg-fuchsia">
+		<ul>
+			for _, item := range navItems {
+				<li>
+					@ButtonComponent(Button{
+						Attr: templ.Attributes{
+							"hx-get":      item.URL,
+							"hx-target":   target,
+							"hx-push-url": item.pushURL(),
+						},
+					}) {
+						{ item.Text }
+					}
+				</li>
+				<script>
+                (()=>{
+                    script = document.currentScript;
+                    const button = script.previousElementSibling.querySelector('button');
+                    const activeClass = 'bg-fuchsia-700';
+                    button.addEventListener('click', () => {
+                        const active = document.querySelector(`#side-nav button.${activeClass}`);
+                        if (active) {
+                            active.classList.remove(activeClass);
+                        }
+                        button.classList.add(activeClass);
+                    });
+                })();
+                </script>
+			}
+		</ul>
+	</nav>
+}

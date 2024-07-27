@@ -2,6 +2,9 @@ package util
 
 import (
 	"errors"
+	"log"
+	"os"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"time"
 
 	"github.com/a-h/templ"
@@ -32,4 +35,12 @@ func ParseDate(date string) (*time.Time, error) {
 		return nil, err
 	}
 	return &parsedDate, nil
+}
+
+func FullPath(name common.RouteName, r *echo.Echo) string {
+	protocol := os.Getenv("PROTOCOL")
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+	log.Println("path: ", protocol, host, port, r.Reverse(name.String()))
+	return protocol + "://" + host + ":" + port + r.Reverse(name.String())
 }

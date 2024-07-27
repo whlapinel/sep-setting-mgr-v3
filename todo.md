@@ -2,13 +2,15 @@
 
 ## PENDING
 
-- Put dashboard and admin top menu buttons in a sidebar.
-- Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
 - refresh token before expiration if user is active
+- Dockerize
+- Add TLS
+- Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
 - consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
 
 ## COMPLETE
 
+- Put dashboard and admin top menu buttons in a sidebar.
 - implement Sign In With Google
 - Calendar table heights should be consistent with each other within the week view. Maybe list every room each day instead of only listing those for which there are tests.
 - admin functionality (users)

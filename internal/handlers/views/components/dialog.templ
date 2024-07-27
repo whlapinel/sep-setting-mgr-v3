@@ -1,0 +1,30 @@
+package components
+
+type dialogProps struct {
+	Title string
+}
+
+func Dialog(title string) dialogProps {
+	return dialogProps{Title: title}
+}
+
+func (d dialogProps) Templify() templ.Component {
+	return DialogComponent(d.Title)
+}
+
+templ DialogComponent(title string) {
+	<dialog
+		class=" rounded-xl p-4"
+	>
+		<h2 class="text-base font-semibold leading-7 text-gray-900">{ title }</h2>
+		{ children... }
+		<script>
+            (() => {
+				const script = document.currentScript;
+				const dialog = script.closest("dialog");
+				dialog.showModal();
+			})();
+
+		</script>
+	</dialog>
+}

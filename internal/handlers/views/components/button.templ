@@ -9,3 +9,9 @@ templ ButtonComponent(b Button) {
 		{ children... }
 	</button>
 }
+
+templ TestUseOfButton() {
+	@ButtonComponent(Button{Attr: templ.Attributes{"hx-get": "/test"}}) {
+		Click me
+	}
+}

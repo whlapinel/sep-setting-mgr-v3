@@ -2,8 +2,10 @@ package views
 
 import (
 	"github.com/labstack/echo/v4"
-	"sep_setting_mgr/internal/handlers/common"
+	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/layouts"
+	"sep_setting_mgr/internal/handlers/views/layouts/layoutscommon"
 	"time"
 )
 
@@ -11,48 +13,19 @@ type AdminPageProps struct {
 	R *echo.Echo
 }
 
-var details = "details"
-var detailsSelector = "#" + details
-
-var modal = "modal"
-var modalSelector = "#" + modal
-
 templ AdminPage(p AdminPageProps) {
-	<h1>Admin</h1>
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":    p.R.Reverse(common.Applications),
-			"hx-target": detailsSelector,
-		},
-	}) {
-		Pending Applications
-	}
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":    common.Rooms,
-			"hx-target": detailsSelector,
-		},
-	}) {
-		Rooms
-	}
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":      p.R.Reverse(string(common.AdminCalendar), time.Now().Format("2006-01-02")),
-			"hx-target":   detailsSelector,
-			"hx-push-url": "true",
-		},
-	}) {
-		Calendar
-	}
-	@components.ButtonComponent(components.Button{
-		Attr: templ.Attributes{
-			"hx-get":      p.R.Reverse(string(common.Users)),
-			"hx-target":   detailsSelector,
-			"hx-push-url": "true",
-		},
-	}) {
-		Users
-	}
-	<div id={ details } class="flex justify-center"></div>
-	<div id={ modal }></div>
+	@layouts.PageLayout("Admin", AdminSideNav(AdminSideNavProps{R: p.R}))
+}
+
+type AdminSideNavProps struct {
+	R *echo.Echo
+}
+
+templ AdminSideNav(p AdminSideNavProps) {
+	@components.SideNav([]components.NavItem{
+		{Text: "Pending Applications", URL: p.R.Reverse(common.Applications.String())},
+		{Text: "Rooms", URL: p.R.Reverse(common.Rooms.String())},
+		{Text: "Calendar", URL: p.R.Reverse(common.AdminCalendar.String(), time.Now().Format("2006-01-02"))},
+		{Text: "Users", URL: p.R.Reverse(common.Users.String())},
+	}, layoutscommon.Details.Selector())
 }
