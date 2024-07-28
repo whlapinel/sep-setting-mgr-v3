@@ -1,0 +1,9 @@
+{
+    "include": [
+        "internal/assets"
+    ],
+    "extends": "@tsconfig/recommended/tsconfig.json",
+    "compilerOptions": {
+        "outDir": "internal/assets/dist",
+    }
+}

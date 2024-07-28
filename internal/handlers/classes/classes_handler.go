@@ -6,9 +6,9 @@ import (
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/classes"
 	"sep_setting_mgr/internal/util"
-	"sep_setting_mgr/internal/handlers/views/layouts"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -53,13 +53,13 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h ClassesHandler) {
 	router = e
-	common.ClassesGroup.GET("", h.Classes).Name = string(common.Classes)
-	common.ClassesGroup.GET("/hx-classes", h.HxClasses).Name = string(common.HxClasses)
-	common.ClassesGroup.GET("/add", h.ShowAddClassForm).Name = string(common.ShowAddClassForm)
-	common.ClassesGroup.POST("", h.CreateClass).Name = string(common.CreateClass)
-	common.ClassIDGroup.GET("/edit", h.ShowEditClassForm).Name = string(common.ShowEditClassForm)
-	common.ClassIDGroup.POST("/edit", h.EditClass).Name = string(common.EditClass)
-	common.ClassIDGroup.DELETE("", h.DeleteClass).Name = string(common.DeleteClass)
+	common.ClassesGroup.GET("", h.Classes).Name = common.Classes.String()
+	common.ClassesGroup.GET("/hx-classes", h.HxClasses).Name = common.HxClasses.String()
+	common.ClassesGroup.GET("/add", h.ShowAddClassForm).Name = common.ShowAddClassForm.String()
+	common.ClassesGroup.POST("", h.CreateClass).Name = common.CreateClass.String()
+	common.ClassIDGroup.GET("/edit", h.ShowEditClassForm).Name = common.ShowEditClassForm.String()
+	common.ClassIDGroup.POST("/edit", h.EditClass).Name = common.EditClass.String()
+	common.ClassIDGroup.DELETE("", h.DeleteClass).Name = common.DeleteClass.String()
 }
 
 func (h handler) HxClasses(c echo.Context) error {

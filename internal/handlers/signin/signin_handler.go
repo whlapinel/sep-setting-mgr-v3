@@ -14,7 +14,7 @@ import (
 
 type SigninHandler interface {
 	// GET /signin
-	SignInHandler(e echo.Context) error
+	SignInPage(e echo.Context) error
 
 	// POST /signin
 	GoogleSignin(e echo.Context) error
@@ -32,16 +32,16 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h SigninHandler) {
 	router = e
-	e.GET("/signin", h.SignInHandler).Name = string(common.SigninPage)
+	e.GET("/signin", h.SignInPage).Name = string(common.SigninPage)
 	e.POST("/signin", h.GoogleSignin).Name = string(common.GoogleSignin)
 }
 
-func (h handler) SignInHandler(c echo.Context) error {
+func (h handler) SignInPage(c echo.Context) error {
 	isSignedIn := auth.IsSignedIn(c)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.SignInPage(isSignedIn), c, 200)
+		return util.RenderTempl(views.SignInPage(isSignedIn, false, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn, false, router)), c, 200)
 }
 
 func (h handler) GoogleSignin(c echo.Context) error {
@@ -63,5 +63,5 @@ func (h handler) GoogleSignin(c echo.Context) error {
 		return c.String(500, "Failed to issue token")
 	}
 	auth.WriteToken(c, t)
-	return c.Redirect(303, router.Reverse(string(common.Classes)))
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(true, true, router)), c, 200)
 }

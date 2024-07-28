@@ -11,7 +11,7 @@ var usersTableID = "users-table"
 
 func prepareUsersForTable(users []*models.User, r *echo.Echo) components.TableData {
 	var rows []components.Row
-	headers := []string{"Email", "Admin"}
+	headers := []string{"First", "Last", "Email", "Admin", "Teacher"}
 	for _, user := range users {
 		rows = append(rows, userToRow(user, r))
 	}
@@ -24,19 +24,26 @@ func prepareUsersForTable(users []*models.User, r *echo.Echo) components.TableDa
 }
 
 func userToRow(user *models.User, r *echo.Echo) components.Row {
-	adminStringFalse := "No"
-	adminStringTrue := "Yes"
-	var adminString string
+	hasRoleFalse := "No"
+	hasRoleTrue := "Yes"
+	var hasAdmin string
 	switch user.Admin {
 	case true:
-		adminString = adminStringTrue
+		hasAdmin = hasRoleTrue
 	case false:
-		adminString = adminStringFalse
+		hasAdmin = hasRoleFalse
+	}
+	var hasTeacher string
+	switch user.Teacher {
+	case true:
+		hasTeacher = hasRoleTrue
+	case false:
+		hasTeacher = hasRoleFalse
 	}
 	return components.Row{
 		TableID:  usersTableID,
 		Editable: true,
-		Data:     []string{user.Email, adminString},
+		Data:     []string{user.FirstName, user.LastName, user.Email, hasAdmin, hasTeacher},
 		ID:       user.ID,
 		Buttons: []components.TableButton{
 			{

@@ -2,14 +2,25 @@
 
 ## PENDING
 
-- refresh token before expiration if user is active
+- something is wrong with the warning timer on the client side session management
+- Fix welcome screen (after signup). Currently is just text saying Welcome!
+- Add row button title should be customizable instead of just using table title
+- classes/hx-classes gets pushed to URL instead of just /classes
+- Add "Up" button to dashboard pages (e.g. when viewing students for A class, should be able to return to A class)
+- Create demo data
 - Dockerize
+- Deploy
 - Add TLS
 - Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
 - consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
 
 ## COMPLETE
 
+- Rooms: priority should be unique. For editing priority, use promote / demote buttons instead of radio inputs.
+- Calendar: both "Unassigned" and "Unassign" show up. Pick one (and make sure it works)
+- Users: add teacher role to table and edit form.
+- Add name fields to Users table and edit form.
+- refresh token before expiration if user is active
 - Put dashboard and admin top menu buttons in a sidebar.
 - implement Sign In With Google
 - Calendar table heights should be consistent with each other within the week view. Maybe list every room each day instead of only listing those for which there are tests.

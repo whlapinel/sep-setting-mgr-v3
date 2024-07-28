@@ -16,15 +16,27 @@ templ DialogComponent(title string) {
 	<dialog
 		class=" rounded-xl p-4"
 	>
-		<h2 class="text-base font-semibold leading-7 text-gray-900">{ title }</h2>
-		{ children... }
+		<h2 class="text-lg font-semibold leading-7 text-gray-900">{ title }</h2>
+		<div class="flex flex-col justify-center items-center p-8 gap-2">
+			{ children... }
+		</div>
 		<script>
             (() => {
 				const script = document.currentScript;
 				const dialog = script.closest("dialog");
 				dialog.showModal();
 			})();
-
 		</script>
+		<button>Close</button>
+		<script>
+            (() => {
+                const script = document.currentScript;
+                const button = script.previousElementSibling;
+                const dialog = button.closest("dialog");
+                button.addEventListener("click", () => {
+                    dialog.close();
+                });
+            })();
+        </script>
 	</dialog>
 }

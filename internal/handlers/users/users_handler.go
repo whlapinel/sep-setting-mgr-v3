@@ -85,9 +85,11 @@ func (h handler) EditUser(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error retrieving user")
 	}
-	user.Email = c.FormValue("email")
 	if c.FormValue("admin") != "" {
 		user.Admin = c.FormValue("admin") == "yes"
+	}
+	if c.FormValue("teacher") != "" {
+		user.Teacher = c.FormValue("teacher") == "yes"
 	}
 	err = h.service.UpdateUser(user)
 	if err != nil {

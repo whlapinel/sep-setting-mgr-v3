@@ -31,6 +31,9 @@ type RoomsHandler interface {
 
 	// POST /admin/rooms/:room-id
 	EditRoom(c echo.Context) error
+
+	// POST /admin/rooms/:room-id/promote
+	PromoteRoom(c echo.Context) error
 }
 
 type handler struct {
@@ -47,12 +50,13 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h RoomsHandler) {
 	router = e
-	common.RoomsGroup.GET("", h.Rooms).Name = string(common.Rooms)
-	common.RoomsGroup.GET("/add", h.ShowAddRoomForm).Name = string(common.ShowAddRoomForm)
-	common.RoomsGroup.POST("", h.CreateRoom).Name = string(common.CreateRoom)
-	common.RoomsIDGroup.GET("/edit", h.ShowEditRoomForm).Name = string(common.ShowEditRoomForm)
-	common.RoomsIDGroup.POST("", h.EditRoom).Name = string(common.EditRoom)
-	common.RoomsIDGroup.DELETE("", h.DeleteRoom).Name = string(common.DeleteRoom)
+	common.RoomsGroup.GET("", h.Rooms).Name = common.Rooms.String()
+	common.RoomsGroup.GET("/add", h.ShowAddRoomForm).Name = common.ShowAddRoomForm.String()
+	common.RoomsGroup.POST("", h.CreateRoom).Name = common.CreateRoom.String()
+	common.RoomsIDGroup.GET("/edit", h.ShowEditRoomForm).Name = common.ShowEditRoomForm.String()
+	common.RoomsIDGroup.POST("", h.EditRoom).Name = common.EditRoom.String()
+	common.RoomsIDGroup.DELETE("", h.DeleteRoom).Name = common.DeleteRoom.String()
+	common.RoomsIDGroup.POST("/promote", h.PromoteRoom).Name = common.PromoteRoom.String()
 }
 
 func (h handler) Rooms(c echo.Context) error {
@@ -88,6 +92,22 @@ func (h handler) CreateRoom(c echo.Context) error {
 	}
 	room.ID = id
 	return util.RenderTempl(views.RoomsRowComponent(&room, router), c, 201)
+}
+
+func (h handler) PromoteRoom(c echo.Context) error {
+	roomID, err := strconv.Atoi(c.Param("room-id"))
+	if err != nil {
+		return err
+	}
+	err = h.service.PromoteRoom(roomID)
+	if err != nil {
+		return err
+	}
+	rooms, err := h.service.ListRooms()
+	if err != nil {
+		return err
+	}
+	return util.RenderTempl(views.RoomsTableComponent(rooms, router), c, 200)
 }
 
 func (h handler) EditRoom(c echo.Context) error {

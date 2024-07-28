@@ -2,9 +2,10 @@ package about
 
 import (
 	"net/http"
+	"sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
-	"sep_setting_mgr/internal/util"
 	"sep_setting_mgr/internal/handlers/views/layouts"
+	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,7 +23,7 @@ func NewHandler() AboutPageHandler {
 }
 
 func Mount(e *echo.Echo, h AboutPageHandler) {
-	e.GET("/about", h.AboutPage)
+	e.GET("/about", h.AboutPage).Name = handlerscommon.AboutPage.String()
 }
 
 func (h handler) AboutPage(c echo.Context) error {

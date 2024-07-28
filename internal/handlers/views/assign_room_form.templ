@@ -15,20 +15,14 @@ func getAssignFormID(id int) string {
 
 const roomSelectID = "room-select"
 
-var unassignOption = &components.Option{
-	Value: "-1",
-	Text:  "Unassign",
-}
-
-func roomOptions(rooms []*models.Room) []*components.Option {
+func roomOptions(rooms models.Rooms) []*components.Option {
 	var options []*components.Option
-	for _, room := range rooms {
+	for _, room := range rooms.SortByRoomPriority() {
 		options = append(options, &components.Option{
 			Value: strconv.Itoa(room.ID),
 			Text:  room.Name,
 		})
 	}
-	options = append(options, unassignOption)
 	return options
 }
 

@@ -3,12 +3,14 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"sep_setting_mgr/internal/domain/models"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,7 +19,10 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-const sessionLifeSpan = time.Minute * 60
+const sessionLifeSpan = 30 * time.Second
+const cushionTime = time.Second * 10
+
+var secret = os.Getenv("JWT_SECRET")
 
 type jwtCustomClaims struct {
 	Email string `json:"email"`
@@ -25,56 +30,7 @@ type jwtCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-type GoogleClaims struct {
-	Email         string `json:"email"`
-	EmailVerified bool   `json:"email_verified"`
-	FirstName     string `json:"given_name"`
-	LastName      string `json:"family_name"`
-	jwt.RegisteredClaims
-}
-
-var config = echojwt.Config{
-	NewClaimsFunc: func(c echo.Context) jwt.Claims {
-		return new(jwtCustomClaims)
-	},
-	SigningKey: []byte("secret"),
-	ErrorHandler: func(c echo.Context, err error) error {
-		// Redirect to login page on error
-		log.Println("Error: ", err)
-		reason := "error validating token"
-		return c.Redirect(303, unauthorizedPath(c, reason, 0))
-	},
-}
-
-func IssueToken(email string, id int) (string, error) {
-	claims := jwtCustomClaims{
-		Email: email,
-		ID:    id,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(sessionLifeSpan)),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString([]byte("secret"))
-	if err != nil {
-		return "", err
-	}
-	return t, nil
-}
-
-func WriteToken(c echo.Context, t string) {
-	cookie := new(http.Cookie)
-	cookie.Name = "token"
-	cookie.Value = t
-	cookie.HttpOnly = true
-	cookie.Path = "/"
-	cookie.Expires = time.Now().Add(sessionLifeSpan)
-	log.Println("Setting cookie: ", cookie)
-	c.SetCookie(cookie)
-	c.Response().Header().Set("Authorization", "Bearer "+t)
-}
-
-var AddCookieToHeader = func(next echo.HandlerFunc) echo.HandlerFunc {
+func AddCookieToHeader(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log.Println("running AddCookieToHeader middleware")
 		cookie, err := c.Cookie("token")
@@ -87,7 +43,44 @@ var AddCookieToHeader = func(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-var GetClaims = func(next echo.HandlerFunc) echo.HandlerFunc {
+var JWTMiddleware = echojwt.WithConfig(config)
+
+var config = echojwt.Config{
+	NewClaimsFunc: func(c echo.Context) jwt.Claims {
+		return new(jwtCustomClaims)
+	},
+	SigningKey: []byte(secret),
+	ErrorHandler: func(c echo.Context, err error) error {
+		// Redirect to login page on error
+		log.Println("Error: ", err)
+		reason := "error validating token"
+		return c.Redirect(303, unauthorizedPath(c, reason, 0))
+	},
+	SuccessHandler: func(c echo.Context) {
+		log.Println("SuccessHandler")
+		log.Println("Claims: ", c.Get("user"))
+		userToken := c.Get("user").(*jwt.Token)
+		claims := userToken.Claims.(*jwtCustomClaims)
+		log.Println("Email: ", claims.Email)
+		log.Println("ID: ", claims.ID)
+		expiration := claims.ExpiresAt.Time
+		log.Println("Expiration: ", expiration)
+		if time.Until(expiration) <= cushionTime {
+			log.Println("less than a minute left")
+			t, err := IssueToken(claims.Email, claims.ID)
+			if err != nil {
+				log.Println("Failed to issue token: ", err)
+			}
+			WriteToken(c, t)
+			jsonString := fmt.Sprintf("{\"signin\":{\"expiration\":%d}}", time.Now().Add(sessionLifeSpan).UnixMilli())
+			c.Response().Header().Set("Hx-Trigger", jsonString)
+		} else {
+			log.Println("more than a minute left")
+		}
+	},
+}
+
+func GetClaims(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		log.Println("running GetClaims middleware")
 		user := c.Get("user").(*jwt.Token)
@@ -97,31 +90,6 @@ var GetClaims = func(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
-var JWTMiddleware = echojwt.WithConfig(config)
-
-func IsSignedIn(c echo.Context) bool {
-	cookie, err := c.Cookie("token")
-	if err != nil {
-		return false
-	}
-	return cookie.Value != ""
-}
-
-func unauthorizedPath(c echo.Context, reason string, userID int) string {
-	escapedReason := url.QueryEscape(reason)
-	return "/unauthorized" + c.Request().RequestURI + "/" + escapedReason + "/" + strconv.Itoa(userID)
-}
-
-type UnauthReason string
-
-func (r UnauthReason) String() string {
-	return string(r)
-}
-
-const NoAdminRole UnauthReason = "user does not have admin role"
-const NoTeacherRole UnauthReason = "user does not have teacher role"
-const UserNotFound UnauthReason = "user not found"
-const ErrorRetrievingUser UnauthReason = "error retrieving user"
 
 func Authorization(userRepo models.UserRepository, role models.Role) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -183,3 +151,64 @@ func GoogleAuth(c echo.Context) (*idtoken.Payload, error) {
 	log.Println("Payload: ", payload)
 	return payload, nil
 }
+
+func IssueToken(email string, id int) (string, error) {
+	claims := jwtCustomClaims{
+		Email: email,
+		ID:    id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(sessionLifeSpan)),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	t, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+	return t, nil
+}
+
+func WriteToken(c echo.Context, t string) {
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = t
+	cookie.HttpOnly = true
+	cookie.Path = "/"
+	cookie.Expires = time.Now().Add(sessionLifeSpan)
+	log.Println("Setting cookie: ", cookie)
+	c.SetCookie(cookie)
+	c.Response().Header().Set("Authorization", "Bearer "+t)
+}
+
+func IsSignedIn(c echo.Context) bool {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		return false
+	}
+	return cookie.Value != ""
+}
+
+func unauthorizedPath(c echo.Context, reason string, userID int) string {
+	log.SetPrefix("UnauthorizedPath: ")
+	trimmedURI := strings.Trim(c.Request().RequestURI, "/")
+	splitURI := strings.Split(trimmedURI, "/")
+	var page string
+	if len(splitURI) > 0 {
+		page = splitURI[0]
+	} else {
+		page = trimmedURI
+	}
+	escapedReason := url.QueryEscape(reason)
+	return "/unauthorized" + "/" + page + "/" + escapedReason + "/" + strconv.Itoa(userID)
+}
+
+type UnauthReason string
+
+func (r UnauthReason) String() string {
+	return string(r)
+}
+
+const NoAdminRole UnauthReason = "user does not have admin role"
+const NoTeacherRole UnauthReason = "user does not have teacher role"
+const UserNotFound UnauthReason = "user not found"
+const ErrorRetrievingUser UnauthReason = "error retrieving user"

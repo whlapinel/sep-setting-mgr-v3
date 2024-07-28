@@ -19,12 +19,8 @@ templ UserFormComponent(adminID int, user *models.User, r *echo.Echo) {
 		SubmitBtnTitle: "Submit",
 		Cancelable:     true,
 	}) {
-		@components.InputComponent(components.Input{
-			Label: "Email",
-			Name:  "email",
-			Type:  "email",
-			Value: user.Email,
-		})
+		<p>{ user.FirstName }{ " " }{ user.LastName }</p>
+		<p>{ user.Email }</p>
 		@components.RadioComponent(components.RadioGroup{
 			Title: "Admin",
 			Name:  "admin",
@@ -34,6 +30,26 @@ templ UserFormComponent(adminID int, user *models.User, r *echo.Echo) {
 					Value:    "yes",
 					Label:    "Yes",
 					Checked:  user.Admin == true,
+					Disabled: user.ID == adminID,
+				},
+				{
+					ID:       "no",
+					Value:    "no",
+					Label:    "No",
+					Checked:  user.Admin == false,
+					Disabled: user.ID == adminID,
+				},
+			},
+		})
+		@components.RadioComponent(components.RadioGroup{
+			Title: "Teacher",
+			Name:  "teacher",
+			Options: []*components.RadioOption{
+				{
+					ID:       "yes",
+					Value:    "yes",
+					Label:    "Yes",
+					Checked:  user.Teacher == true,
 					Disabled: user.ID == adminID,
 				},
 				{

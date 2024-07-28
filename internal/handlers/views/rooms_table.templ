@@ -54,6 +54,14 @@ func roomToRow(room *models.Room, router *echo.Echo) components.Row {
 		ID:       room.ID,
 		Buttons: []components.TableButton{
 			{
+				Text: "Promote",
+				Attr: templ.Attributes{
+					"hx-post":   router.Reverse(common.PromoteRoom.String(), room.ID),
+					"hx-target": "#details",
+					"disabled":  room.Priority < 2,
+				},
+			},
+			{
 				Text: "Edit",
 				Attr: templ.Attributes{
 					"hx-get":      router.Reverse(string(common.ShowEditRoomForm), room.ID),

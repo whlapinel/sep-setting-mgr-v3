@@ -1,71 +1,47 @@
 package views
 
 import (
+	"github.com/labstack/echo/v4"
 	"os"
-	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/handlerscommon"
+	c "sep_setting_mgr/internal/handlers/views/components"
+	cc "sep_setting_mgr/internal/handlers/views/components/componentscommon"
+	"sep_setting_mgr/internal/util"
 )
 
-templ SignInPage(isSignedIn bool) {
+templ SignInPage(isSignedIn bool, justSignedIn bool, router *echo.Echo) {
 	if isSignedIn {
 		<div class="alert alert-success" role="alert">
 			<h1>You are signed in</h1>
 		</div>
+		if justSignedIn {
+			<script src="/dist/signin.js" async defer></script>
+		}
 	} else {
-		@components.FormComponent(components.Form{
-			Title:    "Sign In",
-			SubTitle: "Enter Username and Password and Click Submit",
-			HxAttr: templ.Attributes{
-				"hx-post":                  "/hx-signin",
-				"hx-target":                "#page",
-				"hx-on:htmx:after-request": "document.dispatchEvent(new CustomEvent('signin', { bubbles: true }))",
-			},
-			SubmitBtnTitle: "Submit",
-			ShowDialog:     true,
-			Cancelable:     false,
-		}) {
-			@components.InputComponent(components.Input{
-				Label:    "Email",
-				Type:     "email",
-				Name:     "email",
-				ID:       "email",
-				Required: true,
-			})
-			@components.InputComponent(components.Input{
-				Label:    "Password",
-				Type:     "password",
-				Name:     "password",
-				ID:       "password",
-				Required: true,
-			})
-			<script>
-			(() => {
-				let script = document.currentScript;
-				parent = script.closest("form");
-				button = parent.querySelector("button[type=submit]");
-				button.addEventListener("click", () => {
-					document.dispatchEvent(new CustomEvent('signin', { bubbles: true }));
-				});
-			})();
-			</script>
-			<p>Please Sign In With Your CMS Google Account</p>
-			<div
-				id="g_id_onload"
-				data-client_id={ os.Getenv("GOOGLE_CLIENT_ID") }
-				data-context="signin"
-				data-ux_mode="popup"
-				data-login_uri="http://localhost:1323/signin"
-				data-auto_prompt="false"
-			></div>
-			<div
-				class="g_id_signin"
-				data-type="standard"
-				data-shape="rectangular"
-				data-theme="outline"
-				data-text="signin_with"
-				data-size="large"
-				data-logo_alignment="left"
-			></div>
-			<script src="https://accounts.google.com/gsi/client" onload="console.log('TODO: add onload function')" async defer></script>
+		@cc.Templify(c.Dialog("Sign In")) {
+			@SigninWithGoogleComponent(router)
 		}
 	}
+}
+
+templ SigninWithGoogleComponent(router *echo.Echo) {
+	<p>Please Sign In With Your CMS Google Account</p>
+	<div
+		id="g_id_onload"
+		data-client_id={ os.Getenv("GOOGLE_CLIENT_ID") }
+		data-context="signin"
+		data-ux_mode="popup"
+		data-login_uri={ util.FullPath(handlerscommon.GoogleSignin, router) }
+		data-auto_prompt="false"
+	></div>
+	<div
+		class="g_id_signin"
+		data-type="standard"
+		data-shape="rectangular"
+		data-theme="outline"
+		data-text="signin_with"
+		data-size="large"
+		data-logo_alignment="left"
+	></div>
+	<script src="https://accounts.google.com/gsi/client" onload="console.log('TODO: add onload function')" async defer></script>
 }

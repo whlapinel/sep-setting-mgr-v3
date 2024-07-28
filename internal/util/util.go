@@ -44,3 +44,7 @@ func FullPath(name common.RouteName, r *echo.Echo) string {
 	log.Println("path: ", protocol, host, port, r.Reverse(name.String()))
 	return protocol + "://" + host + ":" + port + r.Reverse(name.String())
 }
+
+func Path(name common.RouteName, r *echo.Echo) string {
+	return r.Reverse(name.String())
+}

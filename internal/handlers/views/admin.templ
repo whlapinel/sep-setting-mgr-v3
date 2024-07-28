@@ -9,9 +9,20 @@ import (
 	"time"
 )
 
+func NewAdminPage(r *echo.Echo) AdminPageProps {
+	return AdminPageProps{
+		R: r,
+	}
+}
+
 type AdminPageProps struct {
 	R *echo.Echo
 }
+
+func (p AdminPageProps) Templify() templ.Component {
+	return AdminPage(p)
+}
+
 
 templ AdminPage(p AdminPageProps) {
 	@layouts.PageLayout("Admin", AdminSideNav(AdminSideNavProps{R: p.R}))

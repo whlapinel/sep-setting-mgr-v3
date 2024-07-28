@@ -44,8 +44,8 @@ func (ur *userRepo) Update(user *models.User) error {
 	log.Println("Updating user in database")
 	_, err := ur.db.Exec(`
 	UPDATE users 
-	SET first_name = ?, last_name = ?, email = ?, admin = ?, teacher = ? 
-	WHERE id = ?`, dbUser.first_name, dbUser.last_name, dbUser.email, dbUser.admin, dbUser.teacher, user.ID)
+	SET admin = ?, teacher = ? 
+	WHERE id = ?`, dbUser.admin, dbUser.teacher, user.ID)
 	if err != nil {
 		return err
 	}

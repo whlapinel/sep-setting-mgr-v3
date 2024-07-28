@@ -1,5 +1,9 @@
 # PROGRESS LOG
 
+## 7/27
+
+- Spent a lot of time figuring out how to request a token refresh from the client when user is active and a certain duration remains before expiration. Then I realized I could just do all of this on the server. So I added a SuccessHandler to the echojwt configuration that issues a new token when the threshold is reached. Simple, and avoids a lot of JS pain.
+
 ## 7/26
 
 - Added side nav components to dashboard and admin pages

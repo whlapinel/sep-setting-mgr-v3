@@ -14,7 +14,7 @@ templ MainLayout(page templ.Component) {
 			<title>Separate Setting Manager</title>
 		</head>
 		<body hx-ext="response-targets">
-			<div hx-post="/hx-signout" hx-trigger="signout" id="user-status" hx-target="#page"></div>
+			<div hx-post="/hx-signout" hx-trigger="signout" id="user-signout" hx-target="#page"></div>
 			@components.HeaderComponent(components.Header{
 				NavItems: []components.NavItem{
 					{Text: "Home", URL: "/"},
