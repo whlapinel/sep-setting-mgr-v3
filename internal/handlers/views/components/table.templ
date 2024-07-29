@@ -17,6 +17,7 @@ type Row struct {
 	ID       int
 	Editable bool
 	Buttons  []TableButton
+	Warning  bool
 }
 
 type TableData struct {
@@ -74,6 +75,9 @@ templ TableComponent(t TableData) {
 templ TableRowComponent(row Row) {
 	<tr
 		data-id={ strconv.Itoa(row.ID) }
+		if row.Warning {
+			class="bg-red-200 text-black font-bold"
+		}
 	>
 		for _, cell := range row.Data {
 			@TableCell(cell, false)
@@ -96,11 +100,11 @@ templ TableRowComponent(row Row) {
 templ TableCell(data string, warning bool) {
 	if !warning {
 		<td
-			class={ "whitespace-nowrap px-3 py-4 size-7 rounded text-gray-500" }
+			class={ "whitespace-nowrap px-3 py-4 size-7 text-gray-700" }
 		>{ data }</td>
 	} else {
 		<td
-			class={ "whitespace-nowrap px-3 py-4 size-7 rounded text-slate-100 bg-red-700" }
+			class={ "whitespace-nowrap px-3 py-4 size-7 rounded text-black font-bold bg-red-300" }
 		>{ data }</td>
 	}
 }
@@ -126,7 +130,7 @@ templ SubHeader(data string, size string, colspan int, warning bool) {
 		<tr>
 			<td
 				colspan={ strconv.Itoa(colspan) }
-				class={ "text-center " + getSizeClass(size) + " rounded text-slate-100 bg-red-700" }
+				class={ "text-center " + getSizeClass(size) + " rounded text-black font-bold bg-red-300" }
 			>{ data }</td>
 		</tr>
 	}

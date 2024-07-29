@@ -2,6 +2,7 @@ package views
 
 import (
 	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"sep_setting_mgr/internal/handlers/views/layouts"
@@ -9,22 +10,32 @@ import (
 	"time"
 )
 
-func NewAdminPage(r *echo.Echo) AdminPageProps {
-	return AdminPageProps{
-		R: r,
+type AdminPage interface {
+	Templify() templ.Component
+}
+
+func NewAdminPage(r *echo.Echo, assignments models.AssignmentsByDate, rooms models.Rooms) AdminPage {
+	return adminPageProps{
+		R:           r,
+		assignments: assignments,
+		rooms:       rooms,
 	}
 }
 
-type AdminPageProps struct {
-	R *echo.Echo
+type adminPageProps struct {
+	R           *echo.Echo
+	assignments models.AssignmentsByDate
+	rooms       models.Rooms
 }
 
-func (p AdminPageProps) Templify() templ.Component {
-	return AdminPage(p)
+func (p adminPageProps) Templify() templ.Component {
+	return adminPageComponent(p)
 }
 
-templ AdminPage(p AdminPageProps) {
-	@layouts.PageLayout("Admin", AdminSideNav(AdminSideNavProps{R: p.R}))
+templ adminPageComponent(p adminPageProps) {
+	@layouts.PageLayout("Admin", AdminSideNav(AdminSideNavProps{R: p.R})) {
+		@CalendarComponent(time.Now(), p.assignments, p.rooms, true, p.R)
+	}
 }
 
 type AdminSideNavProps struct {

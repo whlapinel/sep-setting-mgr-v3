@@ -2,8 +2,14 @@
 
 ## PENDING
 
-- something is wrong with the warning timer on the client side session management
+- show table buttons on hover instead of always
+- table buttons to icons instead of words
+- tweak table formatting
+- load profile photo into user menu
 - Fix welcome screen (after signup). Currently is just text saying Welcome!
+- Format apply for role page
+- Format home page
+- Format about page
 - Add row button title should be customizable instead of just using table title
 - classes/hx-classes gets pushed to URL instead of just /classes
 - Add "Up" button to dashboard pages (e.g. when viewing students for A class, should be able to return to A class)
@@ -16,6 +22,7 @@
 
 ## COMPLETE
 
+- something is wrong with the warning timer on the client side session management
 - Rooms: priority should be unique. For editing priority, use promote / demote buttons instead of radio inputs.
 - Calendar: both "Unassigned" and "Unassign" show up. Pick one (and make sure it works)
 - Users: add teacher role to table and edit form.

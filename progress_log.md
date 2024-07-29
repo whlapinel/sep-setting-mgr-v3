@@ -1,5 +1,9 @@
 # PROGRESS LOG
 
+## 7/29
+
+- Frontend stuff mostly today. Was getting very intimidated, for example with SideNav CSS properties for a minute but slogged through it and implemented some nice Tailwind layouts.
+
 ## 7/27
 
 - Spent a lot of time figuring out how to request a token refresh from the client when user is active and a certain duration remains before expiration. Then I realized I could just do all of this on the server. So I added a SuccessHandler to the echojwt configuration that issues a new token when the threshold is reached. Simple, and avoids a lot of JS pain.

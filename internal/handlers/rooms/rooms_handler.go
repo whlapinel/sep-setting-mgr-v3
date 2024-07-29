@@ -5,7 +5,6 @@ import (
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
-	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/rooms"
 	"sep_setting_mgr/internal/util"
 	"strconv"
@@ -69,7 +68,7 @@ func (h handler) Rooms(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.RoomsTableComponent(rooms, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
 func (h handler) CreateRoom(c echo.Context) error {
@@ -154,7 +153,7 @@ func (h handler) ShowAddRoomForm(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.AddRoomForm(false, &models.Room{}), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
 func (h handler) ShowEditRoomForm(c echo.Context) error {
@@ -170,5 +169,5 @@ func (h handler) ShowEditRoomForm(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.AddRoomForm(true, room), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }

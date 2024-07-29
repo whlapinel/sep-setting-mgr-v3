@@ -4,7 +4,6 @@ import (
 	"log"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
-	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/assignments"
 	"sep_setting_mgr/internal/services/rooms"
 	"sep_setting_mgr/internal/services/students"
@@ -78,7 +77,7 @@ func (h handler) Calendar(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.CalendarComponent(date, assignmentsMap, rooms, true, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
 func (h handler) AdminCalendarDetails(c echo.Context) error {
@@ -102,7 +101,7 @@ func (h handler) AdminCalendarDetails(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, true, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
 func (h handler) DBCalendarDetails(c echo.Context) error {
@@ -126,7 +125,7 @@ func (h handler) DBCalendarDetails(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, false, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
 func (h handler) ShowAssignRoomForm(c echo.Context) error {
@@ -186,5 +185,5 @@ func (h handler) AssignRoom(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.DayComponent(date, assignmentsMap[date.Format("2006-01-02")], rooms, true, router), c, 201)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }

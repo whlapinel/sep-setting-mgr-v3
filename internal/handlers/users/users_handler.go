@@ -4,7 +4,6 @@ import (
 	"log"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
-	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/users"
 	"sep_setting_mgr/internal/util"
 	"strconv"
@@ -51,7 +50,7 @@ func (h handler) Users(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.UsersTableComponent(users, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
 // GET /admin/users/:user-id/edit
@@ -70,7 +69,7 @@ func (h handler) ShowEditUserForm(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.UserFormComponent(adminID, user, router), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.AdminPage(views.AdminPageProps{R: router})), c, 200)
+	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 
 }
 

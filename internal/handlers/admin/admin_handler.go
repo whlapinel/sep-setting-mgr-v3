@@ -6,6 +6,8 @@ import (
 	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/admin"
+	"sep_setting_mgr/internal/services/assignments"
+	"sep_setting_mgr/internal/services/rooms"
 	"sep_setting_mgr/internal/util"
 
 	"github.com/labstack/echo/v4"
@@ -18,10 +20,14 @@ type AdminHandler interface {
 
 type handler struct {
 	adminService admin.AdminService
+	assignments  assignments.AssignmentsService
+	rooms        rooms.RoomsService
 }
 
-func NewHandler(adminService admin.AdminService) AdminHandler {
-	return &handler{adminService}
+func NewHandler(adminService admin.AdminService,
+	assignments assignments.AssignmentsService,
+	rooms rooms.RoomsService) AdminHandler {
+	return &handler{adminService, assignments, rooms}
 }
 
 var router *echo.Echo
@@ -32,8 +38,18 @@ func Mount(e *echo.Echo, h AdminHandler) {
 }
 
 func (h handler) AdminPage(c echo.Context) error {
-
-	template := componentscommon.Templify(views.NewAdminPage(router))
+	// get all assignments
+	assignments, err := h.assignments.ListAll()
+	if err != nil {
+		return err
+	}
+	assignmentsMap := assignments.MapForCalendar()
+	// get all rooms
+	rooms, err := h.rooms.ListRooms()
+	if err != nil {
+		return err
+	}
+	template := componentscommon.Templify(views.NewAdminPage(router, assignmentsMap, rooms))
 	if util.IsHTMX(c) {
 		return util.RenderTempl((template), c, 200)
 	}

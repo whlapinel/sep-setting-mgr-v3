@@ -77,18 +77,15 @@ templ DaySimple(date time.Time, blocks models.AssignmentsByBlock, rooms models.R
 templ RoomSimple(room *models.Room, assignments models.Assignments, tracker map[int]bool, admin bool, r *echo.Echo) {
 	if len(assignments) == 0 {
 		<tr>
-			@components.SubHeader(room.Number, "small", 1, false)
-			@components.TableCell("No students", false)
+			@components.SubHeader(room.Number+": (None)", "small", 1, false)
 		</tr>
 	} else if len(assignments) == 1 {
 		<tr>
-			@components.SubHeader(room.Number, "small", 1, determineWarning(room.ID, tracker))
-			@components.TableCell(strconv.Itoa(len(assignments))+" student", warning)
+			@components.SubHeader(room.Number+": "+strconv.Itoa(len(assignments))+" student", "small", 1, determineWarning(room.ID, tracker))
 		</tr>
 	} else {
 		<tr>
-			@components.SubHeader(room.Number, "small", 1, determineWarning(room.ID, tracker))
-			@components.TableCell(strconv.Itoa(len(assignments))+" students", warning)
+			@components.SubHeader(room.Number+": "+strconv.Itoa(len(assignments))+" students", "small", 1, determineWarning(room.ID, tracker))
 		</tr>
 	}
 }
@@ -131,25 +128,29 @@ templ RoomComponent(room *models.Room, assignments models.Assignments, tracker m
 		</tr>
 	} else {
 		for _, assignment := range assignments {
-			<tr>
-				@components.TableCell(assignment.Student.FirstName, determineWarning(room.ID, tracker))
-				@components.TableCell(assignment.Student.LastName, warning)
-				@components.TableCell(assignment.TestEvent.TestName, warning)
-				@components.TableCell(strconv.FormatBool(assignment.Student.OneOnOne), warning)
-				if admin {
-					<td>
-						@components.ButtonComponent(components.Button{
+			if admin {
+				@components.TableRowComponent(components.Row{
+					ID:   assignment.ID,
+					Data: []string{assignment.Student.FirstName, assignment.Student.LastName, assignment.TestEvent.TestName, strconv.FormatBool(assignment.Student.OneOnOne)},
+					Buttons: []components.TableButton{
+						{
+							Text: "Assign Room",
 							Attr: templ.Attributes{
 								"hx-get":      r.Reverse(string(common.ShowAssignRoomForm), assignment.ID),
 								"hx-target":   "#modal",
 								"hx-push-url": "true",
 							},
-						}) {
-							Assign Room
-						}
-					</td>
-				}
-			</tr>
+						},
+					},
+					Warning: determineWarning(room.ID, tracker),
+				})
+			} else {
+				@components.TableRowComponent(components.Row{
+					ID:      assignment.ID,
+					Data:    []string{assignment.Student.FirstName, assignment.Student.LastName, assignment.TestEvent.TestName, strconv.FormatBool(assignment.Student.OneOnOne)},
+					Warning: determineWarning(room.ID, tracker),
+				})
+			}
 		}
 	}
 }

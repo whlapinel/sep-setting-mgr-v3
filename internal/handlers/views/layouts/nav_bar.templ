@@ -17,7 +17,6 @@ templ NavBarComponent(n NavBar) {
 					<div class="hidden md:block">
 						<div class="ml-10 flex items-baseline space-x-4">
 							for _, item := range n.NavItems {
-								<!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
 								<a hx-get={ item.URL } hx-target="#page" hx-push-url={ item.PushURL() } class=" cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">{ item.Text }</a>
 							}
 						</div>
@@ -32,7 +31,6 @@ templ NavBarComponent(n NavBar) {
 								<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
 							</svg>
 						</button>
-						<!-- Profile dropdown -->
 						<div class="relative ml-3">
 							<div>
 								<button type="button" class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
@@ -55,7 +53,7 @@ templ NavBarComponent(n NavBar) {
 								<!-- Active: "bg-gray-100", Not Active: "" -->
 								<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
 								<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-								<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+								<a hx-post="/hx-signout" hx-target="#page" class=" cursor-pointer block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
 							</div>
 						</div>
 					</div>
