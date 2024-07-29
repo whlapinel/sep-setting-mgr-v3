@@ -6,23 +6,26 @@ import (
 	"sep_setting_mgr/internal/handlers/handlerscommon"
 	c "sep_setting_mgr/internal/handlers/views/components"
 	cc "sep_setting_mgr/internal/handlers/views/components/componentscommon"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/util"
 )
 
 templ SignInPage(isSignedIn bool, justSignedIn bool, router *echo.Echo, expiration string) {
-	if isSignedIn {
-		<div class="alert alert-success" role="alert">
-			<h1>You are signed in</h1>
-		</div>
-		if justSignedIn {
-			<div id="test" data-expiration={ expiration }>
-				<script src="/dist/signin.js" async defer>
-				</script>
+	@layouts.PageLayout("Sign In", nil) {
+		if isSignedIn {
+			<div class="alert alert-success" role="alert">
+				<h1>You are signed in</h1>
 			</div>
-		}
-	} else {
-		@cc.Templify(c.Dialog("Sign In")) {
-			@SigninWithGoogleComponent(router)
+			if justSignedIn {
+				<div id="test" data-expiration={ expiration }>
+					<script src="/dist/signin.js" async defer>
+				</script>
+				</div>
+			}
+		} else {
+			@cc.Templify(c.Dialog("Sign In")) {
+				@SigninWithGoogleComponent(router)
+			}
 		}
 	}
 }

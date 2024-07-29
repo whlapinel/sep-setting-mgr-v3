@@ -1,5 +1,11 @@
 package views
 
+import "sep_setting_mgr/internal/handlers/views/layouts"
+
 templ AboutPage() {
-	<h1>About</h1>
+	@layouts.PageLayout("About", nil) {
+		<p>
+			Welcome to the about page!
+		</p>
+	}
 }

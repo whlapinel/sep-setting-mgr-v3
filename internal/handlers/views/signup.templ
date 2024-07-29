@@ -5,12 +5,15 @@ import (
 	"sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
 	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/util"
 )
 
 templ SignUpPage(router *echo.Echo, clientID string) {
-	@componentscommon.Templify(components.Dialog("Sign Up")) {
-		@SignupWithGoogleComponent(clientID, router)
+	@layouts.PageLayout("Sign Up", nil) {
+		@componentscommon.Templify(components.Dialog("Sign Up")) {
+			@SignupWithGoogleComponent(clientID, router)
+		}
 	}
 }
 

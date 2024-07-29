@@ -1,8 +1,11 @@
 package views
 
+import "sep_setting_mgr/internal/handlers/views/layouts"
+
 templ HomePage() {
-	<div>
-		<h1>Home</h1>
-		<p>Welcome to the home page</p>
-	</div>
+	@layouts.PageLayout("Home", nil) {
+		<p>
+			Welcome to the home page!
+		</p>
+	}
 }
