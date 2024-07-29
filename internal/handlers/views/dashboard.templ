@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
-	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/handlers/views/layouts/layoutscommon"
 )
@@ -16,7 +16,7 @@ templ DashboardPage(classes []*models.Class, router *echo.Echo) {
 }
 
 templ DashboardSideNav(router *echo.Echo) {
-	@components.SideNav([]components.NavItem{
+	@layouts.SideNav([]componentscommon.NavItem{
 		{Text: "Classes", URL: router.Reverse(common.HxClasses.String())},
 		{Text: "Calendar", URL: router.Reverse(common.DashboardCalendar.String())},
 	}, layoutscommon.Details.Selector())

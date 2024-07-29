@@ -26,11 +26,6 @@ func Mount(e *echo.Echo, h SignoutHandler) {
 }
 
 func (h handler) Signout(c echo.Context) error {
-
-	// if not signed in show alert "you are already signed out"
-	if !auth.IsSignedIn(c) {
-		return c.String(200, "You are already signed out")
-	}
 	// delete cookie and render signout page
 	auth.WriteToken(c, "")
 	c.Response().Header().Set("Hx-Trigger", "userSignout")

@@ -1,6 +1,9 @@
 package layouts
 
-import "sep_setting_mgr/internal/handlers/views/components"
+import (
+	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
+)
 
 templ MainLayout(page templ.Component) {
 	<html lang="en">
@@ -15,21 +18,23 @@ templ MainLayout(page templ.Component) {
 		</head>
 		<body hx-ext="response-targets">
 			<div hx-post="/hx-signout" hx-trigger="autoSignout" id="user-signout" hx-target="#page"></div>
-			@components.HeaderComponent(components.Header{
-				NavItems: []components.NavItem{
-					{Text: "Home", URL: "/"},
-					{Text: "Dashboard", URL: "/dashboard"},
-					{Text: "Admin", URL: "/admin"},
-					{Text: "Apply For Role", URL: "/applications"},
-					{Text: "About", URL: "/about"},
-					{Text: "Sign In", URL: "/signin"},
-					{Text: "Sign Up", URL: "/signup"},
-				},
-			})
-			@components.MessageComponent()
-			<main id="page">
-				@page
-			</main>
+			<div class="min-h-full">
+				@NavBarComponent(NavBar{
+					NavItems: []componentscommon.NavItem{
+						{Text: "Home", URL: "/"},
+						{Text: "Dashboard", URL: "/dashboard"},
+						{Text: "Admin", URL: "/admin"},
+						{Text: "Apply For Role", URL: "/applications"},
+						{Text: "About", URL: "/about"},
+						{Text: "Sign In", URL: "/signin"},
+						{Text: "Sign Up", URL: "/signup"},
+					},
+				})
+				@components.MessageComponent()
+				<main id="page">
+					@page
+				</main>
+			</div>
 		</body>
 	</html>
 }

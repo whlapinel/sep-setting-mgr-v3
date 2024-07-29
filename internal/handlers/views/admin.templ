@@ -3,7 +3,7 @@ package views
 import (
 	"github.com/labstack/echo/v4"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
-	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/handlers/views/layouts/layoutscommon"
 	"time"
@@ -23,7 +23,6 @@ func (p AdminPageProps) Templify() templ.Component {
 	return AdminPage(p)
 }
 
-
 templ AdminPage(p AdminPageProps) {
 	@layouts.PageLayout("Admin", AdminSideNav(AdminSideNavProps{R: p.R}))
 }
@@ -33,7 +32,7 @@ type AdminSideNavProps struct {
 }
 
 templ AdminSideNav(p AdminSideNavProps) {
-	@components.SideNav([]components.NavItem{
+	@layouts.SideNav([]componentscommon.NavItem{
 		{Text: "Pending Applications", URL: p.R.Reverse(common.Applications.String())},
 		{Text: "Rooms", URL: p.R.Reverse(common.Rooms.String())},
 		{Text: "Calendar", URL: p.R.Reverse(common.AdminCalendar.String(), time.Now().Format("2006-01-02"))},

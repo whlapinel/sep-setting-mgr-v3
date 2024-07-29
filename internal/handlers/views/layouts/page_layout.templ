@@ -4,12 +4,16 @@ import common "sep_setting_mgr/internal/handlers/views/layouts/layoutscommon"
 
 // intended for admin and dashboard pages, includes sidenav
 templ PageLayout(title string, sideNav templ.Component) {
-	<h1>{ title }</h1>
-	<div class="grid grid-cols-[1fr_4fr]">
-		@sideNav
-		<div id={ common.Details.String() } class="flex justify-center w-[90vw]">
+	<header class="bg-white shadow">
+		<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+			<h1 class="text-3xl font-bold tracking-tight text-gray-900">{ title }</h1>
+		</div>
+	</header>
+	@sideNav
+	<main>
+		<div id={ common.Details.String() } class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 			{ children... }
 		</div>
-	</div>
+	</main>
 	<div id={ common.Modal.String() }></div>
 }

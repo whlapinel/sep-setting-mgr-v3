@@ -19,8 +19,8 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-const SessionLifeSpan = 30 * time.Second
-const cushionTime = time.Second * 10
+const SessionLifeSpan = time.Hour
+const cushionTime = time.Minute * 5
 
 var secret = os.Getenv("JWT_SECRET")
 

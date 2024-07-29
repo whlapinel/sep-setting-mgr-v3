@@ -119,8 +119,8 @@ templ DayComponent(date time.Time, blocks models.AssignmentsByBlock, rooms model
 var warning bool
 
 func determineWarning(roomID int, tracker map[int]bool) bool {
-	warning = roomID == -1 || tracker[roomID]
-	return roomID == -1 || tracker[roomID]
+	warning = roomID != -1 && tracker[roomID]
+	return warning
 }
 
 templ RoomComponent(room *models.Room, assignments models.Assignments, tracker map[int]bool, admin bool, r *echo.Echo) {
