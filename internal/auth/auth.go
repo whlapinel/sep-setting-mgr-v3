@@ -19,7 +19,7 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-const sessionLifeSpan = 30 * time.Second
+const SessionLifeSpan = 30 * time.Second
 const cushionTime = time.Second * 10
 
 var secret = os.Getenv("JWT_SECRET")
@@ -72,7 +72,7 @@ var config = echojwt.Config{
 				log.Println("Failed to issue token: ", err)
 			}
 			WriteToken(c, t)
-			jsonString := fmt.Sprintf("{\"signin\":{\"expiration\":%d}}", time.Now().Add(sessionLifeSpan).UnixMilli())
+			jsonString := fmt.Sprintf("{\"signin\":{\"expiration\":%d}}", time.Now().Add(SessionLifeSpan).UnixMilli())
 			c.Response().Header().Set("Hx-Trigger", jsonString)
 		} else {
 			log.Println("more than a minute left")
@@ -157,7 +157,7 @@ func IssueToken(email string, id int) (string, error) {
 		Email: email,
 		ID:    id,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(sessionLifeSpan)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(SessionLifeSpan)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -174,7 +174,7 @@ func WriteToken(c echo.Context, t string) {
 	cookie.Value = t
 	cookie.HttpOnly = true
 	cookie.Path = "/"
-	cookie.Expires = time.Now().Add(sessionLifeSpan)
+	cookie.Expires = time.Now().Add(SessionLifeSpan)
 	log.Println("Setting cookie: ", cookie)
 	c.SetCookie(cookie)
 	c.Response().Header().Set("Authorization", "Bearer "+t)

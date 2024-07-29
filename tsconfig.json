@@ -1,9 +1,10 @@
 {
     "include": [
-        "internal/assets"
+        "./internal/handlers/views/**/*.ts",
+        "./internal/assets/**/*.ts"
     ],
     "extends": "@tsconfig/recommended/tsconfig.json",
     "compilerOptions": {
-        "outDir": "internal/assets/dist",
+        "outDir": "./internal/assets/dist",
     }
 }

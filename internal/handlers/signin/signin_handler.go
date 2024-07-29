@@ -8,6 +8,8 @@ import (
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/signin"
 	"sep_setting_mgr/internal/util"
+	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -39,9 +41,9 @@ func Mount(e *echo.Echo, h SigninHandler) {
 func (h handler) SignInPage(c echo.Context) error {
 	isSignedIn := auth.IsSignedIn(c)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.SignInPage(isSignedIn, false, router), c, 200)
+		return util.RenderTempl(views.SignInPage(isSignedIn, false, router, ""), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn, false, router)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn, false, router, "")), c, 200)
 }
 
 func (h handler) GoogleSignin(c echo.Context) error {
@@ -63,5 +65,7 @@ func (h handler) GoogleSignin(c echo.Context) error {
 		return c.String(500, "Failed to issue token")
 	}
 	auth.WriteToken(c, t)
-	return util.RenderTempl(layouts.MainLayout(views.SignInPage(true, true, router)), c, 200)
+	expirationTime := time.Now().Add(auth.SessionLifeSpan).UnixMilli()
+	expyString := strconv.Itoa(int(expirationTime))
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(true, true, router, expyString)), c, 200)
 }

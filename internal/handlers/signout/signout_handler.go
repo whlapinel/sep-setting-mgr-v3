@@ -33,5 +33,6 @@ func (h handler) Signout(c echo.Context) error {
 	}
 	// delete cookie and render signout page
 	auth.WriteToken(c, "")
+	c.Response().Header().Set("Hx-Trigger", "userSignout")
 	return util.RenderTempl(views.SignedOutPage(), c, 200)
 }

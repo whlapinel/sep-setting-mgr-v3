@@ -20,43 +20,47 @@ let logInterval = 0;
 document.addEventListener("signin", (e) => {
     clearTimeout(signoutTimerID);
     clearTimeout(warningTimerID);
+    clearInterval(logInterval);
     console.log("signin event triggered");
-    setTimeout(() => {
-        console.log("test timeout");
-    }, 1000);
     console.log(e);
     console.log(e.detail);
     console.log(e.detail.expiration);
     const sessionExpiration = e.detail.expiration;
-    const cushion = sessionExpiration - 5000;
+    const cushion = 5000;
     console.log("setting warningTimer for: ", warningTime(sessionExpiration, cushion));
     warningTimerID = setTimeout((cushion) => {
         let now = new Date().getTime();
-        alert(`You will be signed out in ${sessionExpiration - now} milliseconds.`);
+        alert(`You will be signed out in ${(sessionExpiration - now) / 1000} seconds.`);
     }, warningTime(sessionExpiration, cushion));
     console.log("setting signoutTimer for: ", signoutTime(sessionExpiration));
     signoutTimerID = setTimeout(() => {
         signout();
     }, signoutTime(sessionExpiration));
-    clearInterval(logInterval);
     logInterval = setInterval(() => {
         console.log("expiration: ", new Date(sessionExpiration));
         let timeRemaining = (sessionExpiration - new Date().getTime()) / 1000;
         console.log("time remaining: ", timeRemaining);
     }, 2000);
 });
-document.addEventListener("signout", (e) => {
-    console.log("signout event triggered");
+document.addEventListener("userSignout", (e) => {
+    console.log("userSignout event triggered");
+    clearTimeout(signoutTimerID);
+    clearTimeout(warningTimerID);
+    clearInterval(logInterval);
 });
+document.addEventListener("autoSignout", (e) => {
+    console.log("autoSignout event triggered");
+});
+// auto-signout function
 function signout() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("signOut");
+        clearTimeout(signoutTimerID);
+        clearTimeout(warningTimerID);
+        clearInterval(logInterval);
         // dispatches custom event to trigger signout
         // the event listener for this event is in the user-signout component
         // this component will send request to server to signout
         const signoutDiv = document.querySelector("div#user-signout");
-        if (signoutDiv != null) {
-            signoutDiv.dispatchEvent(new CustomEvent("signout", { bubbles: true, cancelable: true }));
-        }
+        signoutDiv === null || signoutDiv === void 0 ? void 0 : signoutDiv.dispatchEvent(new CustomEvent("autoSignout", { bubbles: true, cancelable: true }));
     });
 }
