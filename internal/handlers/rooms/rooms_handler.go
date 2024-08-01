@@ -76,21 +76,24 @@ func (h handler) CreateRoom(c echo.Context) error {
 	var room models.Room
 	room.Name = c.FormValue("room-name")
 	room.Number = c.FormValue("room-number")
-	priority, err := strconv.Atoi(c.FormValue("priority"))
-	if err != nil {
-		return c.String(400, "Error getting priority value")
-	}
-	room.MaxCapacity, err = strconv.Atoi(c.FormValue("capacity"))
+	maxCapacity, err := strconv.Atoi(c.FormValue("capacity"))
 	if err != nil {
 		return c.String(400, "Error getting capacity value")
 	}
-	room.Priority = priority
-	id, err := h.service.AddRoom(&room)
+	room.MaxCapacity = maxCapacity
+	room.Priority, err = h.service.GetNextPriority()
 	if err != nil {
-		return c.String(500, "Error adding room")
+		return err
 	}
-	room.ID = id
-	return util.RenderTempl(views.RoomsRowComponent(&room, router), c, 201)
+	_, err = h.service.AddRoom(&room)
+	if err != nil {
+		return err
+	}
+	rooms, err := h.service.ListRooms()
+	if err != nil {
+		return err
+	}
+	return util.RenderTempl(views.RoomsTableComponent(rooms, router), c, 200)
 }
 
 func (h handler) PromoteRoom(c echo.Context) error {
@@ -118,15 +121,10 @@ func (h handler) EditRoom(c echo.Context) error {
 	var room models.Room
 	room.Name = c.FormValue("room-name")
 	room.Number = c.FormValue("room-number")
-	priority, err := strconv.Atoi(c.FormValue("priority"))
-	if err != nil {
-		return c.String(400, "Error getting priority value")
-	}
 	room.MaxCapacity, err = strconv.Atoi(c.FormValue("capacity"))
 	if err != nil {
 		return c.String(400, "Error getting capacity value")
 	}
-	room.Priority = priority
 	room.ID = roomID
 	err = h.service.UpdateRoom(&room)
 	if err != nil {

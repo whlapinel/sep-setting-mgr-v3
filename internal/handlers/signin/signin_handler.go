@@ -43,7 +43,7 @@ func (h handler) SignInPage(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.SignInPage(isSignedIn, false, router, ""), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn, false, router, "")), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(isSignedIn, false, router, ""), nil), c, 200)
 }
 
 func (h handler) GoogleSignin(c echo.Context) error {
@@ -55,17 +55,17 @@ func (h handler) GoogleSignin(c echo.Context) error {
 	}
 	email := payload.Claims["email"].(string)
 	// check for user in database
-	id, err := h.service.GetUserID(email)
+	user, err := h.service.GetUser(email)
 	if err != nil {
 		log.Println(err)
 		return c.String(500, err.Error())
 	}
-	t, err := auth.IssueToken(email, id)
+	t, err := auth.IssueToken(user.FirstName, user.LastName, user.Email, user.Picture, user.ID)
 	if err != nil {
 		return c.String(500, "Failed to issue token")
 	}
 	auth.WriteToken(c, t)
 	expirationTime := time.Now().Add(auth.SessionLifeSpan).UnixMilli()
 	expyString := strconv.Itoa(int(expirationTime))
-	return util.RenderTempl(layouts.MainLayout(views.SignInPage(true, true, router, expyString)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(true, true, router, expyString), user), c, 200)
 }

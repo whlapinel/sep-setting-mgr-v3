@@ -5,6 +5,7 @@ import (
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/layouts"
 )
 
 type ApplicationsPageProps struct {
@@ -17,25 +18,26 @@ type ApplicationsPageProps struct {
 }
 
 templ ApplicationsPage(p ApplicationsPageProps) {
-	<h1>Applications</h1>
-	<h2>Teacher Role</h2>
-	if p.HasTeacherRole {
-		<p>You are already a teacher.</p>
-	} else {
-		if p.AppliedForTeacher {
-			<p>Your application for the teacher role is pending.</p>
+	@layouts.PageLayout("Applications", nil) {
+		<h2 class="text-lg">Teacher Role</h2>
+		if p.HasTeacherRole {
+			<p class="text-sm">You are already a teacher.</p>
 		} else {
-			@ApplyButton(p.R, p.UserID, "teacher")
+			if p.AppliedForTeacher {
+				<p class="text-sm">Your application for the teacher role is pending.</p>
+			} else {
+				@ApplyButton(p.R, p.UserID, "teacher")
+			}
 		}
-	}
-	<h2>Admin Role</h2>
-	if p.HasAdminRole {
-		<p>You are already an admin.</p>
-	} else {
-		if p.AppliedForAdmin {
-			<p>Your application for the admin role is pending.</p>
+		<h2 class="text-lg">Admin Role</h2>
+		if p.HasAdminRole {
+			<p class="text-sm">You are already an admin.</p>
 		} else {
-			@ApplyButton(p.R, p.UserID, "admin")
+			if p.AppliedForAdmin {
+				<p class="text-sm">Your application for the admin role is pending.</p>
+			} else {
+				@ApplyButton(p.R, p.UserID, "admin")
+			}
 		}
 	}
 }

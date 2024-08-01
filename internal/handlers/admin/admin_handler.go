@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
@@ -53,6 +54,10 @@ func (h handler) AdminPage(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl((template), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(template), c, 200)
+	user, err := models.NewUser(c.Get("first").(string), c.Get("last").(string), c.Get("email").(string), c.Get("picture").(string))
+	if err != nil {
+		return err
+	}
+	return util.RenderTempl(layouts.MainLayout(template, user), c, 200)
 
 }

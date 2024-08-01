@@ -2,11 +2,12 @@ package signin
 
 import (
 	"errors"
+	"sep_setting_mgr/internal/domain/models"
 	domain "sep_setting_mgr/internal/domain/models"
 )
 
 type SigninService interface {
-	GetUserID(email string) (int, error)
+	GetUser(email string) (*models.User, error)
 }
 
 type service struct {
@@ -17,13 +18,13 @@ func NewService(users domain.UserRepository) SigninService {
 	return &service{users: users}
 }
 
-func (s service) GetUserID(email string) (int, error) {
+func (s service) GetUser(email string) (*models.User, error) {
 	user, err := s.users.Find(email)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if user.Email == "" {
-		return 0, errors.New("user not found")
+		return nil, errors.New("user not found")
 	}
-	return user.ID, nil
+	return user, nil
 }

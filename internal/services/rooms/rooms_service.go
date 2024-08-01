@@ -13,6 +13,7 @@ type RoomsService interface {
 	ListRooms() (models.Rooms, error)
 	FindRoomByID(id int) (*models.Room, error)
 	PromoteRoom(id int) error
+	GetNextPriority() (int, error)
 }
 
 type service struct {
@@ -22,6 +23,14 @@ type service struct {
 
 func NewService(rooms models.RoomRepository, asService services.AssignmentsService) RoomsService {
 	return &service{rooms, asService}
+}
+
+func (s service) GetNextPriority() (int, error) {
+	rooms, err := s.rooms.All()
+	if err != nil {
+		return 0, err
+	}
+	return rooms.GetNextPriority(), nil
 }
 
 // should swap priority with next higher priority room

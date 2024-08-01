@@ -48,3 +48,10 @@ func FullPath(name common.RouteName, r *echo.Echo) string {
 func Path(name common.RouteName, r *echo.Echo) string {
 	return r.Reverse(name.String())
 }
+
+func GetUserFromContext(c echo.Context) string {
+	// Get user from context
+	// Return user
+	user := c.Get("user").(string)
+	return user
+}

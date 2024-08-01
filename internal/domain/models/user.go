@@ -6,6 +6,7 @@ type (
 		FirstName string
 		LastName  string
 		Email     string
+		Picture   string
 		Admin     bool // must be approved for role
 		Teacher   bool // must be approved for role
 	}
@@ -25,10 +26,15 @@ type (
 	}
 )
 
-func NewUser(firstName, lastName, email string) (*User, error) {
+func NewUser(firstName, lastName, email, picture string) (*User, error) {
 	return &User{
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
+		Picture:   picture,
 	}, nil
+}
+
+func (u *User) FullName() string {
+	return u.FirstName + " " + u.LastName
 }

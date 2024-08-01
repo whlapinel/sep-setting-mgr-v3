@@ -64,7 +64,7 @@ templ DaySimple(date time.Time, blocks models.AssignmentsByBlock, rooms models.R
 		}) {
 			<tbody class={ components.TableBodyClass }>
 				for i:=0; i<4; i++ {
-					@components.SubHeader("Block "+strconv.Itoa(i+1), "large", 1, false)
+					@components.SubHeader("Block "+strconv.Itoa(i+1), "large", 1, false, blockHeaderGrayedOut(blocks, i+1), false)
 					for _, room := range rooms.SortByRoomPriority() {
 						@RoomSimple(room, blocks[i+1][room.ID], createOverBookedTracker(blocks[i+1][room.ID]), admin, r)
 					}
@@ -74,20 +74,34 @@ templ DaySimple(date time.Time, blocks models.AssignmentsByBlock, rooms models.R
 	</div>
 }
 
-templ RoomSimple(room *models.Room, assignments models.Assignments, tracker map[int]bool, admin bool, r *echo.Echo) {
-	if len(assignments) == 0 {
-		<tr>
-			@components.SubHeader(room.Number+": (None)", "small", 1, false)
-		</tr>
-	} else if len(assignments) == 1 {
-		<tr>
-			@components.SubHeader(room.Number+": "+strconv.Itoa(len(assignments))+" student", "small", 1, determineWarning(room.ID, tracker))
-		</tr>
-	} else {
-		<tr>
-			@components.SubHeader(room.Number+": "+strconv.Itoa(len(assignments))+" students", "small", 1, determineWarning(room.ID, tracker))
-		</tr>
+func blockHeaderGrayedOut(blocks models.AssignmentsByBlock, block int) bool {
+	if _, ok := blocks[block]; ok {
+		return ok
 	}
+	return true
+}
+
+templ RoomSimple(room *models.Room, assignments models.Assignments, tracker map[int]bool, admin bool, r *echo.Echo) {
+	<tr>
+		@components.SubHeader(simpleRoomDataText(room, assignments), "small", 1, determineWarning(room.ID, tracker), grayedOut(assignments), greenBackground(room.ID, true))
+	</tr>
+}
+
+func simpleRoomDataText(room *models.Room, assignments models.Assignments) string {
+	if len(assignments) == 0 {
+		return room.Number + ": (None)"
+	} else if len(assignments) == 1 {
+		return room.Number + ": " + strconv.Itoa(len(assignments)) + " student"
+	} else {
+		return room.Number + ": " + strconv.Itoa(len(assignments)) + " students"
+	}
+}
+
+func grayedOut(assignments models.Assignments) bool {
+	if len(assignments) == 0 {
+		return true
+	}
+	return false
 }
 
 templ DayComponent(date time.Time, blocks models.AssignmentsByBlock, rooms models.Rooms, admin bool, r *echo.Echo) {
@@ -104,7 +118,7 @@ templ DayComponent(date time.Time, blocks models.AssignmentsByBlock, rooms model
 		)
 		<tbody class={ components.TableBodyClass }>
 			for i:=0; i<4; i++ {
-				@components.SubHeader("Block "+strconv.Itoa(i+1), "large", 5, false)
+				@components.SubHeader("Block "+strconv.Itoa(i+1), "large", 5, false, blockHeaderGrayedOut(blocks, i+1), false)
 				for _, room := range rooms.SortByRoomPriority() {
 					@RoomComponent(room, blocks[i+1][room.ID], createOverBookedTracker(blocks[i+1][room.ID]), admin, r)
 				}
@@ -121,7 +135,7 @@ func determineWarning(roomID int, tracker map[int]bool) bool {
 }
 
 templ RoomComponent(room *models.Room, assignments models.Assignments, tracker map[int]bool, admin bool, r *echo.Echo) {
-	@components.SubHeader(room.Number, "small", 5, tracker[room.ID])
+	@components.SubHeader(room.Number, "small", 5, tracker[room.ID], grayedOut(assignments), greenBackground(room.ID, true))
 	if len(assignments) == 0 {
 		<tr>
 			@components.TableCell("No students", false)
@@ -152,6 +166,16 @@ templ RoomComponent(room *models.Room, assignments models.Assignments, tracker m
 				})
 			}
 		}
+	}
+}
+
+func greenBackground(roomID int, green bool) bool {
+	if roomID == -1 {
+		return false
+	} else if green {
+		return true
+	} else {
+		return false
 	}
 }
 

@@ -32,6 +32,19 @@ var Unassigned = Room{
 	Priority:    -1,
 }
 
+func (rooms Rooms) GetNextPriority() int {
+	if len(rooms) == 0 {
+		return 1
+	}
+	max := 0
+	for _, room := range rooms {
+		if room.Priority > max {
+			max = room.Priority
+		}
+	}
+	return max + 1
+}
+
 func (rooms Rooms) SortByRoomPriority() Rooms {
 	var sorted Rooms
 	var unsorted Rooms

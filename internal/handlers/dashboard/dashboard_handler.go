@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"sep_setting_mgr/internal/auth"
+	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/handlers/views/layouts"
@@ -78,5 +79,9 @@ func (h handler) DashboardCalendar(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(calendar, c, http.StatusOK)
 	}
-	return util.RenderTempl(layouts.MainLayout(calendar), c, http.StatusOK)
+	user, err := models.NewUser(c.Get("first").(string), c.Get("last").(string), c.Get("email").(string), c.Get("picture").(string))
+	if err != nil {
+		return err
+	}
+	return util.RenderTempl(layouts.MainLayout(calendar, user), c, http.StatusOK)
 }

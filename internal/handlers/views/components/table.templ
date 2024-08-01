@@ -12,12 +12,13 @@ type Rower interface {
 }
 
 type Row struct {
-	TableID  string
-	Data     []string
-	ID       int
-	Editable bool
-	Buttons  []TableButton
-	Warning  bool
+	TableID     string
+	Data        []string
+	ID          int
+	Editable    bool
+	Buttons     []TableButton
+	MoreButtons []templ.Component
+	Warning     bool
 }
 
 type TableData struct {
@@ -91,6 +92,11 @@ templ TableRowComponent(row Row) {
 				}
 			</td>
 		}
+		for _, button := range row.MoreButtons {
+			<td>
+				@button
+			</td>
+		}
 		if row.Editable {
 			<td id={ GetCellID(row.TableID, row.ID) }></td>
 		}
@@ -117,13 +123,21 @@ func getSizeClass(size string) string {
 	}
 }
 
-// size: small or large
-templ SubHeader(data string, size string, colspan int, warning bool) {
+// size: small or large, color: black or gray
+templ SubHeader(data string, size string, colspan int, warning bool, grayedOut bool, green bool) {
 	if !warning {
 		<tr>
 			<td
 				colspan={ strconv.Itoa(colspan) }
-				class={ "text-center " + getSizeClass(size) + " rounded" }
+				if grayedOut == true {
+					class={ "text-center " + getSizeClass(size) + " rounded text-gray-500" }
+				}
+				else
+				if green {
+					class={ "text-center " + getSizeClass(size) + " rounded text-black bg-green-300" }
+				} else {
+					class={ "text-center " + getSizeClass(size) + " rounded text-black" }
+				}
 			>{ data }</td>
 		</tr>
 	} else {

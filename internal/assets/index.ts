@@ -67,6 +67,12 @@ async function signout() {
     signoutDiv?.dispatchEvent(new CustomEvent("autoSignout", { bubbles: true, cancelable: true }));
 }
 
+const userMenuButton = document.querySelector("button#user-menu-button");
+userMenuButton?.addEventListener("click", () => {
+    const userMenu = document.querySelector("div#user-menu");
+    userMenu?.classList.toggle("hidden");
+});
+
 
 
 

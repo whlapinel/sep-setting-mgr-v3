@@ -42,14 +42,14 @@ func getRoomFormTarget(isEdit bool) string {
 	if isEdit {
 		return "closest tr"
 	}
-	return "#" + roomsTableID
+	return "#details"
 }
 
 func getRoomFormSwap(isEdit bool) string {
 	if isEdit {
 		return "outerHTML"
 	}
-	return "afterbegin"
+	return "innerHTML"
 }
 
 func getRoomFormSubmitBtnTitle(isEdit bool) string {
@@ -106,16 +106,6 @@ templ AddRoomForm(isEdit bool, room *models.Room) {
 			Type:        "text",
 			Name:        "room-number",
 			Required:    true,
-		})
-		@components.RadioComponent(components.RadioGroup{
-			Name: "priority",
-			Options: []*components.RadioOption{
-				{ID: "1", Value: "1", Label: "1", Checked: isPriorityChecked(isEdit, room.Priority, 1)},
-				{ID: "2", Value: "2", Label: "2", Checked: isPriorityChecked(isEdit, room.Priority, 2)},
-				{ID: "3", Value: "3", Label: "3", Checked: isPriorityChecked(isEdit, room.Priority, 3)},
-				{ID: "4", Value: "4", Label: "4", Checked: isPriorityChecked(isEdit, room.Priority, 4)},
-				{ID: "5", Value: "5", Label: "5", Checked: isPriorityChecked(isEdit, room.Priority, 5)},
-			},
 		})
 		@components.InputComponent(components.Input{
 			Label:       "Capacity",

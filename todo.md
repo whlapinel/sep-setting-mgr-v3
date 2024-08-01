@@ -2,6 +2,7 @@
 
 ## PENDING
 
+- note to self: either run middleware on non-protected pages (e.g. about, home) and allow passage in jwtconfig error handler for non-protected routes, or don't try to access user from context in those routes (but this means profile info won't be accessible if the page is refreshed, which is probably not a great option). Surely there must be a typical way to run checks without blocking, just need to find out what that is.
 - show table buttons on hover instead of always
 - table buttons to icons instead of words
 - tweak table formatting

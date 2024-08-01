@@ -49,7 +49,11 @@ func (h handler) Applications(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(template, c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(template), c, 200)
+	user, err := models.NewUser(c.Get("first").(string), c.Get("last").(string), c.Get("email").(string), c.Get("picture").(string))
+	if err != nil {
+		return err
+	}
+	return util.RenderTempl(layouts.MainLayout(template, user), c, 200)
 }
 
 func (h handler) AdjudicateApplication(c echo.Context) error {

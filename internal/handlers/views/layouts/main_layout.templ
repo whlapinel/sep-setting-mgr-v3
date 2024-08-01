@@ -1,16 +1,18 @@
 package layouts
 
 import (
+	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/handlers/views/components"
 	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 )
 
-templ MainLayout(page templ.Component) {
+templ MainLayout(page templ.Component, user *models.User) {
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link rel="stylesheet" href="/dist/styles.css"/>
+			<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 			<script src="/dist/htmx.js" defer></script>
 			<script src="/dist/htmx-response-targets.js" defer></script>
 			<script src="/dist/index.js" defer></script>
@@ -29,7 +31,7 @@ templ MainLayout(page templ.Component) {
 						{Text: "Sign In", URL: "/signin"},
 						{Text: "Sign Up", URL: "/signup"},
 					},
-				})
+				}, user)
 				@components.MessageComponent()
 				<main id="page">
 					@page

@@ -25,8 +25,11 @@ const cushionTime = time.Minute * 5
 var secret = os.Getenv("JWT_SECRET")
 
 type jwtCustomClaims struct {
-	Email string `json:"email"`
-	ID    int    `json:"id"`
+	First   string `json:"first"`
+	Last    string `json:"last"`
+	Email   string `json:"email"`
+	Picture string `json:"picture"`
+	ID      int    `json:"id"`
 	jwt.RegisteredClaims
 }
 
@@ -63,11 +66,13 @@ var config = echojwt.Config{
 		claims := userToken.Claims.(*jwtCustomClaims)
 		log.Println("Email: ", claims.Email)
 		log.Println("ID: ", claims.ID)
+		log.Println("Name: ", claims.First, claims.Last)
+		log.Println("Picture: ", claims.Picture)
 		expiration := claims.ExpiresAt.Time
 		log.Println("Expiration: ", expiration)
 		if time.Until(expiration) <= cushionTime {
 			log.Println("less than a minute left")
-			t, err := IssueToken(claims.Email, claims.ID)
+			t, err := IssueToken(claims.First, claims.Last, claims.Email, claims.Picture, claims.ID)
 			if err != nil {
 				log.Println("Failed to issue token: ", err)
 			}
@@ -85,7 +90,10 @@ func GetClaims(next echo.HandlerFunc) echo.HandlerFunc {
 		log.Println("running GetClaims middleware")
 		user := c.Get("user").(*jwt.Token)
 		claims := user.Claims.(*jwtCustomClaims)
+		c.Set("first", claims.First)
+		c.Set("last", claims.Last)
 		c.Set("email", claims.Email)
+		c.Set("picture", claims.Picture)
 		c.Set("id", claims.ID)
 		return next(c)
 	}
@@ -152,10 +160,13 @@ func GoogleAuth(c echo.Context) (*idtoken.Payload, error) {
 	return payload, nil
 }
 
-func IssueToken(email string, id int) (string, error) {
+func IssueToken(firstName, lastName, email, picture string, id int) (string, error) {
 	claims := jwtCustomClaims{
-		Email: email,
-		ID:    id,
+		First:   firstName,
+		Last:    lastName,
+		Email:   email,
+		Picture: picture,
+		ID:      id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(SessionLifeSpan)),
 		},

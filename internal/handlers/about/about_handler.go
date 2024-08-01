@@ -29,7 +29,7 @@ func Mount(e *echo.Echo, h AboutPageHandler) {
 func (h handler) AboutPage(c echo.Context) error {
 
 	if !util.IsHTMX(c) {
-		return util.RenderTempl(layouts.MainLayout(views.AboutPage()), c, http.StatusOK)
+		return util.RenderTempl(layouts.MainLayout(views.AboutPage(), nil), c, http.StatusOK)
 	}
 	return util.RenderTempl(views.AboutPage(), c, http.StatusOK)
 }

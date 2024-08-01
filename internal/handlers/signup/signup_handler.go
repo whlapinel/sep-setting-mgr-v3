@@ -62,7 +62,7 @@ func (h handler) SignUpPage(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.SignUpPage(router, clientID), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.SignUpPage(router, clientID)), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.SignUpPage(router, clientID), nil), c, 200)
 }
 
 func (h handler) GoogleSignup(c echo.Context) error {
@@ -74,6 +74,7 @@ func (h handler) GoogleSignup(c echo.Context) error {
 	email := payload.Claims["email"].(string)
 	first := payload.Claims["given_name"].(string)
 	last := payload.Claims["family_name"].(string)
+	picture := payload.Claims["picture"].(string)
 
 	if !isValidEmail(email) {
 		log.Println("Invalid email: ", email)
@@ -92,7 +93,7 @@ func (h handler) GoogleSignup(c echo.Context) error {
 	}
 
 	// create user
-	created, err := h.service.CreateUser(first, last, email)
+	created, err := h.service.CreateUser(first, last, email, picture)
 	if err != nil {
 		log.Println("Failed to create user: ", err)
 		return c.String(500, "Failed to create user")

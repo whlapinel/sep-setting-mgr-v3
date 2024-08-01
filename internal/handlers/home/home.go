@@ -29,5 +29,5 @@ func (h handler) Home(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(views.HomePage(), c, 200)
 	}
-	return util.RenderTempl(layouts.MainLayout(views.HomePage()), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.HomePage(), nil), c, 200)
 }

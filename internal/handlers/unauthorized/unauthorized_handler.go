@@ -62,5 +62,5 @@ func (h handler) Unauthorized(c echo.Context) error {
 	if util.IsHTMX(c) {
 		return util.RenderTempl(unAuthTemplate, c, http.StatusOK)
 	}
-	return util.RenderTempl(layouts.MainLayout(unAuthTemplate), c, http.StatusOK)
+	return util.RenderTempl(layouts.MainLayout(unAuthTemplate, nil), c, http.StatusOK)
 }

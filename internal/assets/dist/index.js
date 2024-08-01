@@ -64,3 +64,8 @@ function signout() {
         signoutDiv === null || signoutDiv === void 0 ? void 0 : signoutDiv.dispatchEvent(new CustomEvent("autoSignout", { bubbles: true, cancelable: true }));
     });
 }
+const userMenuButton = document.querySelector("button#user-menu-button");
+userMenuButton === null || userMenuButton === void 0 ? void 0 : userMenuButton.addEventListener("click", () => {
+    const userMenu = document.querySelector("div#user-menu");
+    userMenu === null || userMenu === void 0 ? void 0 : userMenu.classList.toggle("hidden");
+});
