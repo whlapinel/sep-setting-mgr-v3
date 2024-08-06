@@ -69,7 +69,7 @@ func (ds *demoDataService) createDemoUsers() ([]*models.User, error) {
 			FirstName: "William",
 			LastName:  "Lapinel",
 			Email:     "williamh.lapinel" + emailDomain,
-			Picture:   "https://randomuser.me",
+			Picture:   "https://lh3.googleusercontent.com/a/ACg8ocKZ7iCB2XYFNu0_1wE5nYiGtee0eNbyuk4WiS3N-HKd4mXwgQ=s96-c",
 			Admin:     true,
 			Teacher:   true,
 		},
