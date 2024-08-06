@@ -2,22 +2,21 @@ package views
 
 import (
 	"github.com/labstack/echo/v4"
-	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/handlers/views/layouts/layoutscommon"
 )
 
-templ DashboardPage(classes []*models.Class, router *echo.Echo) {
+templ DashboardPage(router *echo.Echo, section templ.Component) {
 	@layouts.PageLayout("Dashboard", DashboardSideNav(router)) {
-		@ClassesTable(classes, router)
+		@section
 	}
 }
 
 templ DashboardSideNav(router *echo.Echo) {
 	@layouts.SideNav([]componentscommon.NavItem{
-		{Text: "Classes", URL: router.Reverse(common.HxClasses.String())},
+		{Text: "Classes", URL: router.Reverse(common.HxClasses.String()), PushURLString: router.Reverse(common.Classes.String())},
 		{Text: "Calendar", URL: router.Reverse(common.DashboardCalendar.String())},
 	}, layoutscommon.Details.Selector())
 }

@@ -83,5 +83,9 @@ func (h handler) DashboardCalendar(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return util.RenderTempl(layouts.MainLayout(calendar, user), c, http.StatusOK)
+	return util.RenderTempl(
+		layouts.MainLayout(
+			views.DashboardPage(router, calendar),
+			user,
+		), c, http.StatusOK)
 }

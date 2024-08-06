@@ -100,13 +100,13 @@ func (h handler) Classes(c echo.Context) error {
 	log.Println("Current URL: ", currentUrl)
 	// return util.RenderTempl(components.ClassesTable(classes, router, common.ShowAddClassForm, common.DeleteClass), c, 200)
 	if util.IsHTMX(c) {
-		return util.RenderTempl(views.DashboardPage(classes, router), c, 200)
+		return util.RenderTempl(views.DashboardPage(router, views.ClassesTable(classes, router)), c, 200)
 	}
 	user, err := models.NewUser(c.Get("first").(string), c.Get("last").(string), c.Get("email").(string), c.Get("picture").(string))
 	if err != nil {
 		return err
 	}
-	return util.RenderTempl(layouts.MainLayout(views.DashboardPage(classes, router), user), c, 200)
+	return util.RenderTempl(layouts.MainLayout(views.DashboardPage(router, views.ClassesTable(classes, router)), user), c, 200)
 }
 
 func (h handler) ShowAddClassForm(c echo.Context) error {
