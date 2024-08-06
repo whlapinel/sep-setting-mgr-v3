@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"sep_setting_mgr/internal/domain/models"
 	"time"
 
@@ -43,6 +44,15 @@ func createApplicationsTable(db *sql.DB) error {
 	return nil
 }
 
+func (r *applicationRepo) DeleteAll() error {
+	query := `DELETE FROM applications;`
+	_, err := r.db.Exec(query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *applicationRepo) Store(a *models.Application) error {
 	query := `INSERT INTO applications (user_id, role) VALUES (?, ?);`
 	_, err := r.db.Exec(query, a.UserID, a.Role)
@@ -52,16 +62,20 @@ func (r *applicationRepo) Store(a *models.Application) error {
 	return nil
 }
 
-func (r *applicationRepo) Delete(a *models.Application) error {
+func (r *applicationRepo) Update(a *models.Application) error {
+	return errors.New("not implemented")
+}
+
+func (r *applicationRepo) Delete(id int) error {
 	query := `DELETE FROM applications WHERE id = ?;`
-	_, err := r.db.Exec(query, a.ID)
+	_, err := r.db.Exec(query, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *applicationRepo) All() (models.Applications, error) {
+func (r *applicationRepo) All() ([]*models.Application, error) {
 	query := `
 	SELECT a.*, u.first_name, u.last_name, u.email
 	FROM applications a
@@ -100,7 +114,7 @@ func (r *applicationRepo) All() (models.Applications, error) {
 	return apps, nil
 }
 
-func (r *applicationRepo) GetApplicationsByUserID(userID int) (models.Applications, error) {
+func (r *applicationRepo) FindByUserID(userID int) (models.Applications, error) {
 	query := `
 	SELECT a.*, u.first_name, u.last_name, u.email
 	FROM applications a
@@ -139,7 +153,7 @@ func (r *applicationRepo) GetApplicationsByUserID(userID int) (models.Applicatio
 	return apps, nil
 }
 
-func (r *applicationRepo) GetApplicationByID(id int) (*models.Application, error) {
+func (r *applicationRepo) FindByID(id int) (*models.Application, error) {
 	query := `
 	SELECT a.*, u.first_name, u.last_name, u.email
 	FROM applications a

@@ -1,15 +1,14 @@
 package assignments
 
 import (
-	"log"
 	"sep_setting_mgr/internal/domain/models"
 )
 
 type AssignmentsService interface {
-	ListAll() (models.Assignments, error)
-	GetByAssignmentID(id int) (*models.Assignment, error)
-	UpdateRoom(assignmentID, roomID int) (*models.Room, error)
-	GetByTeacherID(teacherID int) (models.Assignments, error)
+	All() (models.Assignments, error)
+	FindByID(id int) (*models.Assignment, error)
+	UpdateRoom(assignmentID, newRoomID int) error
+	FindByTeacherID(teacherID int) (models.Assignments, error)
 }
 
 type service struct {
@@ -26,7 +25,7 @@ func NewService(assignments models.AssignmentRepository, rooms models.RoomReposi
 	}
 }
 
-func (s service) ListAll() (models.Assignments, error) {
+func (s service) All() (models.Assignments, error) {
 	assignments, err := s.assignments.All()
 	if err != nil {
 		return nil, err
@@ -34,31 +33,33 @@ func (s service) ListAll() (models.Assignments, error) {
 	return assignments, nil
 }
 
-func (s service) GetByAssignmentID(id int) (*models.Assignment, error) {
-	return s.assignments.GetByAssignmentID(id)
+func (s service) FindByID(id int) (*models.Assignment, error) {
+	return s.assignments.FindByID(id)
 }
 
-func (s service) UpdateRoom(assignmentID, roomID int) (*models.Room, error) {
+func (s service) UpdateRoom(assignmentID, newRoomID int) error {
 	var room *models.Room
-	if roomID < 0 {
-		log.Printf("Nullifying room for assignment %d", assignmentID)
-		err := s.assignments.NullifyRoomIDByAssignmentID(assignmentID)
+	if newRoomID < 0 {
+		room = &models.Unassigned
+	} else {
+		storedRoom, err := s.rooms.FindByID(newRoomID)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		return nil, nil
+		room = storedRoom
 	}
-	err := s.assignments.UpdateRoom(assignmentID, roomID)
+	assignment, err := s.assignments.FindByID(assignmentID)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	room, err = s.rooms.FindByID(roomID)
+	assignment.Room = room
+	err = s.assignments.Update(assignment)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return room, nil
+	return nil
 }
 
-func (s service) GetByTeacherID(teacherID int) (models.Assignments, error) {
+func (s service) FindByTeacherID(teacherID int) (models.Assignments, error) {
 	return s.assignments.GetByTeacherID(teacherID)
 }

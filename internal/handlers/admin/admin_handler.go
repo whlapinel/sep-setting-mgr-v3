@@ -40,7 +40,7 @@ func Mount(e *echo.Echo, h AdminHandler) {
 
 func (h handler) AdminPage(c echo.Context) error {
 	// get all assignments
-	assignments, err := h.assignments.ListAll()
+	assignments, err := h.assignments.All()
 	if err != nil {
 		return err
 	}

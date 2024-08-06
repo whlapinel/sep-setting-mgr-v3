@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	demodata "sep_setting_mgr/internal/demo_data"
 	"sep_setting_mgr/internal/domain/services"
 	"sep_setting_mgr/internal/handlers/about"
 	"sep_setting_mgr/internal/handlers/admin"
@@ -35,7 +36,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func MountHandlers(e *echo.Echo, db *sql.DB) error {
+func MountHandlers(e *echo.Echo, db *sql.DB, demo bool) error {
 	// initialize repositories
 	usersRepo := repositories.NewUsersRepo(db)
 	classesRepo := repositories.NewClassesRepo(db)
@@ -45,6 +46,23 @@ func MountHandlers(e *echo.Echo, db *sql.DB) error {
 	assignmentsRepo := repositories.NewAssignmentsRepo(db)
 	applicationsRepo := repositories.NewApplicationRepo(db)
 
+	// create demo data
+	if demo {
+		demoDataService := demodata.NewDemoService(
+			usersRepo,
+			classesRepo,
+			studentsRepo,
+			testEventsRepo,
+			roomsRepo,
+			applicationsRepo,
+			assignmentsRepo,
+		)
+		err := demoDataService.CreateDemoData()
+		if err != nil {
+			return err
+		}
+	}
+	
 	// initialize domain services
 	assignmentsDomainService := services.NewAssignmentsService(assignmentsRepo, roomsRepo, testEventsRepo, classesRepo, studentsRepo)
 

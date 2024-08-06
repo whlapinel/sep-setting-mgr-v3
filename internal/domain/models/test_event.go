@@ -12,19 +12,15 @@ type TestEvent struct {
 	Class    *Class
 	TestDate *time.Time
 	Block    int
-	Room     *Room
 }
 type TestEvents []*TestEvent
 
 // TestEventRepository provides access a test event store
 type TestEventRepository interface {
-	ListAll() (TestEvents, error)
-	Store(testEvent *TestEvent) (id int, err error)
-	Update(testEvent *TestEvent) error
-	Delete(id int) error
+	Repository[TestEvent]
+	DeleteAll
 	FindByClass(classID int) (TestEvents, error)
 	FindByTeacherID(teacherID int) (TestEvents, error)
-	FindByID(id int) (*TestEvent, error)
 }
 
 func (t *TestEvent) Update(testName string, testDate *time.Time) {
@@ -48,7 +44,7 @@ func (t TestEvents) Less(i, j int) bool {
 }
 
 // NewTestEvent creates a new test event
-func NewTestEvent(testName string, class *Class, testDate *time.Time, block int) (*TestEvent, error) {
+func NewTestEvent(testName string, class *Class, testDate *time.Time) (*TestEvent, error) {
 	log.SetPrefix("Domain: ")
 	log.Println("Creating new test event")
 	log.Println("Class ID: ", class.ID)
@@ -61,6 +57,6 @@ func NewTestEvent(testName string, class *Class, testDate *time.Time, block int)
 		TestName: testName,
 		Class:    class,
 		TestDate: testDate,
-		Block:    block,
+		Block:    class.Block,
 	}, nil
 }

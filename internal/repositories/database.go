@@ -51,8 +51,13 @@ func InitializeDB(production bool) (*sql.DB, error) {
 
 func ClearDatabase(db *sql.DB) error {
 	log.Println("Clearing database...")
+	log.Println("Dropping applications")
+	_, err := db.Exec("DROP TABLE IF EXISTS applications")
+	if err != nil {
+		return err
+	}
 	log.Println("Dropping assignments")
-	_, err := db.Exec("DROP TABLE IF EXISTS assignments")
+	_, err = db.Exec("DROP TABLE IF EXISTS assignments")
 	if err != nil {
 		return err
 	}
@@ -73,6 +78,11 @@ func ClearDatabase(db *sql.DB) error {
 	}
 	log.Println("Dropping rooms")
 	_, err = db.Exec("DROP TABLE IF EXISTS rooms")
+	if err != nil {
+		return err
+	}
+	log.Println("Dropping users")
+	_, err = db.Exec("DROP TABLE IF EXISTS users")
 	if err != nil {
 		return err
 	}

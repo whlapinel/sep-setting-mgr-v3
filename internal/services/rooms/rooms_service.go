@@ -2,12 +2,14 @@ package rooms
 
 import (
 	"errors"
+	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/domain/services"
+	"strconv"
 )
 
 type RoomsService interface {
-	AddRoom(*models.Room) (id int, err error)
+	AddRoom(*models.Room) error
 	DeleteRoom(id int) error
 	UpdateRoom(room *models.Room) error
 	ListRooms() (models.Rooms, error)
@@ -21,7 +23,9 @@ type service struct {
 	asService services.AssignmentsService
 }
 
-func NewService(rooms models.RoomRepository, asService services.AssignmentsService) RoomsService {
+func NewService(
+	rooms models.RoomRepository,
+	asService services.AssignmentsService) RoomsService {
 	return &service{rooms, asService}
 }
 
@@ -30,7 +34,7 @@ func (s service) GetNextPriority() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return rooms.GetNextPriority(), nil
+	return models.Rooms(rooms).GetNextPriority(), nil
 }
 
 // should swap priority with next higher priority room
@@ -69,15 +73,19 @@ func (s service) ListRooms() (models.Rooms, error) {
 	if err != nil {
 		return nil, err
 	}
-	return rooms.SortByRoomPriority(), nil
+	for _, room := range rooms {
+		log.Printf("Room (id, name, number, priority): %s, %s, %s, %s",
+			strconv.Itoa(room.ID), room.Name, room.Number, strconv.Itoa(room.Priority))
+	}
+	return models.Rooms(rooms).SortByRoomPriority(), nil
 }
 
-func (s service) AddRoom(room *models.Room) (id int, err error) {
-	id, err = s.rooms.Store(room)
+func (s service) AddRoom(room *models.Room) error {
+	err := s.rooms.Store(room)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return id, nil
+	return nil
 }
 
 func (s service) DeleteRoom(id int) error {

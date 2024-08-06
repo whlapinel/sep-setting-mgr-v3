@@ -11,7 +11,8 @@ import (
 )
 
 func main() {
-	clearData := false
+	demo := true
+	clearDB := true
 	LoadEnvironment()
 	e := echo.New()
 	e.Use(logger)
@@ -20,13 +21,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-	if clearData {
+
+	if clearDB {
 		err = repositories.ClearDatabase(db)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	err = MountHandlers(e, db)
+	err = MountHandlers(e, db, demo)
 	if err != nil {
 		log.Fatal(err)
 	}

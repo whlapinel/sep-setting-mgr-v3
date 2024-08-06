@@ -18,11 +18,10 @@ type (
 	}
 
 	UserRepository interface {
-		Store(*User) error
-		Update(*User) error
+		Repository[User]
+		DeleteAll
 		Find(email string) (*User, error)
 		FindByID(id int) (*User, error)
-		All() ([]*User, error)
 	}
 )
 

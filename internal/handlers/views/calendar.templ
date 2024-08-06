@@ -180,9 +180,6 @@ func greenBackground(roomID int, green bool) bool {
 }
 
 func getRoom(assignment models.Assignment) string {
-	if assignment.Room == nil {
-		return "Unassigned"
-	}
 	return assignment.Room.Number
 }
 

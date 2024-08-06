@@ -12,12 +12,12 @@ const studentTableID = "students-table"
 
 func prepareStudentsForTable(students []*models.Student, class *models.Class, router *echo.Echo) components.TableData {
 	var rows []components.Row
-	headers := []string{"Name", "Block"}
+	headers := []string{"First", "Last"}
 	for _, student := range students {
 		rows = append(rows, studentToRow(student, class, router))
 	}
 	return components.TableData{ID: studentTableID,
-		Title:       "Students in " + class.Name,
+		Title:       "Students in " + class.Name + ": Block " + strconv.Itoa(class.Block),
 		Description: "A list of all students.",
 		AddRow:      true,
 		AddRowButton: components.Button{

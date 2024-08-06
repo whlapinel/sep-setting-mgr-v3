@@ -15,15 +15,13 @@ type Assignment struct {
 }
 
 type AssignmentRepository interface {
-	GetByAssignmentID(id int) (*Assignment, error)
-	UpdateRoom(assignmentID, roomID int) error
-	Store(*Assignment) error
-	GetByEventID(eventID int) (Assignments, error)
-	All() (Assignments, error)
+	Repository[Assignment]
+	DeleteAll
+	FindByID(id int) (*Assignment, error)
+	FindByEventID(eventID int) (Assignments, error)
 	DeleteByStudentID(studentID int) error
 	DeleteByEventID(eventID int) error
 	NullifyRoomID(roomID int) error
-	NullifyRoomIDByAssignmentID(assignmentID int) error
 	GetByTeacherID(teacherID int) (Assignments, error)
 }
 

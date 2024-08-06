@@ -52,12 +52,14 @@ func (s service) UpdateClass(classID int, name string) (*models.Class, error) {
 
 func (s service) AddClass(name string, block int, teacherID int) (*models.Class, error) {
 	log.Println("Service: Adding class to database")
-	class := models.NewClass(name, block, teacherID)
-	id, err := s.classes.Store(class)
+	class, err := models.NewClass(name, block, teacherID)
 	if err != nil {
 		return nil, err
 	}
-	class.ID = id
+	err = s.classes.Store(class)
+	if err != nil {
+		return nil, err
+	}
 	return class, nil
 }
 
@@ -70,12 +72,12 @@ func (s service) FindClassByID(classID int) (*models.Class, error) {
 }
 
 func (s service) List(teacherID int) ([]*models.Class, error) {
-	classes, err := s.classes.All(teacherID)
+	classes, err := s.classes.AllByTeacherID(teacherID)
 	if err != nil {
 		return nil, err
 	}
 	for _, class := range classes {
-		students, err := s.students.All(class.ID)
+		students, err := s.students.AllInClass(class.ID)
 		if err != nil {
 			return nil, err
 		}

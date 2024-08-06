@@ -30,10 +30,35 @@ func NewUsersRepo(db *sql.DB) models.UserRepository {
 	return &userRepo{db: db}
 }
 
+func (ur *userRepo) DeleteAll() error {
+	log.Println("Deleting all users from database")
+	_, err := ur.db.Exec(`DELETE FROM users`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ur *userRepo) Store(user *models.User) error {
 	dbUser := convertToTable(user)
 	log.Println("Adding user to database")
-	_, err := ur.db.Exec(`INSERT INTO users (email, first_name, last_name, picture, admin, teacher) VALUES (?, ?, ?, ?, ?, ?)`, dbUser.email, dbUser.first_name, dbUser.last_name, dbUser.picture, dbUser.admin, dbUser.teacher)
+	result, err := ur.db.Exec(`
+	INSERT INTO users (email, first_name, last_name, picture, admin, teacher) 
+	VALUES (?, ?, ?, ?, ?, ?)`, dbUser.email, dbUser.first_name, dbUser.last_name, dbUser.picture, dbUser.admin, dbUser.teacher)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	user.ID = int(id)
+	return nil
+}
+
+func (ur *userRepo) Delete(id int) error {
+	log.Println("Deleting user from database")
+	_, err := ur.db.Exec(`DELETE FROM users WHERE id = ?`, id)
 	if err != nil {
 		return err
 	}

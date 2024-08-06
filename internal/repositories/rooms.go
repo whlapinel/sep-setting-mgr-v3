@@ -27,19 +27,31 @@ func NewRoomsRepo(db *sql.DB) models.RoomRepository {
 	return &roomRepo{db: db}
 }
 
-func (rr *roomRepo) Store(room *models.Room) (int, error) {
+func (rr *roomRepo) DeleteAll() error {
+	_, err := rr.db.Exec(`DELETE FROM rooms`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (rr *roomRepo) Store(room *models.Room) error {
 	dbRoom := convertToRoomTable(room)
-	_, err := rr.db.Exec(`
+	result, err := rr.db.Exec(`
 	INSERT INTO rooms (name, number, max_capacity, priority) 
 	VALUES (?, ?, ?, ?)`, dbRoom.name, dbRoom.number, dbRoom.max_capacity, dbRoom.priority)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	rr.db.QueryRow(`SELECT LAST_INSERT_ID()`).Scan(&room.ID)
-	return room.ID, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	room.ID = int(id)
+	return nil
 }
 
-func (rr *roomRepo) All() (models.Rooms, error) {
+func (rr *roomRepo) All() ([]*models.Room, error) {
 	log.SetPrefix("Rooms Repo: All()")
 	var rooms []*models.Room
 	var tableRows []roomsTableRow

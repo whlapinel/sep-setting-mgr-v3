@@ -47,14 +47,13 @@ func (s service) AddStudent(firstName string, lastName string, classID int, oneO
 	}
 	student.Class = *class
 	log.Println("new student created")
-	id, err := s.students.Store(student)
+	err = s.students.Store(student)
 	if err != nil {
 		return nil, err
 	}
 	// create assignments for student, room is null
 	s.assignmentService.CreateAssignmentsForStudent(student)
 	log.Println("new student stored")
-	student.ID = id
 	return student, nil
 }
 
@@ -95,7 +94,7 @@ func (s service) DeleteStudent(studentID int) error {
 }
 
 func (s service) ListStudents(classID int) ([]*models.Student, error) {
-	students, err := s.students.All(classID)
+	students, err := s.students.AllInClass(classID)
 	if err != nil {
 		return nil, err
 	}

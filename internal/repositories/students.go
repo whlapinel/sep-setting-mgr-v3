@@ -28,6 +28,14 @@ func NewStudentsRepo(db *sql.DB) models.StudentRepository {
 	return &studentRepo{db: db}
 }
 
+func (sr *studentRepo) DeleteAll() error {
+	_, err := sr.db.Exec(`DELETE FROM students`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (sr *studentRepo) GetAssignments(studentID int) (models.Assignments, error) {
 	return nil, nil
 }
@@ -44,16 +52,20 @@ func (sr *studentRepo) FindByID(studentID int) (*models.Student, error) {
 	return student, nil
 }
 
-func (sr *studentRepo) Store(student *models.Student) (int, error) {
+func (sr *studentRepo) Store(student *models.Student) error {
 	dbStudent := convertToStudentTable(student)
-	_, err := sr.db.Exec(`
+	result, err := sr.db.Exec(`
 	INSERT INTO students (first_name, last_name, class_id, one_on_one) 
 	VALUES (?, ?, ?, ?)`, dbStudent.first_name, dbStudent.last_name, dbStudent.class_id, dbStudent.one_on_one)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	sr.db.QueryRow(`SELECT LAST_INSERT_ID()`).Scan(&student.ID)
-	return student.ID, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	student.ID = int(id)
+	return nil
 }
 
 func (sr *studentRepo) Update(student *models.Student) error {
@@ -68,13 +80,37 @@ func (sr *studentRepo) Update(student *models.Student) error {
 	return nil
 }
 
-func (sr *studentRepo) All(classID int) ([]*models.Student, error) {
+func (sr *studentRepo) AllInClass(classID int) ([]*models.Student, error) {
 	var students []*models.Student
 	var tableRows []studentTableRow
 	rows, err := sr.db.Query(`
 	SELECT s.* 
 	FROM students s
 	where s.class_id = ?`, classID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var studentTable studentTableRow
+		err := rows.Scan(&studentTable.id, &studentTable.first_name, &studentTable.last_name, &studentTable.class_id, &studentTable.one_on_one)
+		if err != nil {
+			return nil, err
+		}
+		tableRows = append(tableRows, studentTable)
+	}
+	for _, tableRow := range tableRows {
+		student := convertToStudent(tableRow)
+		students = append(students, student)
+	}
+	return students, nil
+}
+
+func (sr *studentRepo) All() ([]*models.Student, error) {
+	var students []*models.Student
+	var tableRows []studentTableRow
+	rows, err := sr.db.Query(`
+	SELECT * FROM students`)
 	if err != nil {
 		return nil, err
 	}

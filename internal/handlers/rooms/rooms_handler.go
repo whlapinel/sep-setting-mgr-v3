@@ -85,7 +85,7 @@ func (h handler) CreateRoom(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = h.service.AddRoom(&room)
+	err = h.service.AddRoom(&room)
 	if err != nil {
 		return err
 	}

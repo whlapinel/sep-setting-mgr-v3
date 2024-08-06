@@ -38,7 +38,7 @@ func (s service) ApplyForRole(userId int, role models.Role) error {
 func (s service) HasApplied(userID int, role models.Role) (bool, error) {
 	log.SetPrefix("Application Service: HasApplied() ")
 	log.Println("Role: ", role)
-	applications, err := s.applications.GetApplicationsByUserID(userID)
+	applications, err := s.applications.FindByUserID(userID)
 	if err != nil {
 		log.Println(err)
 		return false, err
@@ -74,7 +74,7 @@ func (s service) AdjudicateApplication(appID int, action models.Action) error {
 	if action != models.Approve && action != models.Deny {
 		return models.ErrInvalidAction
 	}
-	app, err := s.applications.GetApplicationByID(appID)
+	app, err := s.applications.FindByID(appID)
 	if err != nil {
 		return ErrSearchError
 	}
@@ -96,9 +96,9 @@ func (s service) AdjudicateApplication(appID int, action models.Action) error {
 		if err != nil {
 			return err
 		}
-		return s.applications.Delete(app)
+		return s.applications.Delete(app.ID)
 	}
-	return s.applications.Delete(app)
+	return s.applications.Delete(app.ID)
 }
 
 func (s service) All() (models.Applications, error) {

@@ -27,6 +27,14 @@ func NewClassesRepo(db *sql.DB) models.ClassRepository {
 	return &classRepo{db: db}
 }
 
+func (cr *classRepo) DeleteAll() error {
+	_, err := cr.db.Exec(`DELETE FROM classes`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (cr *classRepo) Delete(classID int) error {
 	_, err := cr.db.Exec(`DELETE FROM classes WHERE id = ?`, classID)
 	if err != nil {
@@ -35,24 +43,53 @@ func (cr *classRepo) Delete(classID int) error {
 	return nil
 }
 
-func (cr *classRepo) Store(class *models.Class) (int, error) {
+func (cr *classRepo) Store(class *models.Class) error {
 	dbClass := convertToClassTable(class)
 	log.Println("Adding class to database")
-	_, err := cr.db.Exec(`INSERT INTO classes (name, block, teacher_id) VALUES (?, ?, ?)`, dbClass.name, dbClass.block, dbClass.teacher_id)
+	result, err := cr.db.Exec(`INSERT INTO classes (name, block, teacher_id) VALUES (?, ?, ?)`, dbClass.name, dbClass.block, dbClass.teacher_id)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	cr.db.QueryRow(`SELECT LAST_INSERT_ID()`).Scan(&dbClass.id)
-	return dbClass.id, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	class.ID = int(id)
+	return nil
 }
 
-func (classRepo *classRepo) All(teacherID int) ([]*models.Class, error) {
+func (classRepo *classRepo) AllByTeacherID(teacherID int) ([]*models.Class, error) {
 	var classes []*models.Class
 	var tableRows []classTableRow
 	rows, err := classRepo.db.Query(`
 	SELECT * FROM classes 
 	where teacher_id = ? 
 	order by block`, teacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var classTable classTableRow
+		err := rows.Scan(&classTable.id, &classTable.name, &classTable.block, &classTable.teacher_id)
+		if err != nil {
+			return nil, err
+		}
+		tableRows = append(tableRows, classTable)
+	}
+	for _, tableRow := range tableRows {
+		class := convertToClass(tableRow)
+		classes = append(classes, class)
+	}
+	return classes, nil
+}
+
+func (classRepo *classRepo) All() ([]*models.Class, error) {
+	var classes []*models.Class
+	var tableRows []classTableRow
+	rows, err := classRepo.db.Query(`
+	SELECT * FROM classes
+	order by block`)
 	if err != nil {
 		return nil, err
 	}

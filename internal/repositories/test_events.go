@@ -28,19 +28,31 @@ func NewTestEventsRepo(db *sql.DB) models.TestEventRepository {
 	return &testEventsRepo{db: db}
 }
 
-func (tr *testEventsRepo) Store(testEvent *models.TestEvent) (int, error) {
+func (tr *testEventsRepo) DeleteAll() error {
+	_, err := tr.db.Exec(`DELETE FROM test_events`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (tr *testEventsRepo) Store(testEvent *models.TestEvent) error {
 	log.SetPrefix("Repository: ")
 	log.Println("Storing test event in database")
 	log.Println("Class ID: ", testEvent.Class.ID)
 	dbTestEvent := convertTestEventToTable(testEvent)
-	_, err := tr.db.Exec(`
+	result, err := tr.db.Exec(`
 	INSERT INTO test_events (test_name, test_date, class_id) 
 	VALUES (?, ?, ?)`, dbTestEvent.test_name, dbTestEvent.test_date, dbTestEvent.class_id)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	tr.db.QueryRow(`SELECT LAST_INSERT_ID()`).Scan(&testEvent.ID)
-	return testEvent.ID, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	testEvent.ID = int(id)
+	return nil
 }
 
 func (tr *testEventsRepo) Update(testEvent *models.TestEvent) error {
@@ -58,7 +70,7 @@ func (tr *testEventsRepo) Update(testEvent *models.TestEvent) error {
 	return nil
 }
 
-func (tr *testEventsRepo) ListAll() (models.TestEvents, error) {
+func (tr *testEventsRepo) All() ([]*models.TestEvent, error) {
 	var testEvents models.TestEvents
 	var tableRows []testEventTableRow
 	rows, err := tr.db.Query(`

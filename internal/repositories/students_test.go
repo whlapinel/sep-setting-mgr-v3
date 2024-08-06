@@ -48,12 +48,12 @@ func TestStudentsRepo_Store(t *testing.T) {
 		t.Errorf("NewStudent() error = %v; want nil", err)
 	}
 	t.Run("should store a student in the database", func(t *testing.T) {
-		id, err := sr.Store(student)
+		err := sr.Store(student)
 		if err != nil {
 			t.Errorf("Store() error = %v; want nil", err)
 		}
-		if id == 0 {
-			t.Errorf("Store() id = %v; want non-zero", id)
+		if student.ID == 0 {
+			t.Errorf("Store() id = %v; want non-zero", student.ID)
 		}
 	})
 	t.Cleanup(func() {
@@ -83,12 +83,12 @@ func TestStudentsRepo_All(t *testing.T) {
 	if err != nil {
 		t.Errorf("NewStudent() error = %v; want nil", err)
 	}
-	_, err = sr.Store(student)
+	err = sr.Store(student)
 	if err != nil {
 		t.Errorf("Store() error = %v; want nil", err)
 	}
 	t.Run("should return all students in the database", func(t *testing.T) {
-		students, err := sr.All(1)
+		students, err := sr.AllInClass(1)
 		if err != nil {
 			t.Errorf("All() error = %v; want nil", err)
 		}

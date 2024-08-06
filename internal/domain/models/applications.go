@@ -39,11 +39,9 @@ func (r Role) Str() string {
 type Applications []*Application
 
 type ApplicationRepository interface {
-	Store(*Application) error
-	Delete(*Application) error
-	All() (Applications, error)
-	GetApplicationByID(id int) (*Application, error)
-	GetApplicationsByUserID(userID int) (Applications, error)
+	Repository[Application]
+	DeleteAll
+	FindByUserID(userID int) (Applications, error)
 }
 
 var ErrInvalidRole = errors.New("invalid role")

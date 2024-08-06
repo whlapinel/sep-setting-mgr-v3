@@ -49,15 +49,14 @@ func (s service) CreateTestEvent(classID int, testName string, testDate string) 
 	if err != nil {
 		return nil, err
 	}
-	testEvent, err := models.NewTestEvent(testName, class, parsedDate, class.Block)
+	testEvent, err := models.NewTestEvent(testName, class, parsedDate)
 	if err != nil {
 		return nil, err
 	}
-	event_id, err := s.testEvents.Store(testEvent)
+	err = s.testEvents.Store(testEvent)
 	if err != nil {
 		return nil, err
 	}
-	testEvent.ID = event_id
 	log.Println("Test event stored")
 	err = s.asService.CreateAssignmentsForTestEvent(testEvent.ID)
 	if err != nil {
@@ -73,7 +72,6 @@ func (s service) UpdateTestEvent(event *models.TestEvent) error {
 	}
 	return nil
 }
-
 
 func (s service) DeleteTestEvent(testEventID int) error {
 	err := s.asService.DeleteAssignmentsForTestEvent(testEventID)
@@ -113,7 +111,7 @@ func (s service) FindByTeacherID(teacherID int) (models.TestEvents, error) {
 }
 
 func (s service) ListAll() (models.TestEvents, error) {
-	testEvents, err := s.testEvents.ListAll()
+	testEvents, err := s.testEvents.All()
 	if err != nil {
 		return nil, err
 	}

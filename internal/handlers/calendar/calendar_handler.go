@@ -58,7 +58,7 @@ func Mount(e *echo.Echo, h CalendarHandler) {
 
 func (h handler) Calendar(c echo.Context) error {
 	log.SetPrefix("AdminHandler: Calendar()")
-	assignments, err := h.assignments.ListAll()
+	assignments, err := h.assignments.All()
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
@@ -87,7 +87,7 @@ func (h handler) AdminCalendarDetails(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error parsing date param")
 	}
-	assignments, err := h.assignments.ListAll()
+	assignments, err := h.assignments.All()
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
@@ -111,7 +111,7 @@ func (h handler) DBCalendarDetails(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error parsing date param")
 	}
-	assignments, err := h.assignments.ListAll()
+	assignments, err := h.assignments.All()
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
@@ -134,7 +134,7 @@ func (h handler) ShowAssignRoomForm(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	assignment, err := h.assignments.GetByAssignmentID(assignmentID)
+	assignment, err := h.assignments.FindByID(assignmentID)
 	log.Println("assignment.ID", assignment.ID)
 	if err != nil {
 		return c.String(500, err.Error())
@@ -166,17 +166,29 @@ func (h handler) AssignRoom(c echo.Context) error {
 		log.Println(err)
 		return c.String(500, "Error parsing date")
 	}
-	_, err = h.assignments.UpdateRoom(assignmentID, roomID)
+	err = h.assignments.UpdateRoom(assignmentID, roomID)
 	if err != nil {
 		log.Println("Error updating room")
 		return err
 	}
-	assignments, err := h.assignments.ListAll()
+	assignments, err := h.assignments.All()
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")
 	}
 	assignmentsMap := assignments.MapForCalendar()
+	for _, a := range assignmentsMap {
+		log.Println("Date: ", a)
+		for _, b := range a {
+			log.Println("Block: ", b)
+			for _, c := range b {
+				log.Println("Room: ", c)
+				for _, d := range c {
+					log.Println(d.Room.ID)
+				}
+			}
+		}
+	}
 	rooms, err := h.rooms.ListRooms()
 	if err != nil {
 		log.Println(err)

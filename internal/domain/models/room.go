@@ -14,11 +14,8 @@ type (
 	Rooms []*Room
 
 	RoomRepository interface {
-		Store(*Room) (int, error)
-		Delete(roomID int) error
-		All() (Rooms, error)
-		FindByID(roomID int) (*Room, error)
-		Update(room *Room) error
+		Repository[Room]
+		DeleteAll
 		FindByPriority(priority int) (*Room, error)
 		GetRoomAssignments(room *Room, block int, date time.Time) (Assignments, error)
 	}
@@ -30,6 +27,15 @@ var Unassigned = Room{
 	Number:      "Unassigned",
 	MaxCapacity: 1000000000,
 	Priority:    -1,
+}
+
+func NewRoom(name, number string, maxCapacity, priority int) (*Room, error) {
+	return &Room{
+		Name:        name,
+		Number:      number,
+		MaxCapacity: maxCapacity,
+		Priority:    priority,
+	}, nil
 }
 
 func (rooms Rooms) GetNextPriority() int {

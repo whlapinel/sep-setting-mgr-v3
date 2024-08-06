@@ -96,7 +96,7 @@ func (s *AssignmentsService) CreateAssignmentsForTestEvent(testEventID int) erro
 	if err != nil {
 		return err
 	}
-	students, err := s.students.All(testEvent.Class.ID)
+	students, err := s.students.AllInClass(testEvent.Class.ID)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (s *AssignmentsService) GetAssignments(classID int, start, end time.Time) (
 	}
 	for _, event := range testEvents {
 		if event.TestDate.After(start) && event.TestDate.Before(end) {
-			eventAssignments, err := s.asRepo.GetByEventID(event.ID)
+			eventAssignments, err := s.asRepo.FindByEventID(event.ID)
 			if err != nil {
 				return nil, err
 			}

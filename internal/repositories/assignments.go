@@ -28,15 +28,32 @@ func NewAssignmentsRepo(db *sql.DB) models.AssignmentRepository {
 	return &assignmentRepo{db: db}
 }
 
-func (ar *assignmentRepo) UpdateRoom(assignmentID, roomID int) error {
-	_, err := ar.db.Exec(`UPDATE assignments SET room_id = ? WHERE id = ?`, roomID, assignmentID)
+func (ar *assignmentRepo) DeleteAll() error {
+	_, err := ar.db.Exec(`DELETE FROM assignments`)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ar *assignmentRepo) GetByAssignmentID(id int) (*models.Assignment, error) {
+func (ar *assignmentRepo) Update(as *models.Assignment) error {
+	log.Println("Updating assignment. ID: ", as.ID)
+	if as.Room.ID < 0 {
+		log.Printf("Nullifying room for assignment %d", as.ID)
+		err := ar.nullifyRoomIDForAssignment(as)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	_, err := ar.db.Exec(`UPDATE assignments SET room_id = ? WHERE id = ?`, as.Room.ID, as.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ar *assignmentRepo) FindByID(id int) (*models.Assignment, error) {
 	var classRow classTableRow
 	var userRow userTableRow
 	var studentRow studentTableRow
@@ -106,8 +123,8 @@ func (ar *assignmentRepo) NullifyRoomID(roomID int) error {
 	return nil
 }
 
-func (ar *assignmentRepo) NullifyRoomIDByAssignmentID(assignmentID int) error {
-	_, err := ar.db.Exec(`UPDATE assignments SET room_id = NULL WHERE id = ?`, assignmentID)
+func (ar *assignmentRepo) nullifyRoomIDForAssignment(as *models.Assignment) error {
+	_, err := ar.db.Exec(`UPDATE assignments SET room_id = NULL WHERE id = ?`, as.ID)
 	if err != nil {
 		return err
 	}
@@ -200,7 +217,7 @@ func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, err
 	return assignments, nil
 }
 
-func (ar *assignmentRepo) All() (models.Assignments, error) {
+func (ar *assignmentRepo) All() ([]*models.Assignment, error) {
 	log.SetPrefix("Assignments Repo: All()")
 	var assignments models.Assignments
 	rows, err := ar.db.Query(`
@@ -285,7 +302,7 @@ func (ar *assignmentRepo) DeleteByStudentID(studentID int) error {
 	return nil
 }
 
-func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) {
+func (ar *assignmentRepo) FindByEventID(eventID int) (models.Assignments, error) {
 	var assignments models.Assignments
 
 	rows, err := ar.db.Query(`
@@ -360,13 +377,17 @@ func (ar *assignmentRepo) GetByEventID(eventID int) (models.Assignments, error) 
 func (ar *assignmentRepo) Store(assignment *models.Assignment) error {
 	dbAssignment := convertToAssignmentTable(assignment)
 	log.Println("Adding assignment to database")
-	_, err := ar.db.Exec(
+	result, err := ar.db.Exec(
 		`INSERT INTO assignments (event_id, student_id, room_id) VALUES (?, ?, ?)`,
 		dbAssignment.event_id, dbAssignment.student_id, dbAssignment.room_id)
 	if err != nil {
 		return err
 	}
-	ar.db.QueryRow(`SELECT LAST_INSERT_ID()`).Scan(&dbAssignment.id)
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	assignment.ID = int(id)
 	return nil
 }
 
@@ -417,10 +438,10 @@ func convertToAssignmentTable(assignment *models.Assignment) assignmentTableRow 
 	var assignmentTable assignmentTableRow
 	assignmentTable.event_id = assignment.TestEvent.ID
 	assignmentTable.student_id = assignment.Student.ID
-	if assignment.Room != nil {
-		assignmentTable.room_id = &assignment.Room.ID
-	} else {
+	if assignment.Room == nil || assignment.Room.ID < 0 {
 		assignmentTable.room_id = nil
+	} else {
+		assignmentTable.room_id = &assignment.Room.ID
 	}
 	return assignmentTable
 }

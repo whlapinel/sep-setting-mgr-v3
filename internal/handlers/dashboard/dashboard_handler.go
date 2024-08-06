@@ -63,7 +63,7 @@ func (h handler) Dashboard(c echo.Context) error {
 func (h handler) DashboardCalendar(c echo.Context) error {
 	log.SetPrefix("ShowCalendar: ")
 	teacherID := c.Get("id").(int)
-	assignments, err := h.assignments.GetByTeacherID(teacherID)
+	assignments, err := h.assignments.FindByTeacherID(teacherID)
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error retrieving assignments")

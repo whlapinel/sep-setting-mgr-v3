@@ -11,15 +11,13 @@ type (
 	}
 
 	ClassRepository interface {
-		Store(*Class) (int, error)
-		Delete(classID int) error
-		All(teacherID int) ([]*Class, error)
-		FindByID(classID int) (*Class, error)
-		Update(*Class) error
+		Repository[Class]
+		DeleteAll
+		AllByTeacherID(teacherID int) ([]*Class, error)
 	}
 )
 
-func NewClass(name string, block int, teacherID int) *Class {
+func NewClass(name string, block int, teacherID int) (*Class, error) {
 
 	teacher := User{
 		ID: teacherID,
@@ -29,5 +27,5 @@ func NewClass(name string, block int, teacherID int) *Class {
 		Name:    name,
 		Block:   block,
 		Teacher: teacher,
-	}
+	}, nil
 }
