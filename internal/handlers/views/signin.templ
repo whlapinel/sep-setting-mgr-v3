@@ -18,8 +18,7 @@ templ SignInPage(isSignedIn bool, justSignedIn bool, router *echo.Echo, expirati
 			</div>
 			if justSignedIn {
 				<div id="test" data-expiration={ expiration }>
-					<script src="/dist/signin.js" async defer>
-				</script>
+					<script src="/dist/signin.js" async defer></script>
 				</div>
 			}
 		} else {

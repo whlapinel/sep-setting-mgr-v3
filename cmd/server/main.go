@@ -11,9 +11,9 @@ import (
 )
 
 func main() {
-	demo := true
-	clearDB := true
-	LoadEnvironment()
+	demo := false
+	clearDB := false
+	// LoadEnvironment()
 	e := echo.New()
 	e.Use(logger)
 	db, err := repositories.InitializeDB(false)

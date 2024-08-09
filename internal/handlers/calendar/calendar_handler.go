@@ -22,6 +22,9 @@ type CalendarHandler interface {
 	// GET /admin/calendar/:date/details
 	AdminCalendarDetails(c echo.Context) error
 
+	// GET /admin/calendar/auto-assign/:date/:block
+	AutoAssign(c echo.Context) error
+
 	// GET /dashboard/calendar/:date/details
 	DBCalendarDetails(c echo.Context) error
 
@@ -49,11 +52,13 @@ var router *echo.Echo
 
 func Mount(e *echo.Echo, h CalendarHandler) {
 	router = e
-	common.CalendarGroup.GET("/:date", h.Calendar).Name = string(common.AdminCalendar)
-	common.DayDetailsGroup.GET("", h.AdminCalendarDetails).Name = string(common.AdminCalendarDetails)
-	common.DBDayDetailsGroup.GET("", h.DBCalendarDetails).Name = string(common.DBCalendarDetails)
-	common.AssignRoomGroup.GET("", h.ShowAssignRoomForm).Name = string(common.ShowAssignRoomForm)
-	common.AssignRoomGroup.POST("", h.AssignRoom).Name = string(common.AssignRoom)
+	common.CalendarGroup.GET("/:date", h.Calendar).Name = common.AdminCalendar.String()
+	common.DayDetailsGroup.GET("", h.AdminCalendarDetails).Name = common.AdminCalendarDetails.String()
+	common.AutoAssignGroup.GET("", h.AutoAssign).Name = common.AutoAssign.String()
+	common.DBDayDetailsGroup.GET("", h.DBCalendarDetails).Name = common.DBCalendarDetails.String()
+	common.AssignRoomGroup.GET("", h.ShowAssignRoomForm).Name = common.ShowAssignRoomForm.String()
+	common.AssignRoomGroup.POST("", h.AssignRoom).Name = common.AssignRoom.String()
+
 }
 
 func (h handler) Calendar(c echo.Context) error {
@@ -69,7 +74,7 @@ func (h handler) Calendar(c echo.Context) error {
 	}
 	assignmentsMap := assignments.MapForCalendar()
 	dateString := c.Param("date")
-	date, err := time.Parse("2006-01-02", dateString)
+	date, err := time.Parse(views.ButtonDateFormat, dateString)
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error parsing date")
@@ -82,7 +87,7 @@ func (h handler) Calendar(c echo.Context) error {
 
 func (h handler) AdminCalendarDetails(c echo.Context) error {
 	dateParam := c.Param("date")
-	date, err := time.Parse("2006-01-02", dateParam)
+	date, err := time.Parse(views.ButtonDateFormat, dateParam)
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error parsing date param")
@@ -104,9 +109,29 @@ func (h handler) AdminCalendarDetails(c echo.Context) error {
 	return c.Redirect(303, router.Reverse(common.AdminPage.String()))
 }
 
-func (h handler) DBCalendarDetails(c echo.Context) error {
+func (h handler) AutoAssign(c echo.Context) error {
 	dateParam := c.Param("date")
 	date, err := time.Parse("2006-01-02", dateParam)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	block, err := strconv.Atoi(c.Param("block"))
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	autoAssignments, err := h.assignments.CreateAutoAssignments(date, block)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return c.JSON(200, autoAssignments)
+}
+
+func (h handler) DBCalendarDetails(c echo.Context) error {
+	dateParam := c.Param("date")
+	date, err := time.Parse(views.ButtonDateFormat, dateParam)
 	if err != nil {
 		log.Println(err)
 		return c.String(500, "Error parsing date param")

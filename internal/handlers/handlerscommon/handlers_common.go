@@ -57,6 +57,7 @@ const (
 	DashboardCalendar     RouteName = "GET /dashboard/calendar"
 	DBCalendarDetails     RouteName = "GET /dashboard/calendar/:date/details"
 	AdminCalendar         RouteName = "GET /admin/calendar/:date"
+	AutoAssign            RouteName = "GET /admin/calendar/auto-assign/:date/:block"
 	AdminCalendarDetails  RouteName = "GET /admin/calendar/:date/details"
 	ShowAssignRoomForm    RouteName = "show-assign-room-form"
 	AssignRoom            RouteName = "assign-room"
@@ -97,6 +98,9 @@ var (
 
 	// /admin/calendar/assign-room/:assignment-id
 	AssignRoomGroup *echo.Group
+
+	// /admin/calendar/auto-assign/:date/:block
+	AutoAssignGroup *echo.Group
 
 	// /admin/rooms
 	RoomsGroup *echo.Group
@@ -149,6 +153,7 @@ func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	DayDetailsGroup = CalendarGroup.Group("/:date/details")
 
 	AssignRoomGroup = CalendarGroup.Group("/assign-room/:assignment-id")
+	AutoAssignGroup = CalendarGroup.Group("/auto-assign/:date/:block")
 	AdminApplicationsGroup = AdminGroup.Group("/applications")
 
 	ApplicationsGroup = e.Group("/applications", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)

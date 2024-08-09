@@ -16,7 +16,7 @@ func (ds *demoDataService) createDemoRooms() ([]*models.Room, error) {
 		"Room 110",
 	}
 	for i, number := range roomNumbers {
-		room, err := models.NewRoom("", number, 12, i)
+		room, err := models.NewRoom("", number, 12, i+1)
 		if err != nil {
 			return nil, err
 		}

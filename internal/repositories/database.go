@@ -26,11 +26,14 @@ func InitializeDB(production bool) (*sql.DB, error) {
 	var err error
 
 	for i := 0; i < 5; i++ {
+		if i == 0 && os.Getenv("COMPOSE") == "true" {
+			time.Sleep(10 * time.Second)
+		}
 		fmt.Println("Connecting to the database...")
 		db, err = sql.Open("mysql", cfg.FormatDSN())
 		if err != nil {
 			log.Printf("Failed to open database: %v", err)
-			time.Sleep(5 * time.Second)
+			time.Sleep(6 * time.Second)
 			continue
 		}
 

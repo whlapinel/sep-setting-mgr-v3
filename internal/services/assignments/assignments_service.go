@@ -2,6 +2,8 @@ package assignments
 
 import (
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/domain/services"
+	"time"
 )
 
 type AssignmentsService interface {
@@ -9,16 +11,19 @@ type AssignmentsService interface {
 	FindByID(id int) (*models.Assignment, error)
 	UpdateRoom(assignmentID, newRoomID int) error
 	FindByTeacherID(teacherID int) (models.Assignments, error)
+	CreateAutoAssignments(date time.Time, block int) (models.Assignments, error)
 }
 
 type service struct {
+	services.AssignmentsService
 	assignments models.AssignmentRepository
 	rooms       models.RoomRepository
 	testEvents  models.TestEventRepository
 }
 
-func NewService(assignments models.AssignmentRepository, rooms models.RoomRepository, testEvents models.TestEventRepository) AssignmentsService {
+func NewService(asService services.AssignmentsService, assignments models.AssignmentRepository, rooms models.RoomRepository, testEvents models.TestEventRepository) AssignmentsService {
 	return &service{
+		asService,
 		assignments,
 		rooms,
 		testEvents,
@@ -62,4 +67,16 @@ func (s service) UpdateRoom(assignmentID, newRoomID int) error {
 
 func (s service) FindByTeacherID(teacherID int) (models.Assignments, error) {
 	return s.assignments.GetByTeacherID(teacherID)
+}
+
+func (s service) CreateAutoAssignments(date time.Time, block int) (models.Assignments, error) {
+	assignments, err := s.assignments.FindByDateAndBlock(date, block)
+	if err != nil {
+		return nil, err
+	}
+	err = s.AssignmentsService.AutoAssign(assignments, date)
+	if err != nil {
+		return nil, err
+	}
+	return assignments, nil
 }

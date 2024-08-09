@@ -1,5 +1,9 @@
 # PROGRESS LOG
 
+## 8/8
+
+- Keep neglecting to update this. Done a lot, been hassling with docker compose and finally got it working alright. Lots of other things done over the last week but I can't remember what.
+
 ## 7/29
 
 - Frontend stuff mostly today. Was getting very intimidated, for example with SideNav CSS properties for a minute but slogged through it and implemented some nice Tailwind layouts.

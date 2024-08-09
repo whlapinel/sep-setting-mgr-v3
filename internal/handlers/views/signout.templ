@@ -1,5 +1,9 @@
 package views
 
+import "sep_setting_mgr/internal/handlers/views/layouts"
+
 templ SignedOutPage() {
-	<h1>You have been signed out.</h1>
+	@layouts.PageLayout("Signed Out", nil) {
+		<h1>You have been signed out.</h1>
+	}
 }

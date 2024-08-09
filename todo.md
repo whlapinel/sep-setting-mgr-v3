@@ -2,9 +2,12 @@
 
 ## PENDING
 
+- Break up calendar views so details will show room clicked instead of all rooms for block. Should have "up-nav" buttons as well, as should all other views.
+- Back button sometimes results in html/js code displayed as plain text instead of rendering
+- Add auto-assign feature (user confirmation before persisting)
+- Continue tweaking sidenav initial 'peekaboo' display. Toggle classes may not be the best idea, since sometimes it gets stuck in the wrong spot. Should probably use add/remove instead.
 - note to self: either run middleware on non-protected pages (e.g. about, home) and allow passage in jwtconfig error handler for non-protected routes, or don't try to access user from context in those routes (but this means profile info won't be accessible if the page is refreshed, which is probably not a great option). Surely there must be a typical way to run checks without blocking, just need to find out what that is.
 - show table buttons on hover instead of always
-- table buttons to icons instead of words
 - tweak table formatting
 - load profile photo into user menu
 - Fix welcome screen (after signup). Currently is just text saying Welcome!
@@ -12,10 +15,7 @@
 - Format home page
 - Format about page
 - Add row button title should be customizable instead of just using table title
-- classes/hx-classes gets pushed to URL instead of just /classes
 - Add "Up" button to dashboard pages (e.g. when viewing students for A class, should be able to return to A class)
-- Create demo data
-- Dockerize
 - Deploy
 - Add TLS
 - Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
@@ -23,6 +23,12 @@
 
 ## COMPLETE
 
+- Container for sections in dashboard and admin pages should center children on page.
+- table buttons to icons instead of words
+- Sidenav should show itself to user on first load of page before hiding itself
+- Create demo data
+- Dockerize
+- classes/hx-classes gets pushed to URL instead of just /classes
 - something is wrong with the warning timer on the client side session management
 - Rooms: priority should be unique. For editing priority, use promote / demote buttons instead of radio inputs.
 - Calendar: both "Unassigned" and "Unassign" show up. Pick one (and make sure it works)

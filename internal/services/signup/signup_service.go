@@ -4,7 +4,7 @@ import "sep_setting_mgr/internal/domain/models"
 
 type SignupService interface {
 	IsDuplicate(email string) (bool, error)
-	CreateUser(first, last, email, picture string) (bool, error)
+	CreateUser(first, last, email, picture string) (*models.User, error)
 }
 
 type service struct {
@@ -15,16 +15,16 @@ func NewService(users models.UserRepository) SignupService {
 	return &service{users: users}
 }
 
-func (s service) CreateUser(first, last, email, picture string) (bool, error) {
+func (s service) CreateUser(first, last, email, picture string) (*models.User, error) {
 	user, err := models.NewUser(first, last, email, picture)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	err = s.users.Store(user)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return true, nil
+	return user, nil
 }
 
 func (s service) IsDuplicate(email string) (bool, error) {

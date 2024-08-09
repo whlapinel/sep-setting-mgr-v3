@@ -7,5 +7,9 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
   ],
+  safelist: [
+    'w-0',
+    'w-60'
+  ],
 }
 

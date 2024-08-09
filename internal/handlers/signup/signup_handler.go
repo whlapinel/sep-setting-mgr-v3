@@ -1,6 +1,7 @@
 package signup
 
 import (
+	"errors"
 	"log"
 	"os"
 	"sep_setting_mgr/internal/auth"
@@ -9,6 +10,8 @@ import (
 	"sep_setting_mgr/internal/handlers/views/layouts"
 	"sep_setting_mgr/internal/services/signup"
 	"sep_setting_mgr/internal/util"
+	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -89,20 +92,25 @@ func (h handler) GoogleSignup(c echo.Context) error {
 	}
 	if isDuplicate {
 		log.Println("Email already exists: ", email)
-		return c.String(409, "Email already exists")
+		isDuplicateErr := errors.New("Email already exists. Please sign in.")
+		util.SetMessage(c, isDuplicateErr.Error())
+		return util.RenderTempl(layouts.MainLayout(views.SignInPage(false, false, router, ""), nil), c, 200)
 	}
 
 	// create user
-	created, err := h.service.CreateUser(first, last, email, picture)
+	user, err := h.service.CreateUser(first, last, email, picture)
 	if err != nil {
 		log.Println("Failed to create user: ", err)
 		return c.String(500, "Failed to create user")
 	}
-	if !created {
-		log.Println("Failed to create user")
-		return c.String(500, "Failed to create user")
+	t, err := auth.IssueToken(user.FirstName, user.LastName, user.Email, user.Picture, user.ID)
+	if err != nil {
+		return c.String(500, "Failed to issue token")
 	}
-	return c.String(200, "Welcome "+first+" "+last+"!")
+	auth.WriteToken(c, t)
+	expirationTime := time.Now().Add(auth.SessionLifeSpan).UnixMilli()
+	expyString := strconv.Itoa(int(expirationTime))
+	return util.RenderTempl(layouts.MainLayout(views.SignInPage(true, true, router, expyString), user), c, 200)
 }
 
 func isValidEmail(email string) bool {

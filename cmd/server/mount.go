@@ -62,12 +62,12 @@ func MountHandlers(e *echo.Echo, db *sql.DB, demo bool) error {
 			return err
 		}
 	}
-	
+
 	// initialize domain services
 	assignmentsDomainService := services.NewAssignmentsService(assignmentsRepo, roomsRepo, testEventsRepo, classesRepo, studentsRepo)
 
 	// initialize application services
-	assignmentAppService := assignments.NewService(assignmentsRepo, roomsRepo, testEventsRepo)
+	assignmentAppService := assignments.NewService(*assignmentsDomainService, assignmentsRepo, roomsRepo, testEventsRepo)
 	usersService := usersService.NewService(usersRepo)
 	classesService := classesService.NewService(classesRepo, studentsRepo)
 	testEventsService := testEventsService.NewService(testEventsRepo, classesRepo, *assignmentsDomainService)

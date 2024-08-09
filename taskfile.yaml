@@ -6,22 +6,52 @@ tasks:
   init:
     desc: Install some important commands and tools
     cmds:
+      - npm install
+      - go mod download
+
   assets:
     desc: Build the assets
     cmds:
       - npx tailwindcss -i ./internal/assets/tailwind.css -o ./internal/assets/dist/styles.css
       - tsc -build
+
   generate:
     desc: Generate stuff and things
     cmds:
       - go generate ./...
-  run:
+
+  run-dev:
+    desc: Run the application in development mode
+    deps:
+      - assets
+      - generate
+    cmds:
+      - . .env.development
+      - go run ./cmd/server/ .
+
+  build:
     desc: Run the application
     deps:
       - assets
       - generate
     cmds:
-      - cd cmd/server && air
+      - go build -o main ./cmd/server
+      - chmod +x main
+
+  docker-build:
+    desc: Run the application
+    deps:
+      - build
+    cmds:
+      - docker build -t myapp .
+
+  docker-compose-run-dev:
+    desc: Run the application using compose
+    deps:
+      - docker-build
+    cmds:
+      - docker compose --env-file .env.development up
+
   test:
     desc: Run the tests
     cmds:

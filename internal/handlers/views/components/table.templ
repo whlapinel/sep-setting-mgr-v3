@@ -117,35 +117,35 @@ templ TableCell(data string, warning bool) {
 
 func getSizeClass(size string) string {
 	if size == "small" {
-		return "text-lg"
+		return "text-sm font-semibold"
 	} else {
 		return "text-lg font-bold"
 	}
 }
 
-// size: small or large, color: black or gray
+// size: small or large
 templ SubHeader(data string, size string, colspan int, warning bool, grayedOut bool, green bool) {
 	if !warning {
 		<tr>
-			<td
+			<th
 				colspan={ strconv.Itoa(colspan) }
 				if grayedOut == true {
-					class={ "text-center " + getSizeClass(size) + " rounded text-gray-500" }
+					class={ "text-center " + getSizeClass(size) + " rounded text-gray-500 px-3 py-4" }
 				}
 				else
 				if green {
-					class={ "text-center " + getSizeClass(size) + " rounded text-black bg-green-300" }
+					class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4 bg-green-300" }
 				} else {
-					class={ "text-center " + getSizeClass(size) + " rounded text-black" }
+					class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4" }
 				}
-			>{ data }</td>
+			>{ data }</th>
 		</tr>
 	} else {
 		<tr>
-			<td
+			<th
 				colspan={ strconv.Itoa(colspan) }
-				class={ "text-center " + getSizeClass(size) + " rounded text-black font-bold bg-red-300" }
-			>{ data }</td>
+				class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 font-bold bg-red-300" }
+			>{ data }</th>
 		</tr>
 	}
 }
@@ -153,6 +153,8 @@ templ SubHeader(data string, size string, colspan int, warning bool, grayedOut b
 templ TableHeaderComponent(headers []string) {
 	<thead>
 		<tr>
+			// for subheaders
+			{ children... }
 			for _, header := range headers {
 				<th scope="col" class="px-3 py-3.5 text-left text-lg font-semibold text-gray-900 w-1/4">{ header }</th>
 			}
@@ -174,8 +176,8 @@ templ TableWrapperComponent(t TableData) {
 		<div class="mt-8 flow-root">
 			<div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
 				<div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-					<table class="min-w-full divide-y divide-gray-300 w-full">
-						<caption>{ t.Title }</caption>
+					<table class="divide-y divide-gray-300 w-fit">
+						<caption class="text-lg text-slate-800 font-bold">{ t.Title }</caption>
 						{ children... }
 					</table>
 				</div>

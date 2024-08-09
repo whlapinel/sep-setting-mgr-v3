@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"log"
 	"sep_setting_mgr/internal/domain/models"
 	"sep_setting_mgr/internal/util"
@@ -134,4 +135,45 @@ func (s *AssignmentsService) GetAssignments(classID int, start, end time.Time) (
 
 func (s *AssignmentsService) GetAssignmentsByTeacherID(teacherID int) (models.Assignments, error) {
 	return s.asRepo.GetByTeacherID(teacherID)
+}
+
+func (s *AssignmentsService) AutoAssign(assignments models.Assignments, date time.Time) error {
+	// get all rooms
+	rooms, err := s.rooms.All()
+	if err != nil {
+		log.Println("Error getting rooms")
+		return nil
+	}
+	for _, a := range assignments {
+		oneOnOne := a.Student.OneOnOne
+		err := s.autoAssign(a, date, rooms, oneOnOne)
+		if err != nil {
+			log.Println("Error auto assigning")
+			log.Println(err)
+		}
+	}
+	return nil
+}
+
+func (s *AssignmentsService) autoAssign(a *models.Assignment, date time.Time, rooms models.Rooms, oneOnOne bool) error {
+	var ErrNoRoomAvailable = errors.New("no room available")
+	for _, r := range rooms {
+		roomCount, err := s.asRepo.CountInRoomOnDate(r.ID, date)
+		if err != nil {
+			log.Println("Error counting assignments in room")
+			return err
+		}
+		if oneOnOne {
+			if roomCount == 0 {
+				a.Room = r
+				return nil
+			}
+		} else {
+			if roomCount < r.MaxCapacity {
+				a.Room = r
+				return nil
+			}
+		}
+	}
+	return ErrNoRoomAvailable
 }

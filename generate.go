@@ -1,3 +1,3 @@
 package main
 
-//go:generate templ generate
+//go:generate sh -c "templ generate"

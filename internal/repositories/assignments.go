@@ -28,6 +28,77 @@ func NewAssignmentsRepo(db *sql.DB) models.AssignmentRepository {
 	return &assignmentRepo{db: db}
 }
 
+func (ar *assignmentRepo) FindByDateAndBlock(date time.Time, block int) (models.Assignments, error) {
+	log.SetPrefix("Assignments Repo: FindByDateAndBlock()")
+	var assignments models.Assignments
+	rows, err := ar.db.Query(`
+	SELECT a.*, s.*, te.*, r.*, c.block
+	FROM assignments a
+	JOIN test_events te ON a.event_id = te.id
+	JOIN students s ON a.student_id = s.id
+	JOIN rooms r ON a.room_id = r.id
+	JOIN classes c ON te.class_id = c.id
+	WHERE te.test_date = ?
+	AND c.block = ?
+	`, date.Format("2006-01-02"), block)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var assignmentTable assignmentTableRow
+		var eventTable testEventTableRow
+		var studentTable studentTableRow
+		var roomsTable roomsTableRow
+
+		var temp []uint8
+
+		err := rows.Scan(
+			&assignmentTable.id,
+			&assignmentTable.event_id,
+			&assignmentTable.student_id,
+			&assignmentTable.room_id,
+			&eventTable.id,
+			&eventTable.test_name,
+			&temp,
+			&eventTable.class_id,
+			&studentTable.id,
+			&studentTable.first_name,
+			&studentTable.last_name,
+			&studentTable.class_id,
+			&studentTable.one_on_one,
+			&roomsTable.id,
+			&roomsTable.name,
+			&roomsTable.number,
+			&roomsTable.max_capacity,
+			&roomsTable.priority,
+		)
+		if err != nil {
+			return nil, err
+		}
+		eventTable.test_date, err = time.Parse("2006-01-02", string(temp))
+		if err != nil {
+			return nil, err
+		}
+		assignment := convertToAssignment(assignmentTable)
+		event := convertToTestEvent(eventTable)
+		student := convertToStudent(studentTable)
+		room := convertToRoom(roomsTable)
+
+		assignment.TestEvent = event
+		assignment.Student = student
+		assignment.Room = room
+
+		assignments = append(assignments, assignment)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return assignments, nil
+}
+
 func (ar *assignmentRepo) DeleteAll() error {
 	_, err := ar.db.Exec(`DELETE FROM assignments`)
 	if err != nil {
@@ -292,6 +363,26 @@ func (ar *assignmentRepo) All() ([]*models.Assignment, error) {
 		return nil, err
 	}
 	return assignments, nil
+}
+
+func (ar *assignmentRepo) CountInRoomOnDate(roomID int, date time.Time) (int, error) {
+	query := `
+	SELECT COUNT(*)
+	FROM assignments
+	WHERE room_id = ?
+	AND event_id IN (
+		SELECT id
+		FROM test_events
+		WHERE test_date = ?
+	)
+	`
+	row := ar.db.QueryRow(query, roomID, date.Format("2006-01-02"))
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func (ar *assignmentRepo) DeleteByStudentID(studentID int) error {

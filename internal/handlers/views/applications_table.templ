@@ -18,7 +18,7 @@ func appToRow(app models.Application, router *echo.Echo) components.Row {
 	return components.Row{
 		Editable: true,
 		TableID:  applicationsTableID,
-		Data:     []string{app.FirstName, app.LastName, app.Email, app.Role.Str(), app.Date.Format(format)},
+		Data:     []string{app.FirstName, app.LastName, app.Email, app.Role.Str(), app.Date.Format(TimeFormat)},
 		ID:       app.ID,
 		Buttons: []components.TableButton{
 			{

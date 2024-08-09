@@ -1,0 +1,19 @@
+services:
+  database:
+    image: mariadb:latest
+    env_file: ".env.compose.development"
+    ports:
+      - "3307:3306"
+    volumes:
+      - database:/var/lib/mysql
+
+  app:
+    image: myapp:latest
+    env_file: ".env.compose.development"
+    ports:
+      - "1323:1323"
+    depends_on:
+      - database
+
+volumes:
+  database:
