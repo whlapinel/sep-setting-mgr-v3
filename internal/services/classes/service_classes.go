@@ -7,9 +7,9 @@ import (
 
 type ClassesService interface {
 	List(teacherID int) ([]*models.Class, error)
-	AddClass(name string, block int, teacherID int) (*models.Class, error)
+	AddClass(name string, block int, periodicity models.Periodicity, teacherID int) (*models.Class, error)
 	DeleteClass(classID int) error
-	UpdateClass(classID int, name string) (*models.Class, error)
+	UpdateClass(classID int, name string, periodicity models.Periodicity) (*models.Class, error)
 	FindClassByID(classID int) (*models.Class, error)
 }
 
@@ -34,7 +34,7 @@ func (s service) DeleteClass(classID int) error {
 	return nil
 }
 
-func (s service) UpdateClass(classID int, name string) (*models.Class, error) {
+func (s service) UpdateClass(classID int, name string, periodicity models.Periodicity) (*models.Class, error) {
 	log.SetPrefix("Class Service: ")
 	log.Println("Updating class in database")
 	log.Println("Class ID: ", classID)
@@ -43,6 +43,7 @@ func (s service) UpdateClass(classID int, name string) (*models.Class, error) {
 		return nil, err
 	}
 	class.Name = name
+	class.Periodicity = periodicity
 	err = s.classes.Update(class)
 	if err != nil {
 		return nil, err
@@ -50,9 +51,9 @@ func (s service) UpdateClass(classID int, name string) (*models.Class, error) {
 	return class, nil
 }
 
-func (s service) AddClass(name string, block int, teacherID int) (*models.Class, error) {
+func (s service) AddClass(name string, block int, periodicity models.Periodicity, teacherID int) (*models.Class, error) {
 	log.Println("Service: Adding class to database")
-	class, err := models.NewClass(name, block, teacherID)
+	class, err := models.NewClass(name, block, periodicity, teacherID)
 	if err != nil {
 		return nil, err
 	}

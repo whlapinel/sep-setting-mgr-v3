@@ -28,74 +28,80 @@ func NewAssignmentsRepo(db *sql.DB) models.AssignmentRepository {
 	return &assignmentRepo{db: db}
 }
 
-func (ar *assignmentRepo) FindByDateAndBlock(date time.Time, block int) (models.Assignments, error) {
+func (ar *assignmentRepo) FindUnassigned(date time.Time, block int) (models.Assignments, error) {
 	log.SetPrefix("Assignments Repo: FindByDateAndBlock()")
+	log.Println("Finding assignments for date: ", date.Format("2006-01-02"), " and block: ", block)
 	var assignments models.Assignments
 	rows, err := ar.db.Query(`
-	SELECT a.*, s.*, te.*, r.*, c.block
+	SELECT a.*, s.*, te.*, c.block
 	FROM assignments a
 	JOIN test_events te ON a.event_id = te.id
 	JOIN students s ON a.student_id = s.id
-	JOIN rooms r ON a.room_id = r.id
 	JOIN classes c ON te.class_id = c.id
 	WHERE te.test_date = ?
 	AND c.block = ?
+	AND a.room_id IS NULL
 	`, date.Format("2006-01-02"), block)
 	if err != nil {
 		return nil, err
 	}
+	log.Println("Query successful")
+	log.Println(rows.Columns())
 	defer rows.Close()
 
 	for rows.Next() {
+		log.Println("Scanning next row")
 		var assignmentTable assignmentTableRow
 		var eventTable testEventTableRow
 		var studentTable studentTableRow
-		var roomsTable roomsTableRow
+		var classesTable classTableRow
 
 		var temp []uint8
+		var rowCount int
 
 		err := rows.Scan(
 			&assignmentTable.id,
 			&assignmentTable.event_id,
 			&assignmentTable.student_id,
 			&assignmentTable.room_id,
-			&eventTable.id,
-			&eventTable.test_name,
-			&temp,
-			&eventTable.class_id,
+
 			&studentTable.id,
 			&studentTable.first_name,
 			&studentTable.last_name,
 			&studentTable.class_id,
 			&studentTable.one_on_one,
-			&roomsTable.id,
-			&roomsTable.name,
-			&roomsTable.number,
-			&roomsTable.max_capacity,
-			&roomsTable.priority,
+
+			&eventTable.id,
+			&eventTable.test_name,
+			&temp,
+			&eventTable.class_id,
+
+			&classesTable.block,
 		)
+		log.Println("Row count: ", rowCount)
 		if err != nil {
+			log.Println("Error scanning row: ", err)
 			return nil, err
 		}
 		eventTable.test_date, err = time.Parse("2006-01-02", string(temp))
 		if err != nil {
 			return nil, err
 		}
-		assignment := convertToAssignment(assignmentTable)
+		assignment := convertToAssignment(assignmentTable, block)
 		event := convertToTestEvent(eventTable)
 		student := convertToStudent(studentTable)
-		room := convertToRoom(roomsTable)
 
 		assignment.TestEvent = event
 		assignment.Student = student
-		assignment.Room = room
 
 		assignments = append(assignments, assignment)
+		log.Println("so far: ", len(assignments))
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+	log.Println("Found ", len(assignments), " assignments")
 	return assignments, nil
 }
 
@@ -269,7 +275,7 @@ func (ar *assignmentRepo) GetByTeacherID(teacherID int) (models.Assignments, err
 		if err != nil {
 			return nil, err
 		}
-		assignment := convertToAssignment(assignmentTable)
+		assignment := convertToAssignment(assignmentTable, classTable.block)
 		event := convertToTestEvent(eventTable)
 		student := convertToStudent(studentTable)
 		room := convertToRoom(roomsTable)
@@ -346,7 +352,7 @@ func (ar *assignmentRepo) All() ([]*models.Assignment, error) {
 		if err != nil {
 			return nil, err
 		}
-		assignment := convertToAssignment(assignmentTable)
+		assignment := convertToAssignment(assignmentTable, classTable.block)
 		event := convertToTestEvent(eventTable)
 		student := convertToStudent(studentTable)
 		room := convertToRoom(roomsTable)
@@ -365,18 +371,17 @@ func (ar *assignmentRepo) All() ([]*models.Assignment, error) {
 	return assignments, nil
 }
 
-func (ar *assignmentRepo) CountInRoomOnDate(roomID int, date time.Time) (int, error) {
+func (ar *assignmentRepo) CountInRoom(roomID int, date time.Time, block int) (int, error) {
 	query := `
 	SELECT COUNT(*)
-	FROM assignments
-	WHERE room_id = ?
-	AND event_id IN (
-		SELECT id
-		FROM test_events
-		WHERE test_date = ?
-	)
+	FROM assignments a
+	JOIN test_events te ON a.event_id = te.id
+	JOIN classes c ON te.class_id = c.id
+	WHERE a.room_id = ?
+	AND te.test_date = ?
+	AND c.block = ?
 	`
-	row := ar.db.QueryRow(query, roomID, date.Format("2006-01-02"))
+	row := ar.db.QueryRow(query, roomID, date.Format("2006-01-02"), block)
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
@@ -397,11 +402,12 @@ func (ar *assignmentRepo) FindByEventID(eventID int) (models.Assignments, error)
 	var assignments models.Assignments
 
 	rows, err := ar.db.Query(`
-	SELECT a.*, te.*, s.*, r.*
+	SELECT a.*, te.*, s.*, r.*, c.block
 	FROM assignments a
 	JOIN test_events te ON a.event_id = te.id
 	JOIN students s ON a.student_id = s.id
 	JOIN rooms r ON a.room_id = r.id
+	JOIN classes c ON te.class_id = c.id
 	WHERE a.event_id = ?
 	`, eventID)
 	if err != nil {
@@ -414,6 +420,7 @@ func (ar *assignmentRepo) FindByEventID(eventID int) (models.Assignments, error)
 		var eventTable testEventTableRow
 		var studentTable studentTableRow
 		var roomsTable roomsTableRow
+		var classTable classTableRow
 
 		var temp []uint8
 
@@ -436,6 +443,7 @@ func (ar *assignmentRepo) FindByEventID(eventID int) (models.Assignments, error)
 			&roomsTable.number,
 			&roomsTable.max_capacity,
 			&roomsTable.priority,
+			&classTable.block,
 		)
 		if err != nil {
 			return nil, err
@@ -444,7 +452,7 @@ func (ar *assignmentRepo) FindByEventID(eventID int) (models.Assignments, error)
 		if err != nil {
 			return nil, err
 		}
-		assignment := convertToAssignment(assignmentTable)
+		assignment := convertToAssignment(assignmentTable, classTable.block)
 		event := convertToTestEvent(eventTable)
 		log.Println("event date: ", event.TestDate.Format("2006-01-02"))
 		student := convertToStudent(studentTable)
@@ -503,7 +511,7 @@ func createAssignmentsTable(db *sql.DB) error {
 	return nil
 }
 
-func convertToAssignment(dbAssignment assignmentTableRow) *models.Assignment {
+func convertToAssignment(dbAssignment assignmentTableRow, block int) *models.Assignment {
 	var room *models.Room
 	if dbAssignment.room_id == nil {
 		room = nil
@@ -521,7 +529,8 @@ func convertToAssignment(dbAssignment assignmentTableRow) *models.Assignment {
 		Student: &models.Student{
 			ID: dbAssignment.student_id,
 		},
-		Room: room,
+		Room:  room,
+		Block: block,
 	}
 }
 

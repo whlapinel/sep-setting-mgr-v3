@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	demo := false
-	clearDB := false
+	demo := true
+	clearDB := true
 	// LoadEnvironment()
 	e := echo.New()
 	e.Use(logger)

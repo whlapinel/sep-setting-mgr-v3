@@ -2,6 +2,9 @@
 
 ## PENDING
 
+- Allow users to enter A/B day or 4x4 - otherwise yearlong can only have 1 class per block.
+- Test whether auto-assign accounts for the room's max capacity
+- Fix this: auto-assign is still over-allocating to rooms, or at least does not properly account for 1:1 accommodation. 
 - Break up calendar views so details will show room clicked instead of all rooms for block. Should have "up-nav" buttons as well, as should all other views.
 - Back button sometimes results in html/js code displayed as plain text instead of rendering
 - Add auto-assign feature (user confirmation before persisting)
@@ -18,7 +21,6 @@
 - Add "Up" button to dashboard pages (e.g. when viewing students for A class, should be able to return to A class)
 - Deploy
 - Add TLS
-- Maybe allow users to enter A/B day or 4x4 though the data won't be used by the app?
 - consolidate and simplify admin and dashboard calendar/assignment handling and services to reduce duplicate code and complexity
 
 ## COMPLETE

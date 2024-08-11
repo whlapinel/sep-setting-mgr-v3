@@ -15,24 +15,26 @@ type UnauthorizedProps struct {
 
 templ UnauthorizedPage(p UnauthorizedProps) {
 	@layouts.PageLayout("Unauthorized", nil) {
-		<h1>Unauthorized</h1>
-		if p.Page != "" {
-			<p>You are not authorized to access the { p.Page } page.</p>
-			if p.Reason != "" {
-				<p>Reason: { p.Reason }</p>
+		<div class="flex flex-col">
+			<h1>Unauthorized</h1>
+			if p.Page != "" {
+				<p>You are not authorized to access the { p.Page } page.</p>
+				if p.Reason != "" {
+					<p>Reason: { p.Reason }</p>
+				}
+				if p.Page == "admin" && p.Reason == "not admin" {
+					<p>Only approved administrators can access the admin page.</p>
+					<p>Please click here to apply for admin access.</p>
+					<p hx-post={ p.R.Reverse(common.ApplyForRole.String(), p.UserID, "admin") } class="cursor-pointer">Apply For Admin Role</p>
+				}
+				if p.Page == "dashboard" && p.Reason == "not teacher" {
+					<p>Only teachers who have been approved for access can access the dashboard page.</p>
+					<p>Please click here to apply for teacher access.</p>
+					<p hx-post={ p.R.Reverse(common.ApplyForRole.String(), p.UserID, "teacher") } hx-push-url="true" class="cursor-pointer">Apply For Teacher Role</p>
+				}
+			} else {
+				<p>You are not authorized to access this page.</p>
 			}
-			if p.Page == "admin" && p.Reason == "not admin" {
-				<p>Only approved administrators can access the admin page.</p>
-				<p>Please click here to apply for admin access.</p>
-				<p hx-post={ p.R.Reverse(common.ApplyForRole.String(), p.UserID, "admin") } class="cursor-pointer">Apply For Admin Role</p>
-			}
-			if p.Page == "dashboard" && p.Reason == "not teacher" {
-				<p>Only teachers who have been approved for access can access the dashboard page.</p>
-				<p>Please click here to apply for teacher access.</p>
-				<p hx-post={ p.R.Reverse(common.ApplyForRole.String(), p.UserID, "teacher") } hx-push-url="true" class="cursor-pointer">Apply For Teacher Role</p>
-			}
-		} else {
-			<p>You are not authorized to access this page.</p>
-		}
+		</div>
 	}
 }

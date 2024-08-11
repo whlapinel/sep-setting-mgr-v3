@@ -1,0 +1,67 @@
+package views
+
+import (
+	"github.com/labstack/echo/v4"
+	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/handlers/handlerscommon"
+	"strconv"
+	"time"
+)
+
+templ AutoAssignments(assignments models.Assignments, date time.Time, block int, r *echo.Echo) {
+	<div class="flex flex-col items-center text-center">
+		<h1>Auto Assignments</h1>
+		<button
+			hx-get={ r.Reverse(handlerscommon.AdminCalendarDetails.String(), date.Format("2006-01-02")) }
+		>
+			Cancel
+		</button>
+		<table>
+			<thead>
+				<tr>
+					<th>First</th>
+					<th>Last</th>
+					<th>Room</th>
+					<th>Test</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, a := range assignments {
+					<tr>
+						<td>{ a.Student.FirstName }</td>
+						<td>{ a.Student.LastName }</td>
+						<td>{ a.Room.Number }</td>
+						<td>{ a.TestEvent.Class.Name }</td>
+						<td>{ a.TestEvent.TestName }</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		<form>
+			for _, a := range assignments {
+				<input type="hidden" name="assignment-id" value={ strconv.Itoa(a.ID) }/>
+				<input type="hidden" name="room-id" value={ strconv.Itoa(a.Room.ID) }/>
+			}
+			<button
+				type="submit"
+				hx-post={ r.Reverse(handlerscommon.AcceptAutoAssignments.String(), date.Format("2006-01-02"), block) }
+				hx-target="#confirmation"
+			>
+				Accept Auto Assignments
+			</button>
+		</form>
+		<div id="confirmation"></div>
+	</div>
+}
+
+templ AutoAssignmentsAccepted(date time.Time, block int, r *echo.Echo) {
+	<div class="flex flex-col items-center text-center">
+		<h1>Auto Assignments Accepted</h1>
+		<button
+			hx-get={ r.Reverse(handlerscommon.AdminCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), block) }
+			hx-target="#details"
+		>
+			Back to Calendar
+		</button>
+	</div>
+}

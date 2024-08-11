@@ -26,8 +26,7 @@ tasks:
       - assets
       - generate
     cmds:
-      - . .env.development
-      - go run ./cmd/server/ .
+      - export $(grep -v '^#' .env.development | xargs) && go run ./cmd/server/ .
 
   build:
     desc: Run the application
@@ -50,7 +49,7 @@ tasks:
     deps:
       - docker-build
     cmds:
-      - docker compose --env-file .env.development up
+      - docker compose up
 
   test:
     desc: Run the tests

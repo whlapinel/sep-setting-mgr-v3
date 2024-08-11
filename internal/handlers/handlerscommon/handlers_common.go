@@ -19,50 +19,53 @@ const (
 	AdminPage RouteName = "GET /admin"
 
 	// auth routes
-	GoogleSignup          RouteName = "google-signup"
-	GoogleSignin          RouteName = "google-signin"
-	Registration          RouteName = "registration"
-	Rooms                 RouteName = "rooms"
-	DeleteRoom            RouteName = "delete-room"
-	ShowEditRoomForm      RouteName = "show-edit-room-form"
-	ShowAddRoomForm       RouteName = "show-add-room-form"
-	EditRoom              RouteName = "edit-room"
-	ShowEditUserForm      RouteName = "show-edit-user-form"
-	EditUser              RouteName = "edit-user"
-	Users                 RouteName = "users"
-	DeleteUser            RouteName = "delete-user"
-	Dashboard             RouteName = "GET /dashboard"
-	ShowAddClassForm      RouteName = "GET /dashboard/classes/add"
-	DeleteClass           RouteName = "DELETE /dashboard/classes/:class-id"
-	ShowEditClassForm     RouteName = "GET /dashboard/classes/:class-id/edit"
-	EditClass             RouteName = "POST /dashboard/classes/:class-id/edit"
-	Classes               RouteName = "GET /dashboard/classes"
-	HxClasses             RouteName = "GET /dashboard/classes/hx-classes"
-	CreateClass           RouteName = "POST /dashboard/classes"
-	Students              RouteName = "students"
-	ShowAddStudentForm    RouteName = "show-add-student-form"
-	ShowEditStudentForm   RouteName = "show-edit-student-form"
-	DeleteStudent         RouteName = "delete-student"
-	EditStudent           RouteName = "edit-student"
-	DeleteTestEvent       RouteName = "delete-test-event"
-	ShowAddTestEventForm  RouteName = "show-add-test-event-form"
-	ShowEditTestEventForm RouteName = "show-edit-test-event-form"
-	EditTestEvent         RouteName = "edit-test-event"
-	TestEvents            RouteName = "test-events"
-	CreateTestEvent       RouteName = "create-test-event"
-	CreateStudent         RouteName = "create-student"
-	SignupPage            RouteName = "signup-page"
-	Signup                RouteName = "GET /signup"
-	Signout               RouteName = "signout"
-	DashboardCalendar     RouteName = "GET /dashboard/calendar"
-	DBCalendarDetails     RouteName = "GET /dashboard/calendar/:date/details"
-	AdminCalendar         RouteName = "GET /admin/calendar/:date"
-	AutoAssign            RouteName = "GET /admin/calendar/auto-assign/:date/:block"
-	AdminCalendarDetails  RouteName = "GET /admin/calendar/:date/details"
-	ShowAssignRoomForm    RouteName = "show-assign-room-form"
-	AssignRoom            RouteName = "assign-room"
-	CreateRoom            RouteName = "create-room"
-	PromoteRoom           RouteName = "POST /admin/rooms/:room-id/promote"
+	GoogleSignup                 RouteName = "google-signup"
+	GoogleSignin                 RouteName = "google-signin"
+	Registration                 RouteName = "registration"
+	Rooms                        RouteName = "rooms"
+	DeleteRoom                   RouteName = "delete-room"
+	ShowEditRoomForm             RouteName = "show-edit-room-form"
+	ShowAddRoomForm              RouteName = "show-add-room-form"
+	EditRoom                     RouteName = "edit-room"
+	ShowEditUserForm             RouteName = "show-edit-user-form"
+	EditUser                     RouteName = "edit-user"
+	Users                        RouteName = "users"
+	DeleteUser                   RouteName = "delete-user"
+	Dashboard                    RouteName = "GET /dashboard"
+	ShowAddClassForm             RouteName = "GET /dashboard/classes/add"
+	DeleteClass                  RouteName = "DELETE /dashboard/classes/:class-id"
+	ShowEditClassForm            RouteName = "GET /dashboard/classes/:class-id/edit"
+	EditClass                    RouteName = "POST /dashboard/classes/:class-id/edit"
+	Classes                      RouteName = "GET /dashboard/classes"
+	HxClasses                    RouteName = "GET /dashboard/classes/hx-classes"
+	CreateClass                  RouteName = "POST /dashboard/classes"
+	Students                     RouteName = "students"
+	ShowAddStudentForm           RouteName = "show-add-student-form"
+	ShowEditStudentForm          RouteName = "show-edit-student-form"
+	DeleteStudent                RouteName = "delete-student"
+	EditStudent                  RouteName = "edit-student"
+	DeleteTestEvent              RouteName = "delete-test-event"
+	ShowAddTestEventForm         RouteName = "show-add-test-event-form"
+	ShowEditTestEventForm        RouteName = "show-edit-test-event-form"
+	EditTestEvent                RouteName = "edit-test-event"
+	TestEvents                   RouteName = "test-events"
+	CreateTestEvent              RouteName = "create-test-event"
+	CreateStudent                RouteName = "create-student"
+	SignupPage                   RouteName = "signup-page"
+	Signup                       RouteName = "GET /signup"
+	Signout                      RouteName = "signout"
+	DashboardCalendar            RouteName = "GET /dashboard/calendar"
+	DBCalendarDetails            RouteName = "GET /dashboard/calendar/:date/:block/:room-id"
+	DBCalDetailsWithoutRoomID    RouteName = "GET /dashboard/calendar/:date/:block"
+	AdminCalendar                RouteName = "GET /admin/calendar/:date"
+	AutoAssign                   RouteName = "GET /admin/calendar/auto-assign/:date/:block"
+	AcceptAutoAssignments        RouteName = "POST /admin/calendar/auto-assign/:date/:block"
+	AdminCalendarDetails         RouteName = "GET /admin/calendar/:date/:block/:room-id"
+	AdminCalDetailsWithoutRoomID RouteName = "GET /admin/calendar/:date/:block"
+	ShowAssignRoomForm           RouteName = "show-assign-room-form"
+	AssignRoom                   RouteName = "assign-room"
+	CreateRoom                   RouteName = "create-room"
+	PromoteRoom                  RouteName = "POST /admin/rooms/:room-id/promote"
 
 	RefreshToken RouteName = "POST /refresh-token"
 
@@ -88,12 +91,12 @@ var (
 	ApplicationsGroup *echo.Group
 
 	// /admin/calendar
-	CalendarGroup *echo.Group
+	AdminCalendarGroup *echo.Group
 
-	// /admin/calendar/:date/details
-	DayDetailsGroup *echo.Group
+	// /admin/calendar/:date/:block/:room-id
+	AdminDayDetailsGroup *echo.Group
 
-	// /dashboard/calendar/:date/details
+	// /dashboard/calendar/:date/:block/:room-id
 	DBDayDetailsGroup *echo.Group
 
 	// /admin/calendar/assign-room/:assignment-id
@@ -149,18 +152,18 @@ func CreateGroups(e *echo.Echo, userRepo models.UserRepository) {
 	RoomsGroup = AdminGroup.Group("/rooms")
 	RoomsIDGroup = RoomsGroup.Group("/:room-id")
 
-	CalendarGroup = AdminGroup.Group("/calendar")
-	DayDetailsGroup = CalendarGroup.Group("/:date/details")
+	AdminCalendarGroup = AdminGroup.Group("/calendar")
+	AdminDayDetailsGroup = AdminCalendarGroup.Group("/:date/:block/:room-id")
 
-	AssignRoomGroup = CalendarGroup.Group("/assign-room/:assignment-id")
-	AutoAssignGroup = CalendarGroup.Group("/auto-assign/:date/:block")
+	AssignRoomGroup = AdminCalendarGroup.Group("/assign-room/:assignment-id")
+	AutoAssignGroup = AdminCalendarGroup.Group("/auto-assign/:date/:block")
 	AdminApplicationsGroup = AdminGroup.Group("/applications")
 
 	ApplicationsGroup = e.Group("/applications", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims)
 
 	DashboardGroup = e.Group("/dashboard", auth.AddCookieToHeader, auth.JWTMiddleware, auth.GetClaims, auth.Authorization(userRepo, models.TeacherRole))
 	DBCalendarGroup = DashboardGroup.Group("/calendar")
-	DBDayDetailsGroup = DBCalendarGroup.Group(":date/details")
+	DBDayDetailsGroup = DBCalendarGroup.Group(":date/:block/:room-id")
 
 	ClassesGroup = DashboardGroup.Group("/classes")
 	ClassIDGroup = ClassesGroup.Group("/:class-id")

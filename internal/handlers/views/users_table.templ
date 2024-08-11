@@ -41,27 +41,13 @@ func userToRow(user *models.User, r *echo.Echo) components.Row {
 		hasTeacher = hasRoleFalse
 	}
 	return components.Row{
-		TableID:  usersTableID,
-		Editable: true,
-		Data:     []string{user.FirstName, user.LastName, user.Email, hasAdmin, hasTeacher},
-		ID:       user.ID,
-		Buttons: []components.TableButton{
-			{
-				Text: "Edit",
-				Attr: templ.Attributes{
-					"hx-get":    r.Reverse(string(common.ShowEditUserForm), user.ID),
-					"hx-target": "#" + components.GetCellID(usersTableID, user.ID),
-				},
-			},
-			{
-				Text: "Delete",
-				Attr: templ.Attributes{
-					"hx-delete":  r.Reverse(string(common.DeleteUser), user.ID),
-					"hx-target":  "closest tr",
-					"hx-confirm": "Are you sure you want to delete this user?",
-				},
-			},
-		},
+		TableID:       usersTableID,
+		Editable:      true,
+		ShowEditRoute: r.Reverse(string(common.ShowEditUserForm), user.ID),
+		Deleteable:    true,
+		DeleteRoute:   r.Reverse(string(common.DeleteUser), user.ID),
+		Data:          []string{user.FirstName, user.LastName, user.Email, hasAdmin, hasTeacher},
+		ID:            user.ID,
 	}
 }
 

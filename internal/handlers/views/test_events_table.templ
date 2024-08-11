@@ -10,18 +10,21 @@ import (
 
 const testEventsTableID = "test-events-table"
 
-func prepareTestEventsForTable(testEvents models.TestEvents, classID int, router *echo.Echo) components.TableData {
+func prepareTestEventsForTable(testEvents models.TestEvents, class *models.Class, router *echo.Echo) components.TableData {
 	var rows []components.Row
 	headers := []string{"Name", "Date"}
 	for _, testEvent := range testEvents {
-		rows = append(rows, testEventToRow(testEvent, classID, router))
+		rows = append(rows, testEventToRow(testEvent, class.ID, router))
 	}
-	return components.TableData{ID: testEventsTableID, Title: "Test Events",
+	return components.TableData{
+		ID:          testEventsTableID,
+		Title:       "Events in " + strconv.Itoa(class.Block) + string(class.Periodicity) + " " + class.Name,
 		Description: "A list of all test events.",
 		AddRow:      true,
 		AddRowButton: components.Button{
+			Text: "Add Test Event",
 			Attr: templ.Attributes{
-				"hx-get":      router.Reverse(string(common.ShowAddTestEventForm), classID),
+				"hx-get":      router.Reverse(string(common.ShowAddTestEventForm), class.ID),
 				"hx-target":   "#" + testEventsTableID,
 				"hx-swap":     "afterbegin",
 				"hx-push-url": "true",
@@ -31,34 +34,19 @@ func prepareTestEventsForTable(testEvents models.TestEvents, classID int, router
 		Headers: headers, Rows: rows}
 }
 
-templ TestEventsTableComponent(testEvents models.TestEvents, classID int, router *echo.Echo) {
-	@components.TableComponent(prepareTestEventsForTable(testEvents, classID, router))
+templ TestEventsTableComponent(testEvents models.TestEvents, class *models.Class, router *echo.Echo) {
+	@components.TableComponent(prepareTestEventsForTable(testEvents, class, router))
 }
 
 func testEventToRow(testEvent *models.TestEvent, classID int, router *echo.Echo) components.Row {
 	return components.Row{
-		TableID:  testEventsTableID,
-		Editable: true,
-		Data:     []string{testEvent.TestName, testEvent.TestDate.Format("2006-01-02")},
-		ID:       testEvent.ID,
-		Buttons: []components.TableButton{
-			{
-				Text: "Edit",
-				Attr: templ.Attributes{
-					"hx-get":      router.Reverse(string(common.ShowEditTestEventForm), classID, testEvent.ID),
-					"hx-target":   "#" + testEventsTableID + "-form-cell-" + strconv.Itoa(testEvent.ID),
-					"hx-push-url": "true",
-				},
-			},
-			{
-				Text: "Delete",
-				Attr: templ.Attributes{
-					"hx-delete":  router.Reverse(string(common.DeleteTestEvent), classID, testEvent.ID),
-					"hx-target":  "closest tr",
-					"hx-confirm": "Are you sure you want to delete this test event?",
-				},
-			},
-		},
+		TableID:       testEventsTableID,
+		Editable:      true,
+		ShowEditRoute: router.Reverse(string(common.ShowEditTestEventForm), classID, testEvent.ID),
+		Deleteable:    true,
+		DeleteRoute:   router.Reverse(string(common.DeleteTestEvent), classID, testEvent.ID),
+		Data:          []string{testEvent.TestName, testEvent.TestDate.Format("2006-01-02")},
+		ID:            testEvent.ID,
 	}
 }
 

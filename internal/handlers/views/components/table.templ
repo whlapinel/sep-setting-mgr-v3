@@ -12,13 +12,16 @@ type Rower interface {
 }
 
 type Row struct {
-	TableID     string
-	Data        []string
-	ID          int
-	Editable    bool
-	Buttons     []TableButton
-	MoreButtons []templ.Component
-	Warning     bool
+	TableID       string
+	Data          []string
+	ID            int
+	Editable      bool
+	ShowEditRoute string
+	Deleteable    bool
+	DeleteRoute   string
+	Buttons       []TableButton
+	MoreButtons   []templ.Component
+	Warning       bool
 }
 
 type TableData struct {
@@ -92,13 +95,21 @@ templ TableRowComponent(row Row) {
 				}
 			</td>
 		}
+		if row.Editable {
+			<td id={ GetCellID(row.TableID, row.ID) }></td>
+			<td>
+				@EditButtonComponent(row.ShowEditRoute, "#"+GetCellID(row.TableID, row.ID))
+			</td>
+		}
 		for _, button := range row.MoreButtons {
 			<td>
 				@button
 			</td>
 		}
-		if row.Editable {
-			<td id={ GetCellID(row.TableID, row.ID) }></td>
+		if row.Deleteable {
+			<td>
+				@NewDeleteButton(row.DeleteRoute, "closest tr")
+			</td>
 		}
 	</tr>
 }
@@ -126,27 +137,23 @@ func getSizeClass(size string) string {
 // size: small or large
 templ SubHeader(data string, size string, colspan int, warning bool, grayedOut bool, green bool) {
 	if !warning {
-		<tr>
-			<th
-				colspan={ strconv.Itoa(colspan) }
-				if grayedOut == true {
-					class={ "text-center " + getSizeClass(size) + " rounded text-gray-500 px-3 py-4" }
-				}
-				else
-				if green {
-					class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4 bg-green-300" }
-				} else {
-					class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4" }
-				}
-			>{ data }</th>
-		</tr>
+		<th
+			colspan={ strconv.Itoa(colspan) }
+			if grayedOut == true {
+				class={ "text-center " + getSizeClass(size) + " rounded text-gray-500 px-3 py-4" }
+			}
+			else
+			if green {
+				class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4 bg-green-300" }
+			} else {
+				class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4" }
+			}
+		>{ data }</th>
 	} else {
-		<tr>
-			<th
-				colspan={ strconv.Itoa(colspan) }
-				class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 font-bold bg-red-300" }
-			>{ data }</th>
-		</tr>
+		<th
+			colspan={ strconv.Itoa(colspan) }
+			class={ "text-center " + getSizeClass(size) + " rounded text-slate-800 px-3 py-4 font-bold bg-red-300" }
+		>{ data }</th>
 	}
 }
 
@@ -167,9 +174,7 @@ templ TableWrapperComponent(t TableData) {
 		<div class="sm:flex sm:items-center">
 			if t.AddRow {
 				<div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-					@ButtonComponent(t.AddRowButton) {
-						Add { t.Title }
-					}
+					@ButtonComponent(t.AddRowButton)
 				</div>
 			}
 		</div>

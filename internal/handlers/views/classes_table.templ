@@ -28,6 +28,7 @@ func prepareClassesForTable(classes []*models.Class, router *echo.Echo) componen
 		Description: "A list of all classes.",
 		AddRow:      true,
 		AddRowButton: components.Button{
+			Text: "Add Class",
 			Attr: templ.Attributes{
 				"hx-get":      router.Reverse(string(common.ShowAddClassForm)),
 				"hx-target":   "#" + classesTableID,
@@ -46,13 +47,14 @@ templ ClassesTable(classes []*models.Class, router *echo.Echo) {
 func classToRow(class *models.Class, router *echo.Echo) components.Row {
 	return components.Row{
 		// passing class directly will return nil pointer error, have to pass the values individually
-		Editable: true,
-		TableID:  classesTableID,
-		Data:     []string{class.Name, strconv.Itoa(class.Block)},
-		ID:       class.ID,
+		Editable:      true,
+		ShowEditRoute: router.Reverse(common.ShowEditClassForm.String(), class.ID),
+		Deleteable:    true,
+		DeleteRoute:   router.Reverse(common.DeleteClass.String(), class.ID),
+		TableID:       classesTableID,
+		Data:          []string{class.Name, strconv.Itoa(class.Block) + string(class.Periodicity)},
+		ID:            class.ID,
 		MoreButtons: []templ.Component{
-			components.NewDeleteButton(router.Reverse(common.DeleteClass.String(), class.ID), "closest tr"),
-			components.EditButtonComponent(router.Reverse(common.ShowEditClassForm.String(), class.ID), "#"+components.GetCellID(classesTableID, class.ID)),
 			TestsButton(router, class.ID),
 			StudentsButton(router, class.ID),
 		},

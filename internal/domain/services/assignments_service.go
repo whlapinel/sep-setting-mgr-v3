@@ -137,12 +137,18 @@ func (s *AssignmentsService) GetAssignmentsByTeacherID(teacherID int) (models.As
 	return s.asRepo.GetByTeacherID(teacherID)
 }
 
-func (s *AssignmentsService) AutoAssign(assignments models.Assignments, date time.Time) error {
+func (s *AssignmentsService) AutoAssign(date time.Time, block int) (models.Assignments, error) {
+	assignments, err := s.asRepo.FindUnassigned(date, block)
+	log.Println("Found", len(assignments), "assignments")
+	if err != nil {
+		return nil, err
+	}
+
 	// get all rooms
 	rooms, err := s.rooms.All()
 	if err != nil {
 		log.Println("Error getting rooms")
-		return nil
+		return nil, err
 	}
 	for _, a := range assignments {
 		oneOnOne := a.Student.OneOnOne
@@ -152,13 +158,16 @@ func (s *AssignmentsService) AutoAssign(assignments models.Assignments, date tim
 			log.Println(err)
 		}
 	}
-	return nil
+	return assignments, nil
 }
 
 func (s *AssignmentsService) autoAssign(a *models.Assignment, date time.Time, rooms models.Rooms, oneOnOne bool) error {
 	var ErrNoRoomAvailable = errors.New("no room available")
 	for _, r := range rooms {
-		roomCount, err := s.asRepo.CountInRoomOnDate(r.ID, date)
+		if a.Block == 0 {
+			return errors.New("block not set")
+		}
+		roomCount, err := s.asRepo.CountInRoom(r.ID, date, a.Block)
 		if err != nil {
 			log.Println("Error counting assignments in room")
 			return err
@@ -169,6 +178,12 @@ func (s *AssignmentsService) autoAssign(a *models.Assignment, date time.Time, ro
 				return nil
 			}
 		} else {
+			// if there is only one student, ensure that student does not have 1:1
+			if roomCount == 1 {
+				log.Println("WARNING: CODE NOT IMPLEMENTED")
+				log.Println("There is one student in the room and this should check to ensure that the student does not have 1:1")
+				return errors.New("code not implemented")
+			}
 			if roomCount < r.MaxCapacity {
 				a.Room = r
 				return nil

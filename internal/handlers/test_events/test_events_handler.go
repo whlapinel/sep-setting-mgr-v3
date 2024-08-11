@@ -7,6 +7,7 @@ import (
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views"
 	"sep_setting_mgr/internal/services/assignments"
+	"sep_setting_mgr/internal/services/classes"
 	testevents "sep_setting_mgr/internal/services/test_events"
 	"sep_setting_mgr/internal/util"
 	"strconv"
@@ -37,11 +38,12 @@ type TestEventsHandler interface {
 
 type handler struct {
 	testEvents  testevents.TestEventsService
+	classes     classes.ClassesService
 	assignments assignments.AssignmentsService
 }
 
-func NewHandler(testEvents testevents.TestEventsService, assignments assignments.AssignmentsService) TestEventsHandler {
-	return &handler{testEvents, assignments}
+func NewHandler(testEvents testevents.TestEventsService, classes classes.ClassesService, assignments assignments.AssignmentsService) TestEventsHandler {
+	return &handler{testEvents, classes, assignments}
 }
 
 var router *echo.Echo
@@ -70,7 +72,12 @@ func (h handler) TestEvents(c echo.Context) error {
 		log.Println("Failed to list test events: ", err)
 		return c.String(500, "Failed to list test events. See server logs for details.")
 	}
-	return util.RenderTempl(views.TestEventsTableComponent(testEvents, classID, router), c, 200)
+	class, err := h.classes.FindClassByID(classID)
+	if err != nil {
+		log.Println("Failed to find class:", err)
+		return err
+	}
+	return util.RenderTempl(views.TestEventsTableComponent(testEvents, class, router), c, 200)
 }
 
 func (h handler) ShowAddTestEventForm(c echo.Context) error {

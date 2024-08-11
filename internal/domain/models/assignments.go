@@ -23,8 +23,8 @@ type AssignmentRepository interface {
 	DeleteByEventID(eventID int) error
 	NullifyRoomID(roomID int) error
 	GetByTeacherID(teacherID int) (Assignments, error)
-	FindByDateAndBlock(date time.Time, block int) (Assignments, error)
-	CountInRoomOnDate(roomID int, date time.Time) (int, error)
+	FindUnassigned(date time.Time, block int) (Assignments, error)
+	CountInRoom(roomID int, date time.Time, block int) (int, error)
 }
 
 type Assignments []*Assignment

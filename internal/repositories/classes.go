@@ -9,10 +9,11 @@ import (
 )
 
 type classTableRow struct {
-	id         int
-	name       string
-	block      int
-	teacher_id int
+	id          int
+	name        string
+	periodicity string
+	block       int
+	teacher_id  int
 }
 
 type classRepo struct {
@@ -46,7 +47,7 @@ func (cr *classRepo) Delete(classID int) error {
 func (cr *classRepo) Store(class *models.Class) error {
 	dbClass := convertToClassTable(class)
 	log.Println("Adding class to database")
-	result, err := cr.db.Exec(`INSERT INTO classes (name, block, teacher_id) VALUES (?, ?, ?)`, dbClass.name, dbClass.block, dbClass.teacher_id)
+	result, err := cr.db.Exec(`INSERT INTO classes (name, block, periodicity, teacher_id) VALUES (?, ?, ?, ?)`, dbClass.name, dbClass.block, dbClass.periodicity, dbClass.teacher_id)
 	if err != nil {
 		return err
 	}
@@ -71,7 +72,7 @@ func (classRepo *classRepo) AllByTeacherID(teacherID int) ([]*models.Class, erro
 	defer rows.Close()
 	for rows.Next() {
 		var classTable classTableRow
-		err := rows.Scan(&classTable.id, &classTable.name, &classTable.block, &classTable.teacher_id)
+		err := rows.Scan(&classTable.id, &classTable.name, &classTable.block, &classTable.periodicity, &classTable.teacher_id)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +97,7 @@ func (classRepo *classRepo) All() ([]*models.Class, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var classTable classTableRow
-		err := rows.Scan(&classTable.id, &classTable.name, &classTable.block, &classTable.teacher_id)
+		err := rows.Scan(&classTable.id, &classTable.name, &classTable.block, &classTable.periodicity, &classTable.teacher_id)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +118,7 @@ func (classRepo *classRepo) FindByID(classID int) (*models.Class, error) {
 	err := classRepo.db.QueryRow(`
 	SELECT * FROM classes
 	WHERE id = ?
-	`, classID).Scan(&dbClass.id, &dbClass.name, &dbClass.block, &dbClass.teacher_id)
+	`, classID).Scan(&dbClass.id, &dbClass.name, &dbClass.block, &dbClass.periodicity, &dbClass.teacher_id)
 	if err != nil {
 		return nil, err
 	}
@@ -133,10 +134,11 @@ func (classRepo *classRepo) Update(class *models.Class) error {
 	dbClass := convertToClassTable(class)
 	log.Println("Class ID: ", dbClass.id)
 	log.Println("Class Name: ", dbClass.name)
+	log.Println("Class Name: ", dbClass.periodicity)
 	_, err := classRepo.db.Exec(`
 	UPDATE classes
-	SET name = ?
-	WHERE id = ?`, dbClass.name, dbClass.id)
+	SET name = ?, periodicity = ?
+	WHERE id = ?`, dbClass.name, dbClass.periodicity, dbClass.id)
 	if err != nil {
 		return err
 	}
@@ -150,9 +152,10 @@ func createClassesTable(db *sql.DB) error {
 	classes (
 		id int AUTO_INCREMENT PRIMARY KEY, 
 		name VARCHAR(255) NOT NULL, 
-		block INT NOT NULL, 
+		block INT NOT NULL,
+		periodicity VARCHAR(255) NOT NULL,
 		teacher_id int NOT NULL,
-		constraint block_teacher_id unique (block, teacher_id)
+		constraint block_periodicity_teacher_id unique (block, periodicity, teacher_id)
 		)`)
 	if err != nil {
 		return err
@@ -164,9 +167,10 @@ func createClassesTable(db *sql.DB) error {
 
 func convertToClass(dbClass classTableRow) *models.Class {
 	return &models.Class{
-		ID:    dbClass.id,
-		Name:  dbClass.name,
-		Block: dbClass.block,
+		ID:          dbClass.id,
+		Name:        dbClass.name,
+		Block:       dbClass.block,
+		Periodicity: models.Periodicity(dbClass.periodicity),
 		Teacher: models.User{
 			ID: dbClass.teacher_id,
 		},
@@ -178,6 +182,7 @@ func convertToClassTable(class *models.Class) classTableRow {
 	classTable.id = class.ID
 	classTable.name = class.Name
 	classTable.block = class.Block
+	classTable.periodicity = string(class.Periodicity)
 	classTable.teacher_id = class.Teacher.ID
 	return classTable
 }

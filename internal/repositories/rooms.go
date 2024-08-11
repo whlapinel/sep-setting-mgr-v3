@@ -106,7 +106,7 @@ func (rr *roomRepo) GetRoomAssignments(room *models.Room, block int, date time.T
 		tableRows = append(tableRows, tableRow)
 	}
 	for _, tableRow := range tableRows {
-		assignment := convertToAssignment(tableRow)
+		assignment := convertToAssignment(tableRow, block)
 		assignments = append(assignments, assignment)
 	}
 	return assignments, nil

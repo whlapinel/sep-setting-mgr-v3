@@ -1,8 +1,8 @@
 package views
 
 import (
-	"sep_setting_mgr/internal/handlers/views/components"
 	"sep_setting_mgr/internal/domain/models"
+	"sep_setting_mgr/internal/handlers/views/components"
 	"strconv"
 )
 
@@ -103,6 +103,27 @@ templ AddClassForm(props *AddClassFormProperties) {
 			Min:         1,
 			Max:         4,
 			Disabled:    props.IsEdit,
+		})
+		@components.RadioComponent(components.RadioGroup{
+			Title: "Periodicity",
+			Name:  "periodicity",
+			Options: []*components.RadioOption{
+				{
+					Value:   string(models.A),
+					Label:   string(models.A),
+					Checked: props.Class != nil && props.Class.Periodicity == models.A,
+				},
+				{
+					Value:   string(models.B),
+					Label:   string(models.B),
+					Checked: props.Class != nil && props.Class.Periodicity == models.B,
+				},
+				{
+					Value:   string(models.AB),
+					Label:   string(models.AB),
+					Checked: props.Class != nil && props.Class.Periodicity == models.AB,
+				},
+			},
 		})
 		if props.IsEdit {
 			@components.InputComponent(components.Input{

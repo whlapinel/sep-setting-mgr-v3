@@ -170,9 +170,13 @@ func (h handler) CreateClass(c echo.Context) error {
 	if err != nil {
 		return c.String(400, "Invalid block")
 	}
+	periodicity := models.Periodicity(c.FormValue("periodicity"))
+	if err != nil {
+		return err
+	}
 	teacherID := c.Get("id").(int)
 	log.Println(teacherID)
-	class, err := h.classes.AddClass(name, block, teacherID)
+	class, err := h.classes.AddClass(name, block, periodicity, teacherID)
 	if err != nil {
 		log.Println("Failed to create class:", err)
 		return c.String(500, "Failed to create class. Error:"+err.Error())
@@ -201,7 +205,11 @@ func (h handler) EditClass(c echo.Context) error {
 	name := c.FormValue("name")
 	log.Println("Class ID:", classID)
 	log.Println("Name:", name)
-	class, err := h.classes.UpdateClass(classID, name)
+	periodicity := models.Periodicity(c.FormValue("periodicity"))
+	if err != nil {
+		return err
+	}
+	class, err := h.classes.UpdateClass(classID, name, periodicity)
 	if err != nil {
 		return c.String(500, "Failed to edit class. See server logs for details.")
 	}
