@@ -108,60 +108,52 @@ func grayedOut(assignments models.Assignments) bool {
 var tracker map[int]bool
 
 templ DayComponent(date time.Time, blocks models.AssignmentsByBlock, block int, rooms models.Rooms, room *models.Room, admin bool, r *echo.Echo) {
-	<div class="flex flex-col">
-		<div class="flex flex-row gap-1">
-			<select>
-				for i:=0; i<4; i++ {
-					if _, ok := blocks[i+1]; ok {
-						<option
-							if admin {
-								hx-get={ r.Reverse(common.AdminCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), i+1) }
-							} else {
-								hx-get={ r.Reverse(common.DBCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), i+1) }
-							}
-							hx-target="#details"
-							hx-trigger="optionSelected"
-							hx-push-url="true"
-							if i+1 == block {
-								selected
-							}
-						>{ strconv.Itoa(i+1) }</option>
-					} else {
-						<option
-							class="cursor-not-allowed"
-							disabled
-						>{ strconv.Itoa(i+1) }</option>
-					}
+	<div class="flex flex-col gap-2 items-center">
+		<div class="flex flex-row gap-1 justify-center">
+			for i:=0; i<4; i++ {
+				if _, ok := blocks[i+1]; ok {
+					<button
+						if admin {
+							hx-get={ r.Reverse(common.AdminCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), i+1) }
+						} else {
+							hx-get={ r.Reverse(common.DBCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), i+1) }
+						}
+						hx-target="#details"
+						hx-trigger="optionSelected"
+						hx-push-url="true"
+						if i+1 == block {
+							selected
+						}
+					>{ strconv.Itoa(i+1) }</button>
+				} else {
+					<button
+						class="cursor-not-allowed"
+						disabled
+					>{ strconv.Itoa(i+1) }</button>
 				}
-				<script src="/dist/select.js"></script>
-			</select>
+			}
 		</div>
 		@BlockComponent(date, block, rooms, room, blocks[block], admin, r)
 	</div>
 }
 
 templ BlockComponent(date time.Time, block int, rooms models.Rooms, selectedRoom *models.Room, assignments models.AssignmentsByRoom, admin bool, r *echo.Echo) {
-	<select>
+	<div class="flex flex-row gap-1 justify-center">
 		for _, room := range rooms.SortByRoomPriority() {
 			if _, ok := assignments[room.ID]; ok {
-				<option
+				<button
 					hx-get={ r.Reverse(common.AdminCalendarDetails.String(), date.Format("2006-01-02"), block, room.ID) }
 					hx-target="#details"
-					hx-trigger="optionSelected"
 					hx-push-url="true"
 					if selectedRoom != nil && room.ID == selectedRoom.ID {
-						selected
+						class="bg-fuchsia-700 text-white"
+					} else {
+						class="bg-white text-fuchsia-700"
 					}
-				>{ room.Number }</option>
-			} else {
-				<option
-					class="cursor-not-allowed"
-					disabled
-				>{ room.Number }</option>
+				>{ room.Number }</button>
 			}
 		}
-		<script src="/dist/select.js"></script>
-	</select>
+	</div>
 	if selectedRoom != nil {
 		@RoomComponent(date, block, selectedRoom, assignments[selectedRoom.ID], tracker, admin, r)
 	} else {
