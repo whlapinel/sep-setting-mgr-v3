@@ -9,11 +9,31 @@ import (
 )
 
 type AssignmentsService struct {
-	asRepo     models.AssignmentRepository
-	rooms      models.RoomRepository
-	testEvents models.TestEventRepository
-	classes    models.ClassRepository
-	students   models.StudentRepository
+	asRepo       models.AssignmentRepository
+	rooms        models.RoomRepository
+	testEvents   models.TestEventRepository
+	classes      models.ClassRepository
+	students     models.StudentRepository
+	fullTracker  fullTracker
+	countTracker countTracker
+}
+
+// k: roomID, v: room is full
+type fullTracker map[int]bool
+
+func (a fullTracker) clear() {
+	for k := range a {
+		delete(a, k)
+	}
+}
+
+// k: roomID, v: count of students in room
+type countTracker map[int]int
+
+func (a countTracker) clear() {
+	for k := range a {
+		delete(a, k)
+	}
 }
 
 func NewAssignmentsService(
@@ -22,6 +42,8 @@ func NewAssignmentsService(
 	testEvents models.TestEventRepository,
 	classes models.ClassRepository,
 	students models.StudentRepository) *AssignmentsService {
+	fullTracker := make(fullTracker)
+	countTracker := make(countTracker)
 
 	return &AssignmentsService{
 		asRepo,
@@ -29,6 +51,8 @@ func NewAssignmentsService(
 		testEvents,
 		classes,
 		students,
+		fullTracker,
+		countTracker,
 	}
 }
 
@@ -138,6 +162,8 @@ func (s *AssignmentsService) GetAssignmentsByTeacherID(teacherID int) (models.As
 }
 
 func (s *AssignmentsService) AutoAssign(date time.Time, block int) (models.Assignments, error) {
+	defer s.fullTracker.clear()
+	defer s.countTracker.clear()
 	assignments, err := s.asRepo.FindUnassigned(date, block)
 	log.Println("Found", len(assignments), "assignments")
 	if err != nil {
@@ -151,41 +177,60 @@ func (s *AssignmentsService) AutoAssign(date time.Time, block int) (models.Assig
 		return nil, err
 	}
 	for _, a := range assignments {
-		oneOnOne := a.Student.OneOnOne
-		err := s.autoAssign(a, date, rooms, oneOnOne)
+		err := s.autoAssign(a, date, rooms)
 		if err != nil {
 			log.Println("Error auto assigning")
 			log.Println(err)
 		}
 	}
+
 	return assignments, nil
 }
 
-func (s *AssignmentsService) autoAssign(a *models.Assignment, date time.Time, rooms models.Rooms, oneOnOne bool) error {
+func (s *AssignmentsService) autoAssign(a *models.Assignment, date time.Time, rooms models.Rooms) error {
 	var ErrNoRoomAvailable = errors.New("no room available")
 	for _, r := range rooms {
+		if s.fullTracker[r.ID] {
+			continue
+		}
 		if a.Block == 0 {
 			return errors.New("block not set")
 		}
-		roomCount, err := s.asRepo.CountInRoom(r.ID, date, a.Block)
+		dbRoomCount, err := s.asRepo.CountInRoom(r.ID, date, a.Block)
 		if err != nil {
 			log.Println("Error counting assignments in room")
 			return err
 		}
-		if oneOnOne {
-			if roomCount == 0 {
+		if a.Student.OneOnOne {
+			log.Println("One on one student")
+			if s.countTracker[r.ID]+dbRoomCount == 0 {
 				a.Room = r
+				s.countTracker[r.ID]++
+				s.fullTracker[r.ID] = true
 				return nil
+			} else {
+				continue
 			}
 		} else {
 			// if there is only one student, ensure that student does not have 1:1
-			if roomCount == 1 {
-				log.Println("WARNING: CODE NOT IMPLEMENTED")
-				log.Println("There is one student in the room and this should check to ensure that the student does not have 1:1")
-				return errors.New("code not implemented")
+			if dbRoomCount == 1 {
+				log.Println("One student already in this room. Checking if student is 1:1")
+				student, err := s.asRepo.FindStudent(date, a.Block, r)
+				if err != nil {
+					return err
+				}
+				if student.OneOnOne {
+					log.Println("Student is 1:1. Skipping")
+					continue
+				}
+				log.Println("Student is not 1:1. Moving on to check room availability")
 			}
-			if roomCount < r.MaxCapacity {
+			if dbRoomCount < r.MaxCapacity {
 				a.Room = r
+				s.countTracker[r.ID]++
+				if dbRoomCount+s.countTracker[r.ID] == r.MaxCapacity {
+					s.fullTracker[r.ID] = true
+				}
 				return nil
 			}
 		}

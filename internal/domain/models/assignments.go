@@ -25,6 +25,7 @@ type AssignmentRepository interface {
 	GetByTeacherID(teacherID int) (Assignments, error)
 	FindUnassigned(date time.Time, block int) (Assignments, error)
 	CountInRoom(roomID int, date time.Time, block int) (int, error)
+	FindStudent(date time.Time, block int, room *Room) (*Student, error)
 }
 
 type Assignments []*Assignment

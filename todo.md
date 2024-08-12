@@ -2,7 +2,8 @@
 
 ## PENDING
 
-- Bug in calendar display following route AdminCalendarDetailsWithoutRoomID. Clicking room doesn't show assignments or even send request, change should trigger event in script but it doesn't.
+- Autoassignments: cancel button doesn't work
+- Calendar display: clicking block or room in some cases doesn't even send a request.
 - Allow users to enter A/B day or 4x4 - otherwise yearlong can only have 1 class per block.
 - Test whether auto-assign accounts for the room's max capacity
 - Fix this: auto-assign is still over-allocating to rooms, or at least does not properly account for 1:1 accommodation. 

@@ -50,14 +50,12 @@ func (ar *assignmentRepo) FindUnassigned(date time.Time, block int) (models.Assi
 	defer rows.Close()
 
 	for rows.Next() {
-		log.Println("Scanning next row")
 		var assignmentTable assignmentTableRow
 		var eventTable testEventTableRow
 		var studentTable studentTableRow
 		var classesTable classTableRow
 
 		var temp []uint8
-		var rowCount int
 
 		err := rows.Scan(
 			&assignmentTable.id,
@@ -78,7 +76,6 @@ func (ar *assignmentRepo) FindUnassigned(date time.Time, block int) (models.Assi
 
 			&classesTable.block,
 		)
-		log.Println("Row count: ", rowCount)
 		if err != nil {
 			log.Println("Error scanning row: ", err)
 			return nil, err
@@ -103,6 +100,33 @@ func (ar *assignmentRepo) FindUnassigned(date time.Time, block int) (models.Assi
 	}
 	log.Println("Found ", len(assignments), " assignments")
 	return assignments, nil
+}
+
+func (ar *assignmentRepo) FindStudent(date time.Time, block int, room *models.Room) (*models.Student, error) {
+	var student *models.Student
+	row := ar.db.QueryRow(`
+	SELECT s.*
+	FROM assignments a
+	JOIN test_events te ON a.event_id = te.id
+	JOIN students s ON a.student_id = s.id
+	JOIN classes c ON te.class_id = c.id
+	WHERE te.test_date = ?
+	AND c.block = ?
+	AND a.room_id = ?
+	`, date.Format("2006-01-02"), block, room.ID)
+	var studentRow studentTableRow
+	err := row.Scan(
+		&studentRow.id,
+		&studentRow.first_name,
+		&studentRow.last_name,
+		&studentRow.class_id,
+		&studentRow.one_on_one,
+	)
+	if err != nil {
+		return nil, err
+	}
+	student = convertToStudent(studentRow)
+	return student, nil
 }
 
 func (ar *assignmentRepo) DeleteAll() error {
