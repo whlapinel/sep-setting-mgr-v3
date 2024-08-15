@@ -11,9 +11,9 @@ import (
 )
 
 func main() {
-	demo := true
-	clearDB := true
-	// LoadEnvironment()
+	demo := false
+	clearDB := false
+	LoadEnvironment()
 	e := echo.New()
 	e.Use(logger)
 	db, err := repositories.InitializeDB(false)
@@ -34,18 +34,20 @@ func main() {
 	}
 	// scripts, styles and images are embedded in the binary
 	assets.RegisterStatic(e)
-	e.Logger.Fatal(e.Start(":1323"))
+	host := os.Getenv("HOST")
+	e.Logger.Fatal(e.Start(host + ":1323"))
 }
 
 func LoadEnvironment() {
-	err := godotenv.Load("../../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
+		log.Println(err)
 		log.Fatal("Error loading .env file")
 	}
 	if os.Getenv("ENV") == "development" {
-		godotenv.Load("../../.env.development")
+		godotenv.Load(".env.development")
 	}
 	if os.Getenv("ENV") == "production" {
-		godotenv.Load("../../.env.production")
+		godotenv.Load(".env.production")
 	}
 }

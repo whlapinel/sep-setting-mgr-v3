@@ -5,6 +5,7 @@ import (
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"strconv"
 )
 
@@ -35,6 +36,22 @@ func prepareTestEventsForTable(testEvents models.TestEvents, class *models.Class
 }
 
 templ TestEventsTableComponent(testEvents models.TestEvents, class *models.Class, router *echo.Echo) {
+	@componentscommon.Templify(components.UpNav(
+		"Back to classes",
+		true,
+		router.Reverse(common.HxClasses.String(),
+			class.ID),
+		"#details"))
+	// <div
+	// 	id="up-nav"
+	// 	hx-swap-oob="true"
+	// >
+	// 	@components.NewButton("Back to classes", templ.Attributes{
+	// 		"hx-get":      router.Reverse(common.HxClasses.String(), class.ID),
+	// 		"hx-target":   "#details",
+	// 		"hx-push-url": "true",
+	// 	}).Templify()
+	// </div>
 	@components.TableComponent(prepareTestEventsForTable(testEvents, class, router))
 }
 

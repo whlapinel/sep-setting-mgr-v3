@@ -5,6 +5,7 @@ import (
 	"sep_setting_mgr/internal/domain/models"
 	common "sep_setting_mgr/internal/handlers/handlerscommon"
 	"sep_setting_mgr/internal/handlers/views/components"
+	"sep_setting_mgr/internal/handlers/views/components/componentscommon"
 	"strconv"
 )
 
@@ -34,7 +35,25 @@ func prepareStudentsForTable(students []*models.Student, class *models.Class, ro
 }
 
 templ StudentTableComponent(students []*models.Student, class *models.Class, router *echo.Echo) {
-	@components.TableComponent(prepareStudentsForTable(students, class, router))
+	@componentscommon.Templify(components.UpNav(
+		"Back to classes",
+		true,
+		router.Reverse(common.HxClasses.String(),
+			class.ID),
+		"#details"))
+	// <div
+	// 	id="up-nav"
+	// 	hx-swap-oob="true"
+	// >
+	// 	@components.NewButton("Back to classes", templ.Attributes{
+	// 		"hx-get":      router.Reverse(common.HxClasses.String(), class.ID),
+	// 		"hx-target":   "#details",
+	// 		"hx-push-url": "true",
+	// 	}).Templify()
+	// </div>
+	<div class="flex flex-col">
+		@components.TableComponent(prepareStudentsForTable(students, class, router))
+	</div>
 }
 
 func studentToRow(student *models.Student, class *models.Class, router *echo.Echo) components.Row {

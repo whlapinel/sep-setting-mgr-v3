@@ -13,6 +13,10 @@ import (
 const TimeFormat string = "Mon Jan 2"
 
 templ CalendarComponent(date time.Time, assignmentsMap models.AssignmentsByDate, rooms models.Rooms, admin bool, r *echo.Echo) {
+	<div
+		id="up-nav"
+		hx-swap-oob="true"
+	></div>
 	<div class="flex flex-col items-center text-center">
 		<h1>Calendar</h1>
 		@WeekComponent(getThisMonday(date), assignmentsMap, rooms, admin, r)
@@ -108,54 +112,97 @@ func grayedOut(assignments models.Assignments) bool {
 var tracker map[int]bool
 
 templ DayComponent(date time.Time, blocks models.AssignmentsByBlock, block int, rooms models.Rooms, room *models.Room, admin bool, r *echo.Echo) {
+	<div
+		id="up-nav"
+		hx-swap-oob="true"
+	>
+		@components.NewButton("Back to Calendar", templ.Attributes{
+			"hx-get":      r.Reverse(common.AdminCalendar.String(), date.Format("2006-01-02")),
+			"hx-target":   "#details",
+			"hx-push-url": "true",
+		}).Templify()
+	</div>
 	<div class="flex flex-col gap-2 items-center">
 		<div class="flex flex-row gap-1 justify-center">
 			for i:=0; i<4; i++ {
 				if _, ok := blocks[i+1]; ok {
-					<button
-						if admin {
-							hx-get={ r.Reverse(common.AdminCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), i+1) }
-						} else {
-							hx-get={ r.Reverse(common.DBCalDetailsWithoutRoomID.String(), date.Format("2006-01-02"), i+1) }
-						}
-						hx-target="#details"
-						hx-trigger="optionSelected"
-						hx-push-url="true"
-						if i+1 == block {
-							selected
-						}
-					>{ strconv.Itoa(i+1) }</button>
+					if admin {
+						@components.NewButton(strconv.Itoa(i+1), templ.Attributes{
+							"hx-get":      r.Reverse(common.AdminCalendarDetails.String(), date.Format("2006-01-02"), i+1, room.ID),
+							"hx-target":   "#details",
+							"hx-push-url": "true",
+						}).SetActive(i+1 == block).Templify()
+					} else {
+						@components.NewButton(strconv.Itoa(i+1), templ.Attributes{
+							"hx-get":      r.Reverse(common.DBCalendarDetails.String(), date.Format("2006-01-02"), i+1, room.ID),
+							"hx-target":   "#details",
+							"hx-push-url": "true",
+						}).SetActive(i+1 == block).Templify()
+					}
 				} else {
-					<button
-						class="cursor-not-allowed"
-						disabled
-					>{ strconv.Itoa(i+1) }</button>
+					@components.NewButton(strconv.Itoa(i+1), templ.Attributes{
+						"hx-get":      r.Reverse(common.AdminCalendarDetails.String(), date.Format("2006-01-02"), i+1, room.ID),
+						"hx-target":   "#details",
+						"hx-push-url": "true",
+					}).SetAttr("disabled", "true").Templify()
 				}
 			}
 		</div>
-		@BlockComponent(date, block, rooms, room, blocks[block], admin, r)
+		@NewBlockComponent(date, block, rooms, room, blocks[block], admin, r).Templify()
 	</div>
 }
 
-templ BlockComponent(date time.Time, block int, rooms models.Rooms, selectedRoom *models.Room, assignments models.AssignmentsByRoom, admin bool, r *echo.Echo) {
-	<div class="flex flex-row gap-1 justify-center">
-		for _, room := range rooms.SortByRoomPriority() {
+type BlockComponentStruct struct {
+	date         time.Time
+	block        int
+	rooms        models.Rooms
+	selectedRoom *models.Room
+	assignments  models.AssignmentsByRoom
+	admin        bool
+	router       *echo.Echo
+}
+
+func NewBlockComponent(date time.Time, block int, rooms models.Rooms, selectedRoom *models.Room, assignments models.AssignmentsByRoom, admin bool, r *echo.Echo) *BlockComponentStruct {
+	b := &BlockComponentStruct{
+		date:         date,
+		block:        block,
+		rooms:        rooms,
+		selectedRoom: selectedRoom,
+		assignments:  assignments,
+		admin:        admin,
+		router:       r,
+	}
+	if selectedRoom != nil {
+		b.selectedRoom = selectedRoom
+	} else {
+		for _, room := range rooms {
 			if _, ok := assignments[room.ID]; ok {
-				<button
-					hx-get={ r.Reverse(common.AdminCalendarDetails.String(), date.Format("2006-01-02"), block, room.ID) }
-					hx-target="#details"
-					hx-push-url="true"
-					if selectedRoom != nil && room.ID == selectedRoom.ID {
-						class="bg-fuchsia-700 text-white"
-					} else {
-						class="bg-white text-fuchsia-700"
-					}
-				>{ room.Number }</button>
+				b.selectedRoom = room
+				break
+			}
+		}
+	}
+	return b
+}
+
+func (b *BlockComponentStruct) Templify() templ.Component {
+	return BlockComponent(b)
+}
+
+templ BlockComponent(b *BlockComponentStruct) {
+	<div class="flex flex-row gap-1 justify-center">
+		for _, room := range b.rooms.SortByRoomPriority() {
+			if _, ok := b.assignments[room.ID]; ok {
+				@components.NewButton(room.Number, templ.Attributes{
+					"hx-get":      b.router.Reverse(common.AdminCalendarDetails.String(), b.date.Format("2006-01-02"), b.block, room.ID),
+					"hx-target":   "#details",
+					"hx-push-url": "true",
+				}).SetActive(room == b.selectedRoom).Templify()
 			}
 		}
 	</div>
-	if selectedRoom != nil {
-		@RoomComponent(date, block, selectedRoom, assignments[selectedRoom.ID], tracker, admin, r)
+	if b.selectedRoom != nil {
+		@NewRoomComponent(b.date, b.block, b.selectedRoom, b.assignments[b.selectedRoom.ID], b.admin, b.router).Templify()
 	} else {
 		<p>Please select a room</p>
 	}
@@ -168,25 +215,50 @@ func determineWarning(roomID int, tracker map[int]bool) bool {
 	return warning
 }
 
-templ RoomComponent(date time.Time, block int, room *models.Room, assignments models.Assignments, tracker map[int]bool, admin bool, r *echo.Echo) {
-	if room.ID == -1 {
+type RoomComponentStruct struct {
+	date        time.Time
+	block       int
+	room        *models.Room
+	assignments models.Assignments
+	tracker     map[int]bool
+	admin       bool
+	router      *echo.Echo
+}
+
+func NewRoomComponent(date time.Time, block int, room *models.Room, assignments models.Assignments, admin bool, r *echo.Echo) *RoomComponentStruct {
+	rc := &RoomComponentStruct{
+		date:        date,
+		block:       block,
+		room:        room,
+		assignments: assignments,
+		admin:       admin,
+		router:      r,
+	}
+	rc.tracker = createOverBookedTracker(assignments)
+	return rc
+}
+
+func (r *RoomComponentStruct) Templify() templ.Component {
+	return RoomComponent(r)
+}
+
+templ RoomComponent(r *RoomComponentStruct) {
+	if r.room.ID == -1 && r.admin {
 		<tr>
-			<button
-				hx-get={ r.Reverse(common.AutoAssign.String(), date.Format("2006-01-02"), block) }
-				hx-target="#details"
-			>
-				Auto-Assign
-			</button>
+			@components.NewButton("Auto-Assign", templ.Attributes{
+				"hx-get":    r.router.Reverse(common.AutoAssign.String(), r.date.Format("2006-01-02"), r.block),
+				"hx-target": "#details",
+			}).Templify()
 		</tr>
 	}
-	if len(assignments) == 0 {
+	if len(r.assignments) == 0 {
 		<tr>
 			@components.TableCell("No students", false)
 		</tr>
 	} else {
 		@components.TableWrapperComponent(components.TableData{
-			Title: date.Format(TimeFormat),
-			ID:    "day-details-" + date.Format(TimeFormat),
+			Title: r.date.Format(TimeFormat),
+			ID:    "day-details-" + r.date.Format(TimeFormat),
 		}) {
 			@components.TableHeaderComponent([]string{
 				"First",
@@ -196,15 +268,15 @@ templ RoomComponent(date time.Time, block int, room *models.Room, assignments mo
 			},
 			) {
 				<tr>
-					@components.SubHeader("Block "+strconv.Itoa(block), "large", 5, false, room.ID == -1, false)
+					@components.SubHeader("Block "+strconv.Itoa(r.block), "large", 5, false, r.room.ID == -1, false)
 				</tr>
 				<tr>
-					@components.SubHeader(room.Number, "large", 5, createOverBookedTracker(assignments)[room.ID], grayedOut(assignments), greenBackground(room.ID, true))
+					@components.SubHeader(r.room.Number, "large", 5, createOverBookedTracker(r.assignments)[r.room.ID], grayedOut(r.assignments), greenBackground(r.room.ID, true))
 				</tr>
 			}
 			<tbody class={ components.TableBodyClass }>
-				for _, assignment := range assignments {
-					if admin {
+				for _, assignment := range r.assignments {
+					if r.admin {
 						@components.TableRowComponent(components.Row{
 							ID:   assignment.ID,
 							Data: []string{assignment.Student.FirstName, assignment.Student.LastName, assignment.TestEvent.TestName, strconv.FormatBool(assignment.Student.OneOnOne)},
@@ -212,19 +284,19 @@ templ RoomComponent(date time.Time, block int, room *models.Room, assignments mo
 								{
 									Text: "Assign",
 									Attr: templ.Attributes{
-										"hx-get":      r.Reverse(string(common.ShowAssignRoomForm), assignment.ID),
+										"hx-get":      r.router.Reverse(string(common.ShowAssignRoomForm), assignment.ID),
 										"hx-target":   "#modal",
 										"hx-push-url": "true",
 									},
 								},
 							},
-							Warning: determineWarning(room.ID, tracker),
+							Warning: determineWarning(r.room.ID, tracker),
 						})
 					} else {
 						@components.TableRowComponent(components.Row{
 							ID:      assignment.ID,
 							Data:    []string{assignment.Student.FirstName, assignment.Student.LastName, assignment.TestEvent.TestName, strconv.FormatBool(assignment.Student.OneOnOne)},
-							Warning: determineWarning(room.ID, tracker),
+							Warning: determineWarning(r.room.ID, tracker),
 						})
 					}
 				}

@@ -27,3 +27,38 @@ func (i NavItem) PushURL() string {
 		return "true"
 	}
 }
+
+type hxAttr struct {
+	Key HxAttrKey
+	Val HxAttrVal
+}
+
+func NewHxAttr(k HxAttrKey, v HxAttrVal) hxAttr {
+	return hxAttr{Key: k}
+}
+
+type HxAttrKey string
+type HxAttrVal string
+
+func NewURL(url string) HxAttrVal {
+	return HxAttrVal(url)
+}
+
+const (
+	HxGet     HxAttrKey = "hx-get"
+	HxPost    HxAttrKey = "hx-post"
+	HxPut     HxAttrKey = "hx-put"
+	HxDelete  HxAttrKey = "hx-delete"
+	HxPatch   HxAttrKey = "hx-patch"
+	HxTrigger HxAttrKey = "hx-trigger"
+	HxSwap    HxAttrKey = "hx-swap"
+	HxPushURL HxAttrKey = "hx-push-url"
+)
+
+const (
+	SwapNone     HxAttrVal = ""
+	SwapOuter    HxAttrVal = "outerHTML"
+	SwapInner    HxAttrVal = "innerHTML"
+	PushURLTrue  HxAttrVal = "true"
+	PushURLFalse HxAttrVal = "false"
+)

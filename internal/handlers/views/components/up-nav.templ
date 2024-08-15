@@ -1,0 +1,36 @@
+package components
+
+import "sep_setting_mgr/internal/handlers/views/components/componentscommon"
+
+type upNav struct {
+	text    string
+	enabled bool
+	url     string
+	target  string
+}
+
+func UpNav(text string, enabled bool, url string, target string) componentscommon.Templifier {
+	return &upNav{
+		text:    text,
+		enabled: enabled,
+		url:     url,
+		target:  target,
+	}
+}
+
+func (u *upNav) Templify() templ.Component {
+	return upNavComponent(u)
+}
+
+templ upNavComponent(u *upNav) {
+	<div
+		id="up-nav"
+		hx-swap-oob="true"
+	>
+		@NewButton("Back to classes", templ.Attributes{
+			"hx-get":      u.url,
+			"hx-target":   u.target,
+			"hx-push-url": "true",
+		}).Templify()
+	</div>
+}

@@ -19,26 +19,28 @@ type ApplicationsPageProps struct {
 
 templ ApplicationsPage(p ApplicationsPageProps) {
 	@layouts.PageLayout("Applications", nil) {
-		<h2 class="text-lg">Teacher Role</h2>
-		if p.HasTeacherRole {
-			<p class="text-sm">You are already a teacher.</p>
-		} else {
-			if p.AppliedForTeacher {
-				<p class="text-sm">Your application for the teacher role is pending.</p>
+		<div class="flex flex-col gap-2">
+			<h2 class="text-lg">Teacher Role</h2>
+			if p.HasTeacherRole {
+				<p class="text-sm">You are already a teacher.</p>
 			} else {
-				@ApplyButton(p.R, p.UserID, "teacher")
+				if p.AppliedForTeacher {
+					<p class="text-sm">Your application for the teacher role is pending.</p>
+				} else {
+					@ApplyButton(p.R, p.UserID, "teacher")
+				}
 			}
-		}
-		<h2 class="text-lg">Admin Role</h2>
-		if p.HasAdminRole {
-			<p class="text-sm">You are already an admin.</p>
-		} else {
-			if p.AppliedForAdmin {
-				<p class="text-sm">Your application for the admin role is pending.</p>
+			<h2 class="text-lg">Admin Role</h2>
+			if p.HasAdminRole {
+				<p class="text-sm">You are already an admin.</p>
 			} else {
-				@ApplyButton(p.R, p.UserID, "admin")
+				if p.AppliedForAdmin {
+					<p class="text-sm">Your application for the admin role is pending.</p>
+				} else {
+					@ApplyButton(p.R, p.UserID, "admin")
+				}
 			}
-		}
+		</div>
 	}
 }
 

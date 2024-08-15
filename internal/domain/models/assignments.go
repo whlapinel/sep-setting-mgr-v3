@@ -190,3 +190,19 @@ func (a Assignments) GetRoomList() []*Room {
 	}
 	return rooms
 }
+
+// SortByOneOnOne sorts the assignments by one-on-one students first.
+func (a Assignments) SortByOneOnOne() Assignments {
+	var sorted Assignments
+	for _, assignment := range a {
+		if assignment.Student.OneOnOne {
+			sorted = append(sorted, assignment)
+		}
+	}
+	for _, assignment := range a {
+		if !assignment.Student.OneOnOne {
+			sorted = append(sorted, assignment)
+		}
+	}
+	return sorted
+}

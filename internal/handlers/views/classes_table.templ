@@ -41,6 +41,10 @@ func prepareClassesForTable(classes []*models.Class, router *echo.Echo) componen
 }
 
 templ ClassesTable(classes []*models.Class, router *echo.Echo) {
+	<div
+		id="up-nav"
+		hx-swap-oob="true"
+	></div>
 	@components.TableComponent(prepareClassesForTable(classes, router))
 }
 

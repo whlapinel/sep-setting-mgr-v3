@@ -176,7 +176,7 @@ func (s *AssignmentsService) AutoAssign(date time.Time, block int) (models.Assig
 		log.Println("Error getting rooms")
 		return nil, err
 	}
-	for _, a := range assignments {
+	for _, a := range assignments.SortByOneOnOne() {
 		err := s.autoAssign(a, date, rooms)
 		if err != nil {
 			log.Println("Error auto assigning")
