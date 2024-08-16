@@ -34,8 +34,11 @@ func main() {
 	}
 	// scripts, styles and images are embedded in the binary
 	assets.RegisterStatic(e)
-	host := os.Getenv("HOST")
-	e.Logger.Fatal(e.Start(host + ":1323"))
+	if os.Getenv("ENV") == "development" {
+		e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	} else {
+		e.Logger.Fatal(e.StartAutoTLS(os.Getenv("HOST") + ":" + os.Getenv("PORT")))
+	}
 }
 
 func LoadEnvironment() {
