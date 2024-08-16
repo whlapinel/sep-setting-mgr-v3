@@ -14,6 +14,16 @@ func main() {
 	demo := false
 	clearDB := false
 	LoadEnvironment()
+	if os.Getenv("DEMO") == "true" {
+		demo = true
+	}
+	if os.Getenv("CLEAR_DB") == "true" {
+		clearDB = true
+	}
+	log.Println("Environment: " + os.Getenv("ENV"))
+	log.Println("Host: " + os.Getenv("HOST"))
+
+	log.Println("Starting server on port " + os.Getenv("PORT") + " in " + os.Getenv("ENV") + " mode")
 	e := echo.New()
 	e.Use(logger)
 	db, err := repositories.InitializeDB(false)
