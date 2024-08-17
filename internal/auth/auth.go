@@ -116,12 +116,12 @@ func Authorization(userRepo models.UserRepository, role models.Role) echo.Middle
 			} else if user == nil {
 				ok = false
 				reason = UserNotFound
-			} else if role == "admin" {
+			} else if role == models.AdminRole {
 				if !user.Admin {
 					ok = false
 					reason = NoAdminRole
 				}
-			} else if role == "teacher" {
+			} else if role == models.TeacherRole {
 				if !user.Teacher {
 					ok = false
 					reason = NoTeacherRole

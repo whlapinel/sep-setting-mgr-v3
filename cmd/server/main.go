@@ -8,6 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
@@ -47,6 +48,7 @@ func main() {
 	if os.Getenv("ENV") == "development" {
 		e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 	} else {
+		e.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
 		e.Logger.Fatal(e.StartAutoTLS(os.Getenv("HOST") + ":" + os.Getenv("PORT")))
 	}
 }

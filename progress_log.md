@@ -1,5 +1,11 @@
 # PROGRESS LOG
 
+## 8/17
+
+- Implemented auto-assign functionality, began deployment to single Digital Ocean droplet. Hit a snag with implementing TLS.
+- I think I'm going to have to set this project aside for a few months, as both work and school are starting up again and they will both keep me very busy (new job teaching Python, plus I'm taking 3 classes this semester including AI and ML and also have to submit my MS final project report since I'm graduating.) I was hoping to have the demo ready but the timeline just was a bit too tight. I'm going to be immersed in the world of Python for the next few months and probably can't afford to work on this project until mid to late December.
+- Note to self since it will be a while before I work on this again, and I will probably have forgotten everything: latest status is that I deployed but had an issue with running server on droplet. Was successful with getting TLS but I was hitting the rate limits on requesting certificates from Let's Encrypt (via echo's StartAutoTLS) because it was requesting a new cert every time I restarted the server. So I then implemented echo's cert caching, but this resulted in nothing being returned to the browser. I'm not sure if the caching is properly configured, and I'm not sure if I hit the limits before I implemented caching or after. So I really don't know what the problem is. The browser was giving different responses including "Network change detected" response. I didn't have much time to troubleshoot as I did most of this during training breaks at work, so it's only questions at this point, not much information to give. But the website will not load, server doesn't seem to log anything unless rate limits are hit.
+
 ## 8/8
 
 - Keep neglecting to update this. Done a lot, been hassling with docker compose and finally got it working alright. Lots of other things done over the last week but I can't remember what.
