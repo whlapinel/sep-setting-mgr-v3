@@ -4,11 +4,7 @@
 
 ![Screen Demo](./sep-setting-demo.gif)
 
-# Table of Contents {#table-of-contents}
-
-[Table of Contents](#table-of-contents)
-
-[Separate Setting Manager: A Full Stack Web Application](#separate-setting-manager:-a-full-stack-web-application)
+## Table of Contents
 
 [Project Summary](#project-summary)
 
@@ -18,7 +14,7 @@
 
 [The Stack](#the-stack)
 
-[Components of the Project:](#components-of-the-project:)
+[Components of the Project:](#components-of-the-project)
 
 [Domain](#domain)
 
@@ -26,7 +22,7 @@
 
 [Services](#services)
 
-[Handlers:](#handlers:)
+[Handlers:](#handlers)
 
 [Reflection](#reflection)
 
@@ -36,7 +32,7 @@
 
 [Barriers and Challenges](#barriers-and-challenges)
 
-# Separate Setting Manager: A Full Stack Web Application {#separate-setting-manager:-a-full-stack-web-application}
+Separate Setting Manager: A Full Stack Web Application
 
 Submitted November 2024
 
@@ -48,7 +44,7 @@ Masters in Information Technology program
 
 Author: Will Lapinel
 
-## Project Summary {#project-summary}
+## Project Summary
 
 Separate Setting Manager is a prototype of a full-stack web application that provides a room reservation service for teachers with students who have a “small group setting” test accommodation in their Individual Education Plan (IEP).  I had built a previous version of this project using NextJS in December 2023 and January 2024\.  I began this version of the project in the summer 2024, and while my work slowed in late August due to my beginning three challenging classes in the Fall semester, fortunately it was largely complete by that time. This was part of an ongoing personal project, not part of any class assignment, internship or work-related assignment.  I chose this project for several reasons:
 
@@ -60,13 +56,13 @@ Separate Setting Manager is a prototype of a full-stack web application that pro
 
 * to assess the guiding principles for web development advocated in the book Hypermedia Systems and compare the experience of developing a Hypermedia System to that of a Single-Page Application.
 
-### Problem Statement {#problem-statement}
+### Problem Statement
 
 I am employed as a Python teacher at Phillip O. Berry Academy of Technology, part of Charlotte-Mecklenburg Schools (CMS).  Many students in CMS, including some of my own, have special testing accommodations that teachers are required to provide for any formal exam.  Every course typically has 3 to 4 unit exams each quarter in addition to midterm and final exams, and every teacher typically has several, perhaps 1 to 2 per section.  This amounts to a significant number of accommodations being provided each week.  Some schools are very short on space, and teachers often experience significant challenges in finding both a proctor and a room for these students on test day.  Some schools have designated rooms and an effective schoolwide registration system, but in such cases, forms must be completed for each event, and an administrator must be assigned to manually open the form and place students in a spreadsheet representing the schedule.  Other schools leave it to the teachers to solve these logistical challenges.
 
 This project aims to remove some of the burden associated with this process.  It is a website with a graphical user interface allowing teachers to directly register their classes, add students with the small group setting accommodation, and create test events.  Creating a test event for a class will automatically assign students in the class to a room based on current room availability.  There are two main user groups: teachers and administrators.  Teachers manage their own students and must manually enter all data; there is currently no interfacing with Canvas or Powerschool or any other external system.  However, this only needs to be completed once per section, and most teachers have only a few students with this accommodation, so the burden is minimal, especially when compared with existing processes.  To minimize the potential for unauthorized access and disclosure of sensitive records, only CMS google accounts may be used for login, and administrators must manually approve applications for the teacher role.  
 
-## The Project {#the-project}
+## The Project
 
 This application involves the use of several technologies:
 
@@ -88,7 +84,7 @@ This application involves the use of several technologies:
 
 The code repository is located here: [https://github.com/whlapinel/sep-setting-mgr-v3](https://github.com/whlapinel/sep-setting-mgr-v3) and the project demo is served from a single Digital Ocean droplet at [https://separate-setting-manager.online](https://separate-setting-manager.online).  It is currently offline at the time of this writing but can be brought online upon request.  A droplet is a Virtual Machine provided by Digital Ocean and usually runs a distribution of Linux.  The particular one chosen for this demo has minimal memory and storage in order to reduce costs.  It is an Ubuntu distribution of Linux and contains both the web server and the MySQL database.  The deployment process consists of building the binary and pushing it to “releases” on Github, then using SSH into the droplet, downloading the Go-compiled binary from Github, and executing the binary to run the server.  All environment variables, including secrets, are copy-pasted into a .env file on the server.  MySQL is installed on the droplet as well.  Initially, Docker containers were used for deployment; however this came to be seen as unnecessary given the ease of the aforementioned process.
 
-### The Stack {#the-stack}
+### The Stack
 
 The particular suite of technologies chosen for this project has been called the GoTTH stack for short; which stands for Go, Templ, Tailwind, and HTMX.  The last element is notable because it indicates a very different approach to web development.  HTMX takes the relative simplicity and ease of early 2000s web development, often associated by veteran developers with server-side-rendered PHP, and adds the “reactivity” associated with modern web development, where clicking a button for example can update the user interface without doing a full-page reload.  Although it is a Javascript library, its authors’ stated goal is to extend the power of HTML, and to allow the developer to write few to no lines of Javascript.  For example, one can add an attribute like \`hx-get=\<url\>\`within an HTML element, and clicking such a button triggers an “AJAX” (asynchronous Javascript) request to the server, which responds with HTML, rather than data, which would typically be serialized in JSON, and then processed using Javascript to render HTML on the client.  HTMX swaps in the new HTML sent from the server according to the additional element attribute hx-swap, for example hx-swap=”outerHtml” is the default and simply replaces the element with the HTML sent in the response.  In this way, a large and often frustrating part of full stack applications can be removed – namely, client-side state management.  This pattern can make for a drastic reduction in the complexity of modern web development without much loss in functionality or aesthetic, and has thus become very popular in recent years, especially among backend developers of other languages, evidenced by HTMX high ranking in a recent Javascript survey.
 
@@ -96,11 +92,11 @@ SPA libraries have become increasingly tied to frameworks such as NextJS for Rea
 
 In this context, HTMX is advocated as an antidote to “Javascript fatigue” associated with Single-Page-Application (SPA) libraries and for the additional complexity that using these libraries can bring, and it provides a way to develop server-side-rendered, reactive applications in other languages such as Python, Java, or Go.  While it does not provide all of the capabilities of React or Vue, or the frameworks they are tied to, it suits well for a vast number of common full stack application requirements.
 
-#### Components of the Project: {#components-of-the-project:}
+#### Components of the Project
 
 The project is divided into several directories in an attempt to conform with common industry practices.  From the root directory, ‘cmd’ houses ‘package main’ and main() which is the entry point for the application.  In main(), secrets are loaded from .env, the database is initialized, repositories are instantiated and provided the database connection, then services are instantiated and provided the repositories, handlers are mounted and provided with the necessary services.  There is generally one domain model, one repository, and one service for each entity.  And the dependency hierarchy flows from the domain to the repository, to the service, to the route handlers.  Dependency injection is used at each stage in an effort to keep the application modular and loosely coupled.
 
-##### Domain {#domain}
+##### Domain
 
 In the Domain directory, within “models” I define the core logic of the application.  The structs are as follows:
 
@@ -120,17 +116,17 @@ In the Domain directory, within “models” I define the core logic of the appl
 
 The domain directory also includes a services package, where “domain services” are housed.  Domain services are core logic operations that span across multiple domain entities.  There is one domain service called “AssignmentService” which includes such methods as AutoAssign (perhaps the most complex part of the application) which handles automatically assigning students to designated rooms based on factors such as room priority (the order in which rooms are to be filled) and whether the student to be assigned has a 1:1 accommodation or the basic 12 or less accommodation.
 
-##### Repositories {#repositories}
+##### Repositories
 
 Each struct in the domain typically has a corresponding repository struct which satisfies the repository interface and has a private field for the database connection.  For example, for the Student struct, there is a StudentRepository interface with methods such as Store() and Delete(), and there is a studentRepo struct which implements these methods.  In Go, interfaces are satisfied by structs that have matching method signatures; there is no need to explicitly identify that a struct implements an interface.
 
  There is no use of an Object Relational Mapper (ORM) in this project.  Instead, the Go standard library’s database/sql is used to write SQL queries and definition language.
 
-##### Services {#services}
+##### Services
 
 In this project, services are structs corresponding to each model in the domain, with methods that are called by the respective handlers that wrap domain methods as well as  repository methods.  This is effectively the place where activities are coordinated across the application so that handlers call services only and need not concern themselves with much beyond the UI level.  For example, there is a StudentsService interface, which is implemented by students.service (in this layer I created a separate package for each service).  The fields in each service struct include repository interfaces that are required for their methods; for example:
 
-##### Handlers: {#handlers:}
+##### Handlers
 
 The final and outermost layer is the handlers layer, where the http route handlers accept incoming requests and parse the parameters in order to call service methods.  The handler is provided a single instance of each of the services it requires; for example the students handler is given a StudentsService interface upon construction, following the same dependency injection pattern used in the service layer.
 
@@ -138,15 +134,15 @@ This application uses the popular Go package Echo to write the route handlers.  
 
  Tailwind is another library used in this application.  This is a very popular CSS utility class library allowing developers to easily put styles directly in the elements rather than having to jump back and forth between CSS and html / template files.  Lastly, Templ is a very important component of this application.  This is a relatively new templating language in Go, still working out many kinks (for example, I personally alerted the authors to an issue in the LSP when using VS Code).  This powerful package facilitates building dynamic components in Go which render very to HTML, either to be sent in a server response or written to a file for static rendering.  It feels like React but it’s Go.
 
-## Reflection {#reflection}
+## Reflection
 
-### Knowledge and Skills Acquired {#knowledge-and-skills-acquired}
+### Knowledge and Skills Acquired
 
 One of the more difficult aspects of this project was consistently applying the design patterns I had committed to using.  Partly this was due to my having no exposure to such patterns, and needing to learn them by studying existing projects.  I had to all but start over several times when I realized I was doing something wrong.  These patterns include dependency injection, the use of interfaces in facilitating decoupled, modular design, as well as broader principles encompassed in domain-driven design (DDD) and Service-Oriented Architecture (SOA).  Although I am not entirely certain that I fully understand these ideas yet, I have found a lot of value in the idea that one should prioritize writing core business logic first, with implementation layers such as handlers depending on this core layer and not the other way around. This project made me much more aware of which parts were depending on which, and the need to be consistent in the general flow of dependency within the overall project.
 
 Knowledge and skills gained: this project made me much more proficient in most of the technologies involved. Go, Templ, and HTMX were very new to me, while I'd had previous experience with MySQL and Tailwind. Other first-time usages include Sign-in With Google and implementation of TLS, since my NextJS implementation used Clerk, an authentication service.
 
-### Related Courses {#related-courses}
+### Related Courses
 
 \- Courses that were important in building the skills required for this project include:
 
@@ -160,7 +156,7 @@ Knowledge and skills gained: this project made me much more proficient in most o
 
   \- ITIS 6177 (systems integration): In this course I deepened my knowledge in web technologies and the many nuances of tying together different systems and what factors to consider when choosing a given technology or platform.
 
-### Barriers and Challenges {#barriers-and-challenges}
+### Barriers and Challenges
 
 When I decided to learn HTMX and Go, I began by looking on Github for demo projects that I could explore and play with.  I came upon one that had a lot of additional design complexity that took me a while to understand and led me to reading about things like Dependency Injection and other design patterns, as well as even broader ideas such as Domain Driven Design and Service Oriented Architecture.  I have a greater appreciation now for the value of modularity and understand better how applications can be thought of as layers, as well as how to keep my software decoupled so that things can be changed more easily as needed.  I have also gained an appreciation for keeping an open-mind, being on a constant lookout for better ways of doing things, and reading about packages I’m using to discover features that might save time and energy, as well as the “foot guns” that might give me headaches.
 
