@@ -1,5 +1,22 @@
 # PROGRESS LOG
 
+## 10/8
+
+- Well I'll be damned. Today it worked. I logged into <https://separate-setting-manager.online> using my work account, and the whole damn thing works.  And it's so FAST that I have a really hard time believing it's not running locally! I'm talking data mutation and server-side rendering is FAST FAST FAST!
+- Previously I think the issue was just that I wasn't caching the certs. I am not sure what was happening yesterday, but today it looks like everything is good!  Best news possible, and very welcome as I am really dragging this morning!
+- Let's start automating the deployment pipeline with GitHub actions so that when I push, the binary is rebuilt and then pulled to the server
+
+## 10/7
+
+- I feel like the guy from Memento, trying to figure out what I've done so I can see what I need to do.
+- Briefly poked around in this project to see if I could refresh my memory. I'd like to get the deployment complete before I submit my final project report so that the graders can view it. I've forgotten almost everything so I'm grateful to my past self for the information (albeit not enough) that I did take the time to provide on 8/17 regarding the status and details (such as it is) of the TLS issues.
+- Ran `task run-dev` and it worked, loading demo data. Nice! Haven't tried the docker commands.
+- Looked at the production server and it looks like it runs from a single binary file in production mode. I executed the file and it started up the server with no errors. However,
+  - when trying to access the server: <https://separate-setting-manager.online> I got a bunch of TLS errors which I've provided separately in error_log.txt.
+  - Not significant but interesting: While I still had the server up, I also got a bunch of GET requests from potentially malicious bots, probably a normal thing but I've never seen that before personally (not saying much).
+- I am not quite sure what command I used to build the production server, it wasn't immediately apparent from viewing taskfile.yaml.
+- There are no .env files in the droplet's directory where the binary is located, so I don't think it's reading variables using Godotenv(). I must have passed in the variables when I built the binary in the first place, but task build doesn't pass in any env so I must not have used task to build the file. Indeed `task build` gives me a binary that runs the server in development mode. Whatever command I used, it seems I'll have to figure out again. I am thinking that I built the binary and uploaded to Github and then downloaded from Github. I also installed mariadb on the droplet.
+
 ## 8/17
 
 - Implemented auto-assign functionality, began deployment to single Digital Ocean droplet. Hit a snag with implementing TLS.
@@ -118,4 +135,3 @@
 ## 6/28
 
 After completing summer 1st term I resumed working on this project in earnest. I'm having an issue with the templ-vscode extension that's really bugging me. I went to the Gopher slack and posted a question about it in the #templ channel, and got a nice response from the developer "a-h" himself, who indicated that this issue has been identified and is being addressed.  Things are continuing to work alright, aside from the annoying message that keeps popping up "Request textDocument/codeAction failed." I am not sure if there is any impact to the development process, and the code runs correctly.
-
